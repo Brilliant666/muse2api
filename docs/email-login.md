@@ -18,6 +18,7 @@
 
 - 状态依次为 `QUEUED`、`STARTING`、`WAITING_FOR_CODE`、`VERIFYING`、`SAVING`，最后为 `AUTHENTICATED` 或明确失败状态。
 - 验证码等待上限 600 秒。错误验证码最多尝试 3 次；不重新发送验证码。
+- 600 秒是本地等待上限，不延长官网验证码有效期；收到后请尽快输入本次最新验证码。
 - 验证码只在当前输入框及进程内存使用，提交前清空输入框，不写入 localStorage、队列 JSON、账号 JSON 或日志；页面轮询保留尚未提交的输入。
 - `FAILED`、`BLOCKED`、`UNKNOWN`、`CANCELLED`、`EXPIRED`、`INTERRUPTED` 均不会自动重发。重启将未完成任务标为 `INTERRUPTED`，不继续旧验证码或登录提交。检查原任务后，由管理员明确创建新任务。
 - `SAVING` 已进入账号写入边界，不能取消；其他运行阶段取消后，迟到的登录结果不得入池。
@@ -57,3 +58,7 @@ python tests/test_email_login_browser.py
 `test_email_login_app.py` 包含 API 鉴权/参数和脱敏、无浏览器能力降级、保留 Cookie 导入、同身份去重与 CAS、冲突/繁忙/隔离保护、真实 Manager 配 fake driver 的串行入池、启动不创建浏览器，以及离线 Node DOM 的文本注入防护、轮询保留输入、提交即清空测试。Node 缺失时 DOM 测试明确跳过。
 
 这些受控验证不代表真实 Muse 发码、实号认证或生成验收。实际登录必须单独记录运行环境、数量、结果和未覆盖项；既有协议验收历史证据不因此改变。
+
+## 实号登录记录
+
+2026-11-03 已完成 9 个不同上游身份的 Windows 邮箱验证码登录和独立 Store 入库，另 1 个按用户要求跳过，新增生成 0。首次实测的 UNKNOWN 与取消记录均保留，未改写为成功。详见 [登录验收报告](email-login-acceptance.md) 和 [机器结果](email-login-results.json)。这不构成 Linux 多账号生成或并发验收通过。

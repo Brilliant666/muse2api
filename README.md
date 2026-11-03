@@ -135,6 +135,12 @@
 > **Manual extension upgrade required:** extension 1.0.2+ / userscript 1.1.2+. A server update does not upgrade unpacked extensions. Replace files in the original folder and click Reload, separately for every browser profile.
 
 
+### 邮箱验证码批量登录（可选）
+
+在管理页「账号池」的「邮箱验证码批量登录」中，每行填写一个已获授权的 Muse 邮箱，最多 10 个待完成任务，逐个发码后由用户手动输入验证码。验证码不落盘，成功仅表示认证入池，生成能力需单独验证。详见 [邮箱登录说明](docs/email-login.md)。
+
+此功能的专用 Chrome/Chromium 只负责登录，不参与协议生成；协议后端仍可直接使用既有 Cookie。默认协议 Docker 镜像未安装 Chrome 时，登录助手显示不可用，Cookie 导入和协议 API 保留。本功能不代表已证明纯 HTTP OTP 登录或通过多账号负载验收。
+
 ### 方式 A：Chrome / Edge 扩展
 项目内置了专用 Chrome 导号扩展（目录位于 `extension/`），告别复杂的 F12 Cookie 提取：
 
