@@ -25,8 +25,7 @@ def check(root, home, observe):
 
     def account(prior=True, expiry=True):
         a = app.store.add_account({'hatch_sess': 'fixture'}, cookies_exp={'hatch_vml': 1900012345} if expiry else {})
-        a.update(ok=prior, last_keepalive=1899999900, synced_at=1899999900)
-        return a
+        return app.store.update_account(a['id'], ok=prior, last_keepalive=1899999900, synced_at=1899999900)
 
     def response(code, body=None):
         def decode():
@@ -50,6 +49,7 @@ def check(root, home, observe):
             before = copy.deepcopy(a)
             with patch('requests.get', side_effect=reply if isinstance(reply, Exception) else None, return_value=reply) as get:
                 result = app._probe_account_sync(a['id'])
+            a = app.store.get_account(a['id'])
             expected_ok = True if name == 'assigned' else False if name == '401' else prior
             expect(a['ok'] is expected_ok, f'{name}: account state changed incorrectly')
             expect(result['ok'] is (name == 'assigned'), f'{name}: wrong probe result')
@@ -75,6 +75,7 @@ def check(root, home, observe):
                 app._renew_and_persist(a['id'], force=True)
             except app.MuseAuthError:
                 auth_error = True
+        a = app.store.get_account(a['id'])
         expect(auth_error is (name == '401'), name + ': pre-renew wrong exception')
         expect(a['ok'] is (name != '401'), name + ': pre-renew wrong account state')
         if name in ('403', '503'):
@@ -85,11 +86,13 @@ def check(root, home, observe):
         a = account(prior)
         before = copy.deepcopy(a)
         app.store.touch_keepalive(a['id'], None, 'fixture diagnostic')
+        a = app.store.get_account(a['id'])
         expect(a['ok'] is prior and all(a[k] == before[k] for k in protected), 'unknown touch changed state')
     a = account(expiry=False)
     before_expiry = a['expires_at']
     with patch('time.time', return_value=1900003600):
         app.store.touch_keepalive(a['id'], True)
+    a = app.store.get_account(a['id'])
     expect(a['expires_at'] == before_expiry, 'estimated expiry advanced without renewed cookie')
 
     for error in (app.MuseAuthError('fixture auth'), app.MuseGenerationError('fixture loading')):
@@ -97,6 +100,7 @@ def check(root, home, observe):
             a = account(prior)
             with patch.object(app.engine, 'start'), patch.object(app.engine, 'refresh', side_effect=error):
                 asyncio.run(app.test_account(a['id']))
+            a = app.store.get_account(a['id'])
             want = False if isinstance(error, app.MuseAuthError) else prior
             expect(a['ok'] is want, 'manual test misclassified account')
 

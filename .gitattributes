@@ -1,0 +1,4 @@
+# The dependency preparer verifies patch bytes; keep them stable on Windows.
+# Unified diff context lines intentionally include a single space.
+protocol-dependency/*.patch text eol=lf -whitespace
+protocol-dependency/manifest.json text eol=lf

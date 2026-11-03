@@ -1,5 +1,7 @@
 # MUSE2API
 
+> **Python 协议集成试用分支**：新增 `MUSE_BACKEND=protocol`，保留原 API、账号池和管理页。请先阅读 [协议后端运行说明](docs/python-protocol/README.md)、[已验证范围](docs/python-protocol/VALIDATION.md)和 [Codex 验收任务](docs/python-protocol/ACCEPTANCE.md)。本分支默认 Docker 使用协议后端，源码未配置时仍默认浏览器；下文的浏览器性能/续期描述不作为协议后端的实号验收结论。
+
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%2B-blue?logo=python" alt="Python Version" />
   <img src="https://img.shields.io/badge/FastAPI-0.115%2B-009688?logo=fastapi" alt="FastAPI" />

@@ -1,0 +1,33 @@
+{
+  "scope": "Final source, build, dependency patch and test file bytes prior to remote commit",
+  "base_commit": "1cd01682533dbf2c015fa879a8dc09534b50b4a3",
+  "sha256": {
+    ".dockerignore": "abff004312bdd122ce7c2364ccc039d7e3a5d04e458070979aba98444657ba2a",
+    ".gitattributes": "54e7396cacfdd56a383c974276d58ac33b12eb3c9007757db60deff1b1fb4562",
+    ".gitignore": "5c56bd807a65432e85f1c0c11dd0d7ce9398e0d9faceaf67ef8157a0f5055234",
+    "Dockerfile": "64dadad79d758d787221b08c5e0ca52b3c63ef204c10f464e08caf08ea310597",
+    "README.md": "520163ce2ecee80867e6cf9cf3131fd80949246be886a9ca7cb591643a798d1d",
+    "admin.html": "c63a3cab4ecaf82a9df82df82411005542b24978f2e8d1a00acd36209a5735b8",
+    "app.py": "0408228c6083a4e01036b88854ffc941f851e99889d73aac6e884fcd27c5d1ba",
+    "config.py": "4d6de2bb7479c4feec91787e5a51828793ba48bfe57338a883330f12dd3fd745",
+    "docker-compose.yml": "216836914d1aecb34488ea6c2704a270bd99d89c704696998f514b83ba098716",
+    "protocol-dependency/integration.patch": "2b31dc50b730b0870ab6e7099d7718e8ac43eebf6c61a9ed39eba6d63c7ebcf9",
+    "protocol-dependency/manifest.json": "1af7de07d0c759cae29dbca48b814d8813e43ad0e81670eb6149730be4d1234c",
+    "protocol_backend.py": "e756cd099a0e789d3e163dd37a5ad042cd4a5ac49d9fa9c88815973900572e94",
+    "store.py": "ac37f3cb1fac15c6b519c2950b16ef5abebfc9133a3a4d1c4deb9d0bbe267f39",
+    "tests/protocol/_paths.py": "6013cb400a41a083f81413f2905368e44e6a1800028d7f1b8e7e810706e5a0b1",
+    "tests/protocol/network_guard/sitecustomize.py": "c2b504146a529a4b59418d80ac289c0cc7347c3749ac869a6684f7abf527fddf",
+    "tests/protocol/test_adapter_integration.py": "aa7ac35426daced15d011469fc778f5bc30cb9c02e7059611dd487d439b8bed7",
+    "tests/protocol/test_admin_protocol.mjs": "2eab06d625f3ed4df5ca2ab225f6412cb9540475c7f302a55989ecb474e1c486",
+    "tests/protocol/test_app_contract.py": "582c00335ef72e30d4980d378ccfcc7f57bb746402c520d28cc3542e72ac0022",
+    "tests/protocol/test_composed_protocol.py": "ecd924e49c7b29fec4960967f0200d7a8211fd50bfc571960002b22bcedf6560",
+    "tests/protocol/test_protocol_regressions.py": "961f7e74cdf83688417b6dd4fd194dda9ff3b344e89a60f84b9a7652b256f8d8",
+    "tests/test_account_proxy_routing.py": "99c17fa8781977eaadb5a44b3437c78dd9789b144834be41314ae47026e59135",
+    "tests/test_keepalive_scheduling.py": "b9a9d2e3628d39a07738f46fd9b835e15d41571a21767d37450258e640d739aa",
+    "tests/test_session_health.py": "f99697ca5003d6469fe0408f9461cbb9ca5bc5f721d17bede51a229fc3ac1229",
+    "tools/init_test_env.py": "18ef9fc03182f36bd1b8254d96423fccef52792605be130e89078c087f00298f",
+    "tools/prepare_protocol.py": "14c0e38c838c4b343636a8558c59c4bc372d89dba69c26181abd6446d8f6059b",
+    "tools/protocol_smoke.py": "3659227e62bf2879012543d293efafbdee409b53b050f0343851fc8a38688646",
+    "tools/test_protocol.py": "23d9ac4bf64acf65a271dfcb21a8da3708270dbac0bf94d842da49174e4426fd"
+  }
+}

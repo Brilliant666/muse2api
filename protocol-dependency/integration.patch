@@ -1,0 +1,1474 @@
+diff --git a/muse2api/chat.py b/muse2api/chat.py
+index 686ddbb..203be5f 100644
+--- a/muse2api/chat.py
++++ b/muse2api/chat.py
+@@ -26,7 +26,12 @@ from typing import Any
+ from .approvals import POLICIES as APPROVAL_POLICIES
+ from .approvals import handle_pending
+ from .config import Settings
+-from .gateway import GatewayError, HatchConnection
++from .gateway import (
++    GatewayError,
++    HatchConnection,
++    ProtocolCancelledError,
++    ProtocolOperationError,
++)
+ from .media import MediaRef, extract_media
+ from .pool import AccountPool
+ from .protocol import ProtocolConfig
+@@ -44,6 +49,7 @@ DEFAULT_SESSION_KEY = "default"
+ # The upstream history can pause between assistant deltas; require a quiet
+ # window before declaring a reply complete, otherwise long turns truncate.
+ TEXT_SETTLE_SECONDS = 2.0
++MAX_MAIN_EVENTS = 1024
+ 
+ # Markers indicating upstream refused or failed to invoke media tools,
+ # allowing early return without waiting out the full media grace period.
+@@ -306,6 +312,58 @@ class ChatResult:
+     message_id: str
+     events: list[dict] = field(default_factory=list)
+     media: list[MediaRef] = field(default_factory=list)
++    session_id: str = ""
++
++
++def _lifecycle(payload: dict, *, assistant: bool = False) -> tuple[bool, bool]:
++    """Return explicit activity/completion; missing fields prove neither."""
++    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
++    status = str(payload.get("status") or payload.get("state") or "").lower()
++    if metadata.get("streaming") is True or payload.get("streaming") is True:
++        return True, False
++    if status in {"running", "streaming", "pending", "queued", "in_progress", "started", "executing"}:
++        return True, False
++    if status in {"completed", "done", "succeeded", "success", "failed", "error", "cancelled", "canceled"}:
++        return False, True
++    # Explicit false is an assistant-text boundary, not a whole tool/turn
++    # completion. Missing metadata remains unknown.
++    if assistant and (metadata.get("streaming") is False or payload.get("streaming") is False):
++        return False, True
++    return False, payload.get("completed") is True or payload.get("done") is True
++
++
++def _turn_lifecycle(events: list[dict]) -> tuple[bool, bool, bool]:
++    """Track the latest assistant and independent tool lifecycles in order."""
++    active: dict[str, bool] = {}
++    assistant_active = assistant_done = turn_done = False
++    for event in events:
++        name = str(event.get("event_name") or event.get("event") or "")
++        payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
++        if name in {"turn.completed", "turn.failed", "turn.cancelled", "turn.canceled"}:
++            active.clear()
++            assistant_active, turn_done = False, True
++            continue
++        if name == "message.assistant":
++            if event.get("reply_to_message_id") or payload.get("reply_to_message_id"):
++                continue
++            assistant_active, assistant_done = _lifecycle(payload, assistant=True)
++            # Even an empty replacement assistant supersedes the old reply.
++            turn_done = False
++            continue
++        if name in {"message.done", "delta.message_done"}:
++            # A message boundary is weaker than an active assistant/tool.
++            if not assistant_active:
++                assistant_done = True
++            continue
++        busy, done = _lifecycle(payload)
++        if not busy and not done:
++            continue
++        identity = (payload.get("tool_call_id") or payload.get("call_id")
++                    or payload.get("id") or event.get("message_id") or name)
++        active[str(identity)] = busy
++        if busy:
++            turn_done = False
++    return assistant_active or any(active.values()), assistant_done, turn_done
+ 
+ 
+ class ChatService:
+@@ -378,9 +436,10 @@ class ChatService:
+         timeout: float | None = None,
+         items: list[dict] | None = None,
+         refusal_markers: tuple[str, ...] | None = None,
++        session_key_value: str | None = None,
+     ) -> ChatResult:
+         """Generate media in a throwaway thread and collect the artifacts."""
+-        state = self.sessions.get(f"media:{kind}:{uuid.uuid4()}")
++        state = self.sessions.get(session_key_value or f"media:{kind}:{uuid.uuid4()}")
+         return await self._run_thread(
+             prompt,
+             state,
+@@ -404,50 +463,98 @@ class ChatService:
+         items: list[dict] | None = None,
+         refusal_markers: tuple[str, ...] = (),
+     ) -> ChatResult:
+-        async with self._connection() as (_account, _session, conn):
+-            try:
+-                await self._register_node(conn, state.node_id)
+-                await self._register_capabilities(conn, state.node_id)
+-                body = {
+-                    "items": items or [{"type": "text", "text": prompt}],
+-                    "message": prompt,
+-                    "node_id": state.node_id,
+-                    "capabilities": CAPABILITIES,
+-                    "session_id": state.session_id,
+-                    "timezone": self.settings.timezone,
+-                    "metadata": {"thread_is_dictation_used": False},
+-                }
+-                message_id = ""
+-                try:
+-                    ack = await conn.ack("POST", self.protocol.route("chat.stream").path, body, timeout=20.0)
+-                    raw_id = ack.get("message_id") or ack.get("id")
+-                    if isinstance(raw_id, str):
+-                        message_id = raw_id
+-                except (TimeoutError, GatewayError) as exc:
+-                    log.debug("chat.stream ack unavailable (%s); falling back to history search", exc)
+-
+-                reply, reply_id, events, media = await self._poll_thread_reply(
+-                    conn,
+-                    state.session_id,
+-                    message_id=message_id,
+-                    prompt=prompt,
+-                    on_delta=on_delta,
+-                    timeout=timeout,
+-                    want_media=want_media,
+-                    refusal_markers=refusal_markers,
+-                )
+-                if not reply and not media:
+-                    raise GatewayError("muse returned an empty reply")
+-                return ChatResult(
+-                    text=reply,
+-                    message_id=reply_id or message_id or str(uuid.uuid4()),
+-                    events=events,
+-                    media=media,
+-                )
+-            except Exception:
+-                # If the turn failed unexpectedly on this connection, mark closed so next turn reconnects
+-                conn._closed.set()
+-                raise
++        phase, delivery, message_id = "connect", "not_sent", ""
++        deadline = time.monotonic() + timeout
++        budget = asyncio.timeout(timeout)
++        try:
++            async with budget:
++                async with self._connection() as (_account, _session, conn):
++                    await self._register_node(conn, state.node_id)
++                    await self._register_capabilities(conn, state.node_id)
++                    body = {
++                        "items": items or [{"type": "text", "text": prompt}],
++                        "message": prompt,
++                        "node_id": state.node_id,
++                        "capabilities": CAPABILITIES,
++                        "session_id": state.session_id,
++                        "timezone": self.settings.timezone,
++                        "metadata": {"thread_is_dictation_used": False},
++                    }
++                    phase, delivery = "submit", "unknown"
++                    try:
++                        ack = await conn.ack("POST", self.protocol.route("chat.stream").path, body,
++                                             timeout=min(20.0, max(0.0, deadline - time.monotonic())))
++                        raw_id = ack.get("message_id") or ack.get("id")
++                        if isinstance(raw_id, str):
++                            message_id, delivery = raw_id, "accepted"
++                    except (TimeoutError, GatewayError) as exc:
++                        # Recover this same session; never submit the prompt again.
++                        if getattr(exc, "delivery", None) == "not_sent":
++                            delivery = "not_sent"
++                            raise
++                        log.debug("chat.stream acknowledgement unavailable; checking this session's history")
++
++                    phase = "history"
++                    reply, reply_id, events, media = await self._poll_thread_reply(
++                        conn, state.session_id, message_id=message_id, prompt=prompt,
++                        on_delta=on_delta, timeout=max(0.0, deadline - time.monotonic()),
++                        want_media=want_media, refusal_markers=refusal_markers,
++                    )
++                    if not reply and not media:
++                        raise ProtocolOperationError("muse returned an empty completed reply",
++                            code="empty_reply", phase="history", delivery="accepted")
++                    return ChatResult(text=reply, message_id=reply_id or message_id or str(uuid.uuid4()),
++                                      events=events, media=media, session_id=state.session_id)
++        except asyncio.CancelledError as exc:
++            known = getattr(exc, "delivery", delivery)
++            if phase == "history" and delivery == "accepted":
++                known = "accepted"
++            if budget.expired():
++                raise ProtocolOperationError("chat timed out before confirmed completion", code="timeout",
++                    phase=phase, delivery=known, retryable=known == "not_sent",
++                    session_id=state.session_id, message_id=message_id) from exc
++            raise ProtocolCancelledError(phase=phase, delivery=known,
++                session_id=state.session_id, message_id=message_id) from exc
++        except TimeoutError as exc:
++            raise ProtocolOperationError("chat timed out before confirmed completion", code="timeout",
++                phase=phase, delivery=delivery, retryable=delivery == "not_sent",
++                session_id=state.session_id, message_id=message_id) from exc
++        except ProtocolOperationError as exc:
++            exc.session_id = exc.session_id or state.session_id
++            exc.message_id = exc.message_id or message_id
++            if delivery == "accepted":
++                exc.delivery, exc.retryable = "accepted", False
++            raise
++        except Exception as exc:
++            raise ProtocolOperationError("chat protocol operation failed", code="protocol_failed",
++                phase=phase, delivery=delivery, retryable=delivery == "not_sent",
++                session_id=state.session_id, message_id=message_id) from exc
++
++    async def recover_thread(self, session_id: str, *, prompt: str, message_id: str = "",
++                             timeout: float = 30.0, want_media: bool = False) -> ChatResult:
++        """Read an existing thread through the caller's pinned account; never submit."""
++        budget = asyncio.timeout(timeout)
++        deadline = time.monotonic() + timeout
++        try:
++            async with budget:
++                async with self._connection() as (_account, _session, conn):
++                    text, reply_id, events, media = await self._poll_thread_reply(
++                        conn, session_id, message_id=message_id, prompt=prompt, on_delta=None,
++                        timeout=max(0.0, deadline - time.monotonic()), want_media=want_media,
++                    )
++        except asyncio.CancelledError as exc:
++            delivery = getattr(exc, "delivery", "accepted" if message_id else "unknown")
++            if budget.expired():
++                raise ProtocolOperationError("thread recovery timed out", code="timeout", phase="history",
++                    delivery=delivery, session_id=session_id, message_id=message_id) from exc
++            raise ProtocolCancelledError(phase="history", delivery=delivery,
++                session_id=session_id, message_id=message_id) from exc
++        except TimeoutError as exc:
++            raise ProtocolOperationError("thread recovery timed out", code="timeout", phase="history",
++                delivery="accepted" if message_id else "unknown", session_id=session_id,
++                message_id=message_id) from exc
++        return ChatResult(text=text, message_id=reply_id or message_id,
++                          events=events, media=media, session_id=session_id)
+ 
+     async def _poll_thread_reply(
+         self,
+@@ -463,7 +570,8 @@ class ChatService:
+     ) -> tuple[str, str, list[dict], list[MediaRef]]:
+         deadline = time.monotonic() + timeout
+         last_text: str | None = None
+-        emitted = 0
++        emitted = ""
++        delivery = "accepted" if message_id else "unknown"
+         best = ""
+         best_id = ""
+         started = time.monotonic()
+@@ -475,13 +583,30 @@ class ChatService:
+         text_stable_at: float | None = None
+         next_approval_check = 0.0
+ 
++        async def bounded(awaitable):
++            try:
++                return await asyncio.wait_for(awaitable, max(0.0, deadline - time.monotonic()))
++            except asyncio.CancelledError as exc:
++                raise ProtocolCancelledError(phase="history", delivery=delivery,
++                    session_id=session_id, message_id=message_id) from exc
++            except TimeoutError as exc:
++                raise ProtocolOperationError("chat timed out before confirmed completion", code="timeout",
++                    phase="history", delivery=delivery, session_id=session_id, message_id=message_id) from exc
++
++        async def pause(seconds: float) -> None:
++            try:
++                await asyncio.sleep(min(seconds, max(0.0, deadline - time.monotonic())))
++            except asyncio.CancelledError as exc:
++                raise ProtocolCancelledError(phase="history", delivery=delivery,
++                    session_id=session_id, message_id=message_id) from exc
++
+         async def approval_hold() -> bool:
+             """Answer prompts before declaring the turn finished."""
+             if self.approval_policy == "off":
+                 return False
+-            handled = await handle_pending(
++            handled = await bounded(handle_pending(
+                 conn, session_id, self.approval_policy, ask_policy=self.approval_ask
+-            )
++            ))
+             if handled:
+                 log.info("answered %d permission prompt(s) for %s", handled, session_id)
+             return handled > 0
+@@ -490,33 +615,44 @@ class ChatService:
+             polls += 1
+             if self.approval_policy != "off" and time.monotonic() >= next_approval_check:
+                 next_approval_check = time.monotonic() + 4.0
+-                handled = await handle_pending(
++                handled = await bounded(handle_pending(
+                     conn, session_id, self.approval_policy, ask_policy=self.approval_ask
+-                )
++                ))
+                 if handled:
+                     log.info("answered %d permission prompt(s) for %s", handled, session_id)
+             try:
+-                response = await conn.request(
++                response = await bounded(conn.request(
+                     "GET",
+                     self.protocol.route("chat.history").path,
+                     {"limit": 60, "session_id": session_id},
+-                    timeout=min(20.0, max(5.0, deadline - time.monotonic())),
+-                )
++                    timeout=min(20.0, max(0.0, deadline - time.monotonic())),
++                ))
++                response.raise_for_status()
+                 data = response.json() or {}
+             except (TimeoutError, GatewayError) as exc:
++                if time.monotonic() >= deadline:
++                    break
++                if isinstance(exc, ProtocolOperationError) and exc.code in {"response_too_large", "consumer_too_slow"}:
++                    exc.phase, exc.delivery, exc.retryable = "history", delivery, False
++                    exc.session_id, exc.message_id = session_id, message_id
++                    raise
++                if getattr(exc, "status", 0) >= 400:
++                    raise ProtocolOperationError("history request rejected", code="history_failed",
++                        phase="history", delivery=delivery, session_id=session_id,
++                        message_id=message_id) from exc
+                 log.debug("history poll failed: %s", exc)
+                 if getattr(conn, "is_closed", False):
+                     log.info("gateway connection closed mid-turn; reconnecting to recover thread %s", session_id)
+                     try:
+-                        _, _, conn = await self.pool.connect()
++                        _, _, conn = await bounded(self.pool.connect())
+                     except Exception as rec_exc:
+                         log.warning("gateway reconnection failed: %s", rec_exc)
+-                await asyncio.sleep(0.8 + random.uniform(-0.1, 0.2))
++                await pause(0.8 + random.uniform(-0.1, 0.2))
+                 continue
+ 
+             events = history_events(data)
+             if not events:
+-                await asyncio.sleep(0.7 + random.uniform(-0.1, 0.2))
++                await pause(0.7 + random.uniform(-0.1, 0.2))
+                 continue
+ 
+             user_index = -1
+@@ -525,7 +661,7 @@ class ChatService:
+                     if event.get("message_id") == message_id:
+                         user_index = index
+                         break
+-            if user_index < 0:
++            if user_index < 0 and not message_id:
+                 needle = prompt.strip()
+                 for index, event in enumerate(events):
+                     name = str(event.get("event_name") or event.get("event") or "")
+@@ -535,11 +671,17 @@ class ChatService:
+                     if text and (text == needle or needle[:80] in text):
+                         user_index = index
+             if user_index < 0:
+-                await asyncio.sleep(0.7 + random.uniform(-0.1, 0.2))
++                await pause(0.7 + random.uniform(-0.1, 0.2))
+                 continue
+ 
++            delivery = "accepted"
+             after = events[user_index + 1:]
++            for index, event in enumerate(after):
++                if str(event.get("event_name") or event.get("event") or "") == "message.user":
++                    after = after[:index]
++                    break
+             captured = after
++            active, assistant_done, turn_done = _turn_lifecycle(after)
+             current_text = ""
+             current_id = ""
+             for event in after:
+@@ -550,8 +692,6 @@ class ChatService:
+                 if event.get("reply_to_message_id") or payload.get("reply_to_message_id"):
+                     continue
+                 text = event_text(event)
+-                if not text:
+-                    continue
+                 current_text = text
+                 raw_id = event.get("message_id") or payload.get("message_id")
+                 current_id = raw_id if isinstance(raw_id, str) else current_id
+@@ -559,14 +699,18 @@ class ChatService:
+             if want_media:
+                 media = extract_media(after)
+ 
++            best = current_text
++            best_id = current_id or best_id
+             if current_text:
+-                best = current_text
+-                best_id = current_id or best_id
+-                if on_delta and len(current_text) > emitted:
+-                    fresh = current_text[emitted:]
++                if on_delta and emitted and not current_text.startswith(emitted):
++                    raise ProtocolOperationError("upstream revised already emitted text",
++                        code="non_append_text", phase="history", delivery="accepted",
++                        session_id=session_id, message_id=message_id)
++                if on_delta and len(current_text) > len(emitted):
++                    fresh = current_text[len(emitted):]
+                     for start in range(0, len(fresh), 240):
+                         on_delta(fresh[start:start + 240])
+-                    emitted = len(current_text)
++                    emitted = current_text
+                 if last_text == current_text:
+                     if text_stable_at is None:
+                         text_stable_at = time.monotonic()
+@@ -577,10 +721,11 @@ class ChatService:
+                 last_text = None
+                 text_stable_at = None
+ 
+-            if (refusal_markers and not media and current_text
++            terminal = not active and (turn_done or assistant_done)
++            if (terminal and refusal_markers and not media and current_text
+                     and any(marker in current_text.lower() for marker in refusal_markers)):
+-                # The upstream model already refused; do not wait out the
+-                # artifact grace period for a file that will never arrive.
++                # Refusal words can occur in a progress message. Require a
++                # terminal assistant/turn with no active tools first.
+                 return best, best_id, captured, media
+ 
+             if want_media:
+@@ -593,7 +738,7 @@ class ChatService:
+                         text_stable_at is not None
+                         and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS
+                     )
+-                    if text_settled or settled:
++                    if terminal and (turn_done or text_settled or settled):
+                         if await approval_hold():
+                             text_stable_at = None
+                             media_stable_at = None
+@@ -604,20 +749,14 @@ class ChatService:
+                     media_stable_at = time.monotonic()
+                 else:
+                     media_stable_at = None
+-                    is_searching = any(
+-                        kw in current_text.lower()
+-                        for kw in (
+-                            "search", "looking", "checking", "finding", "reference",
+-                            "appearance", "generating", "creating", "drawing",
+-                            "rendering", "browse", "wait", "inspect", "query",
+-                        )
+-                    )
+-                    settle_limit = 35.0 if is_searching else 15.0
+-                    if text_stable_at is not None and time.monotonic() - text_stable_at > settle_limit:
+-                        # Text settled and no artifact arrived; surface what we have promptly.
++                    if terminal and (turn_done or (text_stable_at is not None
++                            and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS)):
+                         return best, best_id, captured, media
+-            elif (text_stable_at is not None
+-                  and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS):
++                if media and turn_done and not active:
++                    if not await approval_hold():
++                        return best, best_id, captured, media
++            elif (not active and (turn_done or assistant_done or (text_stable_at is not None
++                  and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS))):
+                 if await approval_hold():
+                     text_stable_at = None
+                     last_text = None
+@@ -629,13 +768,32 @@ class ChatService:
+                 text_stable_at = None
+ 
+             poll_interval = 0.35 if (current_text and text_stable_at is None) else 0.6
+-            await asyncio.sleep(max(0.2, poll_interval + random.uniform(-0.05, 0.15)))
++            await pause(max(0.2, poll_interval + random.uniform(-0.05, 0.15)))
+ 
+-        return best, best_id, captured, media
++        raise ProtocolOperationError("chat timed out before confirmed completion", code="timeout",
++            phase="history", delivery=delivery, session_id=session_id, message_id=message_id)
+ 
+     # -- main-chat mode ----------------------------------------------------
+ 
+     async def _run_main(
++        self, prompt: str, *, on_delta: Callable[[str], None] | None,
++        timeout: float, want_media: bool = False, items: list[dict] | None = None,
++    ) -> ChatResult:
++        budget = asyncio.timeout(timeout)
++        try:
++            async with budget:
++                return await self._run_main_inner(prompt, on_delta=on_delta,
++                    timeout=timeout, want_media=want_media, items=items)
++        except asyncio.CancelledError as exc:
++            if budget.expired():
++                raise ProtocolOperationError("main chat timed out", code="timeout",
++                    phase="history", delivery="unknown") from exc
++            raise ProtocolCancelledError(phase="history", delivery="unknown") from exc
++        except TimeoutError as exc:
++            raise ProtocolOperationError("main chat timed out", code="timeout",
++                phase="history", delivery="unknown") from exc
++
++    async def _run_main_inner(
+         self,
+         prompt: str,
+         *,
+@@ -646,7 +804,8 @@ class ChatService:
+     ) -> ChatResult:
+         async with self._connection() as (_account, _session, conn):
+             client_id = str(uuid.uuid4())
+-            queue: asyncio.Queue[Any] = asyncio.Queue()
++            queue: asyncio.Queue[Any] = asyncio.Queue(maxsize=MAX_MAIN_EVENTS)
++            pump_task = None
+ 
+             try:
+                 await self._register_node(conn, client_id)
+@@ -668,7 +827,9 @@ class ChatService:
+                     except asyncio.CancelledError:
+                         raise
+                     except Exception as exc:  # noqa: BLE001
+-                        log.debug("subscribe stream ended: %s", exc)
++                        await queue.put(("error", exc))
++                    else:
++                        await queue.put(("error", GatewayError("subscription ended before turn completion")))
+ 
+                 pump_task = asyncio.create_task(pump())
+                 await asyncio.sleep(0.4)  # let the subscribe attach
+@@ -687,6 +848,7 @@ class ChatService:
+                 )
+ 
+                 parts: list[str] = []
++                completed = False
+                 deadline = time.monotonic() + timeout
+                 while True:
+                     remaining = deadline - time.monotonic()
+@@ -696,6 +858,9 @@ class ChatService:
+                         event = await asyncio.wait_for(queue.get(), min(5.0, remaining))
+                     except TimeoutError:
+                         continue
++                    if isinstance(event, tuple) and event[0] == "error":
++                        raise ProtocolOperationError("chat subscription interrupted", code="connection_lost",
++                            phase="history", delivery="unknown") from event[1]
+                     if not isinstance(event, dict):
+                         continue
+                     ts = event.get("ts_ms")
+@@ -719,6 +884,7 @@ class ChatService:
+                                              parts.append(content["text"])
+                                              if on_delta:
+                                                  on_delta(content["text"])
++                        completed = True
+                         break
+                     elif name == "message.assistant":
+                         if not parts:
+@@ -727,16 +893,24 @@ class ChatService:
+                                 parts.append(text)
+                                 if on_delta:
+                                     on_delta(text)
+-                        break
++                        active, done = _lifecycle(payload, assistant=True)
++                        if done and not active:
++                            completed = True
++                            break
++                if not completed:
++                    raise ProtocolOperationError("chat timed out before confirmed completion", code="timeout",
++                        phase="history", delivery="accepted" if parts else "unknown")
+                 text = "".join(parts)
+                 if not text:
+                     raise GatewayError(f"muse returned an empty reply within {timeout:.0f}s")
+                 return ChatResult(text=text, message_id=str(uuid.uuid4()))
+             finally:
+-                try:
+-                    pump_task.cancel()  # type: ignore[possibly-undefined]
+-                except Exception:
+-                    pass
++                if pump_task is not None:
++                    pump_task.cancel()
++                    try:
++                        await pump_task
++                    except asyncio.CancelledError:
++                        pass
+                 await conn.close()
+ 
+     # -- preamble helpers --------------------------------------------------
+diff --git a/muse2api/filesystem.py b/muse2api/filesystem.py
+index 0db3d5b..d5c0576 100644
+--- a/muse2api/filesystem.py
++++ b/muse2api/filesystem.py
+@@ -5,7 +5,8 @@ import uuid
+ from pathlib import Path
+ from urllib.parse import quote
+ 
+-from .gateway import HatchConnection
++from .gateway import HatchConnection, MAX_RPC_BYTES
++from .media import MediaRef, MediaTooLargeError, download_media_to
+ 
+ UPLOAD_CHUNK_SIZE = 524_288
+ 
+@@ -116,7 +117,8 @@ class MuseFilesystem:
+                     pass
+             raise
+ 
+-    async def raw(self, path: str, *, byte_range: tuple[int, int] | None = None, timeout: float = 300) -> bytes:
++    async def raw(self, path: str, *, byte_range: tuple[int, int] | None = None,
++                  timeout: float = 300, max_bytes: int = MAX_RPC_BYTES) -> bytes:
+         normalized = normalize_gateway_path(path)
+         route = "/fs/raw/" + quote(normalized, safe="/")
+         extra = []
+@@ -125,12 +127,16 @@ class MuseFilesystem:
+             if start < 0 or end < start:
+                 raise ValueError("invalid byte range")
+             extra = [("Range", f"bytes={start}-{end}")]
+-        response = await self.conn.request("GET", route, {}, extra_headers=extra, timeout=timeout)
++        limits = {"max_response_bytes": max_bytes} if max_bytes != MAX_RPC_BYTES else {}
++        response = await self.conn.request("GET", route, {}, extra_headers=extra, timeout=timeout, **limits)
+         response.raise_for_status()
++        if len(response.body) > max_bytes:
++            raise MediaTooLargeError("filesystem response exceeds byte limit")
+         return response.body
+ 
+-    async def download(self, path: str, destination: str) -> Path:
++    async def download(self, path: str, destination: str, *, max_bytes: int = MAX_RPC_BYTES,
++                       timeout: float = 300) -> Path:
+         target = Path(destination)
+-        target.parent.mkdir(parents=True, exist_ok=True)
+-        target.write_bytes(await self.raw(path))
++        await download_media_to(self.conn, MediaRef(kind="file", path=normalize_gateway_path(path)),
++                                target, max_bytes=max_bytes, timeout=timeout)
+         return target
+diff --git a/muse2api/gateway.py b/muse2api/gateway.py
+index cece571..5756838 100644
+--- a/muse2api/gateway.py
++++ b/muse2api/gateway.py
+@@ -90,6 +90,43 @@ class GatewayClosed(GatewayError):
+     pass
+ 
+ 
++class ProtocolOperationError(GatewayError):
++    """A bounded operation failed; delivery controls whether replay is safe."""
++
++    def __init__(self, message: str, *, code: str, phase: str,
++                 delivery: str = "unknown", retryable: bool = False,
++                 session_id: str = "", message_id: str = "") -> None:
++        super().__init__(message)
++        self.code = code
++        self.phase = phase
++        self.delivery = delivery
++        self.retryable = retryable
++        self.session_id = session_id
++        self.message_id = message_id
++
++
++class ProtocolCancelledError(asyncio.CancelledError):
++    """Local cancellation does not assert that the remote generation stopped."""
++
++    def __init__(self, message: str = "operation canceled", *, phase: str,
++                 delivery: str = "unknown", session_id: str = "",
++                 message_id: str = "") -> None:
++        super().__init__(message)
++        self.code = "cancelled"
++        self.phase = phase
++        self.delivery = delivery
++        self.retryable = False
++        self.session_id = session_id
++        self.message_id = message_id
++
++
++# Limits apply while receiving, before a response can be accumulated in memory.
++MAX_RPC_BYTES = 150 * 1024 * 1024
++MAX_JSON_STREAM_BYTES = 16 * 1024 * 1024
++MAX_STREAM_PENDING_BYTES = 16 * 1024 * 1024
++MAX_STREAM_RECORDS = 1024
++
++
+ class RpcError(GatewayError):
+     def __init__(self, message: str, *, status: int = 0, body: bytes = b"") -> None:
+         super().__init__(message)
+@@ -142,10 +179,19 @@ class RpcResponse:
+ 
+ 
+ class _Stream:
+-    """One stream_id: unary request or long-lived subscription."""
+-
+-    def __init__(self, stream_id: int) -> None:
++    """A bounded unary, JSON, or binary stream on a multiplexed connection."""
++
++    def __init__(self, stream_id: int, *, mode: str = "json",
++                 max_bytes: int = MAX_JSON_STREAM_BYTES,
++                 max_pending_bytes: int = MAX_STREAM_PENDING_BYTES,
++                 service: str = "daemon") -> None:
++        if mode not in {"json", "unary", "bytes", "discard"} or max_bytes < 0:
++            raise ValueError("invalid response stream mode or byte limit")
+         self.id = stream_id
++        self.mode = mode
++        self.max_bytes = max_bytes
++        self.max_pending_bytes = min(max_bytes, max_pending_bytes)
++        self.service = service
+         self.queue: asyncio.Queue[Any] = asyncio.Queue()
+         self.status = 0
+         self.headers: list[Header] = []
+@@ -154,23 +200,33 @@ class _Stream:
+         self._buffer = ""
+         self._decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+         self._done = False
++        self.received_bytes = 0
++        self.pending_bytes = 0
++        self.delivery = "not_sent"
++        self.phase = "send"
++        self.error: BaseException | None = None
+ 
+     def feed(self, frame) -> None:
++        if self._done:
++            return
+         if frame.kind == "response":
+             response: ApplicationResponse = frame.payload
+             self.responded = True
+             self.status = response.status
+             self.headers = response.headers
+-            if response.body:
+-                self.body += response.body
+-                self._parse(response.body)
++            self.delivery = "accepted"
++            self.phase = "receive"
++            for header in self.headers:
++                if header.key.lower() == "content-length" and header.value.isdigit():
++                    if int(header.value) > self.max_bytes:
++                        self._limit("response_too_large", "declared response exceeds byte limit")
++                        return
++            self._accept(response.body)
+             if response.end_body:
+                 self._finish()
+         elif frame.kind == "body_chunk":
+             data, end_body = frame.payload
+-            if data:
+-                self.body += data
+-                self._parse(data)
++            self._accept(data)
+             if end_body:
+                 self._finish()
+         elif frame.kind == "reset":
+@@ -180,6 +236,43 @@ class _Stream:
+             # Server-initiated request frames are not part of this client.
+             pass
+ 
++    def _limit(self, code: str, message: str) -> None:
++        self._finish(ProtocolOperationError(message, code=code, phase="receive",
++                                           delivery=self.delivery))
++
++    def _accept(self, data: bytes) -> None:
++        if not data or self._done:
++            return
++        if self.received_bytes + len(data) > self.max_bytes:
++            self._limit("response_too_large", "response exceeds byte limit")
++            return
++        self.received_bytes += len(data)
++        if self.mode == "unary":
++            self.body.extend(data)
++        elif self.mode == "bytes":
++            if (self.pending_bytes + len(data) > self.max_pending_bytes
++                    or self.queue.qsize() >= MAX_STREAM_RECORDS):
++                self._limit("consumer_too_slow", "binary response buffer is full")
++                return
++            self.pending_bytes += len(data)
++            self.queue.put_nowait(bytes(data))
++        elif self.mode == "json":
++            self._parse(data)
++
++    def _enqueue_record(self, record: Any) -> None:
++        if self._done:
++            return
++        if self.queue.qsize() >= MAX_STREAM_RECORDS:
++            self._limit("consumer_too_slow", "JSON response buffer is full")
++            return
++        self.queue.put_nowait(record)
++
++    async def next_item(self) -> Any:
++        item = await self.queue.get()
++        if isinstance(item, bytes):
++            self.pending_bytes -= len(item)
++        return item
++
+     def _parse(self, data: bytes) -> None:
+         text = self._decoder.decode(data)
+         if not text:
+@@ -194,7 +287,9 @@ class _Stream:
+                 obj = json.loads(line)
+             except json.JSONDecodeError:
+                 continue
+-            self.queue.put_nowait(obj)
++            self._enqueue_record(obj)
++            if self._done:
++                return
+         # Chat chunks are usually one self-contained JSON object without newline.
+         tail = self._buffer.strip()
+         if tail.startswith("{") or tail.startswith("["):
+@@ -203,19 +298,28 @@ class _Stream:
+             except json.JSONDecodeError:
+                 return
+             self._buffer = ""
+-            self.queue.put_nowait(obj)
++            self._enqueue_record(obj)
+ 
+-    def _finish(self, error: str | None = None) -> None:
++    def _finish(self, error: str | BaseException | None = None) -> None:
+         if self._done:
+             return
+-        self._done = True
+-        if self._buffer.strip():
++        if error is not None:
++            self.error = error if isinstance(error, BaseException) else GatewayError(error)
++            self.body.clear()
++            self._buffer = ""
++            while not self.queue.empty():
++                self.queue.get_nowait()
++            self.pending_bytes = 0
++        elif self._buffer.strip() and self.mode == "json":
+             try:
+-                self.queue.put_nowait(json.loads(self._buffer))
++                self._enqueue_record(json.loads(self._buffer))
+             except json.JSONDecodeError:
+                 pass
+             self._buffer = ""
+-        self.queue.put_nowait(("complete", error))
++            if self._done:
++                return
++        self._done = True
++        self.queue.put_nowait(("complete", self.error))
+ 
+ 
+ class HatchConnection:
+@@ -301,7 +405,11 @@ class HatchConnection:
+ 
+                 if not ws_fallback:
+                     if own_client is not None:
+-                        await own_client.close()
++                        try:
++                            async with asyncio.timeout(0.2):
++                                await own_client.close()
++                        except Exception:
++                            pass
+                     raise GatewayError(
+                         "curl_cffi websocket failed; refusing the stdlib fallback "
+                         f"because it leaks a different TLS fingerprint (set "
+@@ -342,7 +450,6 @@ class HatchConnection:
+             if isinstance(message2, tuple):  # curl_cffi returns (payload, flags)
+                 message2 = message2[0]
+             if not isinstance(message2, (bytes, bytearray)):
+-                await ws.close()
+                 raise GatewayError("expected binary Noise handshake message 2")
+             payload2 = noise.read_message2(bytes(message2))
+             message3_payload = b""
+@@ -352,7 +459,6 @@ class HatchConnection:
+                 log.debug("standard message 2 payload (%d bytes)", len(payload2))
+             if challenge is not None:
+                 if not cvm_rv_key:
+-                    await ws.close()
+                     raise GatewayError(
+                         "confidential VM challenge received but MUSE_CVM_RV_KEY is not set; "
+                         "refusing to downgrade the handshake"
+@@ -386,12 +492,14 @@ class HatchConnection:
+         except BaseException:
+             if ws is not None:
+                 try:
+-                    await ws.close()
++                    async with asyncio.timeout(0.2):
++                        await ws.close()
+                 except Exception:
+                     pass
+             if own_client is not None:
+                 try:
+-                    await own_client.close()
++                    async with asyncio.timeout(0.2):
++                        await own_client.close()
+                 except Exception:
+                     pass
+             raise
+@@ -413,11 +521,17 @@ class HatchConnection:
+                     service_payload = decode_service_response(assembled)
+                     frame = decode_service_frame(service_payload)
+                 except Exception as exc:  # pragma: no cover - protocol corruption
+-                    log.warning("dropping bad noise frame: %s", exc)
+-                    continue
++                    # A failed decrypt may have advanced the peer's nonce. The
++                    # channel cannot safely keep accepting later frames.
++                    raise GatewayError("invalid encrypted gateway frame") from exc
+                 stream = self._streams.get(frame.stream_id)
+                 if stream is not None:
+                     stream.feed(frame)
++                    if stream.mode == "discard" and stream._done:
++                        self._drop_stream(stream.id)
++                    elif stream.mode == "bytes":
++                        # Let a ready file consumer drain before the next frame.
++                        await asyncio.sleep(0)
+         except asyncio.CancelledError:
+             raise
+         except BaseException as exc:  # noqa: BLE001 - surface as fatal
+@@ -427,10 +541,16 @@ class HatchConnection:
+             self._closed.set()
+             for stream in list(self._streams.values()):
+                 stream._finish("connection closed")
++            try:
++                async with asyncio.timeout(0.2):
++                    await self.ws.close()
++            except (Exception, asyncio.CancelledError):
++                pass
+ 
+     # -- send --------------------------------------------------------------
+ 
+-    def _headers(self, *, json_body: bool) -> list[Header]:
++    def _headers(self, *, json_body: bool,
++                 extra_headers: list[tuple[str, str]] | None = None) -> list[Header]:
+         headers = [
+             Header("x-request-id", str(uuid.uuid4())),
+             Header("x-app-id", "hatch-web"),
+@@ -438,50 +558,108 @@ class HatchConnection:
+         ]
+         if json_body:
+             headers.insert(0, Header("Content-Type", "application/json"))
++        headers.extend(Header(key, value) for key, value in (extra_headers or []))
+         return headers
+ 
+     async def _send_stream_frames(self, stream_id: int, *, method: str, path: str,
+                                   body: bytes, json_body: bool,
+-                                  service: str) -> None:
+-        request = ApplicationRequest(method, path, self._headers(json_body=json_body), body, True)
++                                  service: str,
++                                  extra_headers: list[tuple[str, str]] | None = None) -> None:
++        request = ApplicationRequest(method, path, self._headers(json_body=json_body,
++                                     extra_headers=extra_headers), body, True)
+         service_frame = encode_service_frame_request(stream_id, request)
+         envelope = encode_service_request(SERVICES[service], service_frame)
+         async with self._send_lock:
+             if self._closed.is_set():
+                 raise GatewayClosed(f"gateway closed: {self._fatal!r}")
+-            for frame in split_noise_payload(envelope):
+-                await self.ws.send(self.tx.encrypt_with_ad(EMPTY_AD, frame))
+-            if hasattr(self.ws, "flush"):
+-                await self.ws.flush()
+-
+-    def _new_stream(self) -> _Stream:
++            stream = self._streams.get(stream_id)
++            try:
++                for frame in split_noise_payload(envelope):
++                    if stream is not None:
++                        stream.delivery = "unknown"
++                    await self.ws.send(self.tx.encrypt_with_ad(EMPTY_AD, frame))
++                if hasattr(self.ws, "flush"):
++                    await self.ws.flush()
++            except BaseException as exc:
++                # Once encryption started, a canceled/failed write can leave
++                # both delivery and nonce state uncertain. Retire this socket.
++                self._retire_write(exc)
++                raise
++            if stream is not None:
++                stream.phase = "receive"
++
++    def _new_stream(self, **kwargs) -> _Stream:
+         stream_id = self._next_stream_id
+         self._next_stream_id += 1
+-        stream = _Stream(stream_id)
++        stream = _Stream(stream_id, **kwargs)
+         self._streams[stream_id] = stream
+         return stream
+ 
+     def _drop_stream(self, stream_id: int) -> None:
+         self._streams.pop(stream_id, None)
+ 
+-    async def _send_reset(self, stream_id: int, reason: str) -> None:
++    def _retire_write(self, error: BaseException) -> None:
++        self._fatal = error
++        self._closed.set()
++        for pending in list(self._streams.values()):
++            pending._finish("gateway write interrupted")
++        self._receiver.cancel()
++
++    async def _send_reset(self, stream_id: int, reason: str, *, service: str = "daemon") -> None:
+         if self._closed.is_set():
+             return
++        started = False
+         try:
+             from .wire import encode_service_frame_reset
+ 
+             envelope = encode_service_request(
+-                SERVICES["daemon"],
++                SERVICES[service],
+                 encode_service_frame_reset(stream_id, 1, reason),
+             )
+             async with self._send_lock:
++                if self._closed.is_set():
++                    return
+                 for frame in split_noise_payload(envelope):
++                    started = True
+                     await self.ws.send(self.tx.encrypt_with_ad(EMPTY_AD, frame))
+                 if hasattr(self.ws, "flush"):
+                     await self.ws.flush()
+-        except Exception:  # pragma: no cover - best effort
++        except asyncio.CancelledError as exc:
++            if started:
++                self._retire_write(exc)
++            raise
++        except Exception as exc:  # best effort; a failed write still taints Noise
++            if started:
++                self._retire_write(exc)
+             pass
+ 
++    async def _cleanup_stream(self, stream: _Stream, reason: str,
++                              deadline: float | None) -> None:
++        self._drop_stream(stream.id)
++        if stream._done and stream.error is None:
++            return
++        budget = 0.2 if deadline is None else min(0.2, deadline - asyncio.get_running_loop().time())
++        if budget <= 0:
++            return
++        try:
++            async with asyncio.timeout(budget):
++                await self._send_reset(stream.id, reason, service=stream.service)
++        except asyncio.CancelledError as exc:
++            raise ProtocolCancelledError(phase=stream.phase, delivery=stream.delivery) from exc
++        except Exception:
++            pass
++
++    @staticmethod
++    def _complete_error(stream: _Stream, item: Any) -> None:
++        if isinstance(item, tuple) and item[0] == "complete" and item[1] is not None:
++            error = item[1]
++            if isinstance(error, ProtocolOperationError):
++                raise error
++            raise ProtocolOperationError("gateway response interrupted", code="connection_lost",
++                                         phase="receive", delivery=stream.delivery) from error
++        if stream.status >= 400:
++            raise RpcError(f"hatch RPC HTTP {stream.status}", status=stream.status)
++
+     # -- public API --------------------------------------------------------
+ 
+     async def request(
+@@ -492,6 +670,8 @@ class HatchConnection:
+         *,
+         service: str = "daemon",
+         timeout: float = 60.0,
++        extra_headers: list[tuple[str, str]] | None = None,
++        max_response_bytes: int = MAX_RPC_BYTES,
+     ) -> RpcResponse:
+         if method.upper() == "GET":
+             query = urlencode({k: v for k, v in (params or {}).items() if v is not None}, doseq=True)
+@@ -503,26 +683,27 @@ class HatchConnection:
+             body = json.dumps(params or {}, ensure_ascii=False, separators=(",", ":")).encode()
+             json_body = True
+ 
+-        stream = self._new_stream()
++        deadline = asyncio.get_running_loop().time() + timeout
++        stream = self._new_stream(mode="unary", max_bytes=max_response_bytes, service=service)
+         try:
+-            await self._send_stream_frames(
+-                stream.id, method=method.upper(), path=path, body=body,
+-                json_body=json_body, service=service,
+-            )
+-            deadline = asyncio.get_running_loop().time() + timeout
+-            while True:
+-                remaining = deadline - asyncio.get_running_loop().time()
+-                if remaining <= 0:
+-                    raise GatewayError(f"RPC timeout after {timeout:.0f}s: {method} {path}")
+-                item = await asyncio.wait_for(stream.queue.get(), remaining)
+-                if isinstance(item, tuple) and item[0] == "complete":
+-                    if item[1]:
+-                        raise GatewayError(item[1])
+-                    return RpcResponse(stream.status, stream.headers, bytes(stream.body))
++            async with asyncio.timeout(timeout):
++                await self._send_stream_frames(
++                    stream.id, method=method.upper(), path=path, body=body,
++                    json_body=json_body, service=service, extra_headers=extra_headers,
++                )
++                while True:
++                    item = await stream.next_item()
++                    if isinstance(item, tuple) and item[0] == "complete":
++                        if item[1] is not None:
++                            self._complete_error(stream, item)
++                        return RpcResponse(stream.status, stream.headers, bytes(stream.body))
++        except asyncio.CancelledError as exc:
++            raise ProtocolCancelledError(phase=stream.phase, delivery=stream.delivery) from exc
++        except TimeoutError as exc:
++            raise ProtocolOperationError("gateway request timed out", code="timeout",
++                                         phase=stream.phase, delivery=stream.delivery) from exc
+         finally:
+-            if not stream._done:
+-                await self._send_reset(stream.id, "client aborted")
+-            self._drop_stream(stream.id)
++            await self._cleanup_stream(stream, "client aborted", deadline)
+ 
+     async def send(
+         self,
+@@ -531,17 +712,27 @@ class HatchConnection:
+         params: dict | None = None,
+         *,
+         service: str = "daemon",
++        timeout: float = 60.0,
+     ) -> int:
+         """Fire-and-forget request; returns stream_id without waiting for a reply."""
+         body = json.dumps(params or {}, ensure_ascii=False, separators=(",", ":")).encode()
+-        stream = self._new_stream()
++        deadline = asyncio.get_running_loop().time() + timeout
++        stream = self._new_stream(mode="discard", max_bytes=MAX_JSON_STREAM_BYTES, service=service)
+         try:
+-            await self._send_stream_frames(
+-                stream.id, method=method.upper(), path=path, body=body,
+-                json_body=True, service=service,
+-            )
++            async with asyncio.timeout(timeout):
++                await self._send_stream_frames(
++                    stream.id, method=method.upper(), path=path, body=body,
++                    json_body=True, service=service,
++                )
++        except asyncio.CancelledError as exc:
++            await self._cleanup_stream(stream, "send canceled", deadline)
++            raise ProtocolCancelledError(phase="send", delivery=stream.delivery) from exc
++        except TimeoutError as exc:
++            await self._cleanup_stream(stream, "send timed out", deadline)
++            raise ProtocolOperationError("gateway send timed out", code="timeout",
++                                         phase="send", delivery=stream.delivery) from exc
+         except BaseException:
+-            self._drop_stream(stream.id)
++            await self._cleanup_stream(stream, "send failed", deadline)
+             raise
+         return stream.id
+ 
+@@ -557,62 +748,97 @@ class HatchConnection:
+     ) -> AsyncIterator[dict]:
+         """Yield JSON records from a long-lived (or NDJSON) response stream."""
+         body = json.dumps(params or {}, ensure_ascii=False, separators=(",", ":")).encode()
+-        stream = self._new_stream()
++        deadline = asyncio.get_running_loop().time() + timeout if timeout is not None else None
++        stream = self._new_stream(mode="json", max_bytes=MAX_JSON_STREAM_BYTES, service=service)
+         try:
+-            await self._send_stream_frames(
+-                stream.id, method=method.upper(), path=path, body=body,
+-                json_body=True, service=service,
+-            )
++            send = self._send_stream_frames(stream.id, method=method.upper(), path=path,
++                                            body=body, json_body=True, service=service)
++            await asyncio.wait_for(send, timeout)
+             loop = asyncio.get_running_loop()
+-            deadline = loop.time() + timeout if timeout else None
+             while True:
+-                wait = 1.0
+-                if deadline is not None:
+-                    remaining = deadline - loop.time()
+-                    if remaining <= 0:
+-                        return
+-                    wait = min(wait, remaining)
+-                try:
+-                    item = await asyncio.wait_for(stream.queue.get(), wait)
+-                except TimeoutError:
+-                    if deadline is not None and loop.time() >= deadline:
+-                        return
+-                    continue
++                remaining = None if deadline is None else deadline - loop.time()
++                if remaining is not None and remaining <= 0:
++                    raise TimeoutError
++                item = await asyncio.wait_for(stream.next_item(), remaining)
++                self._complete_error(stream, item)
+                 if isinstance(item, tuple) and item[0] == "complete":
+                     return
+                 yield item
++        except asyncio.CancelledError as exc:
++            raise ProtocolCancelledError(phase=stream.phase, delivery=stream.delivery) from exc
++        except TimeoutError as exc:
++            raise ProtocolOperationError("gateway stream timed out", code="timeout",
++                                         phase=stream.phase, delivery=stream.delivery) from exc
++        finally:
++            await self._cleanup_stream(stream, reset_reason, deadline)
++
++    async def iter_bytes(self, method: str, path: str, *, service: str = "daemon",
++                         timeout: float = 300.0, max_bytes: int = MAX_RPC_BYTES,
++                         extra_headers: list[tuple[str, str]] | None = None) -> AsyncIterator[bytes]:
++        """Consume binary chunks without retaining a second complete body."""
++        deadline = asyncio.get_running_loop().time() + timeout
++        stream = self._new_stream(mode="bytes", max_bytes=max_bytes, service=service)
++        try:
++            await asyncio.wait_for(self._send_stream_frames(
++                stream.id, method=method.upper(), path=path, body=b"", json_body=False,
++                service=service, extra_headers=extra_headers), timeout)
++            while True:
++                remaining = deadline - asyncio.get_running_loop().time()
++                if remaining <= 0:
++                    raise TimeoutError
++                item = await asyncio.wait_for(stream.next_item(), remaining)
++                self._complete_error(stream, item)
++                if isinstance(item, tuple) and item[0] == "complete":
++                    return
++                if isinstance(item, bytes):
++                    yield item
++        except asyncio.CancelledError as exc:
++            raise ProtocolCancelledError(phase="download", delivery=stream.delivery) from exc
++        except TimeoutError as exc:
++            raise ProtocolOperationError("gateway download timed out", code="timeout",
++                                         phase="download", delivery=stream.delivery) from exc
+         finally:
+-            await self._send_reset(stream.id, reset_reason)
+-            self._drop_stream(stream.id)
++            await self._cleanup_stream(stream, "download ended", deadline)
+ 
+     async def ack(self, method: str, path: str, params: dict | None = None, *,
+                   service: str = "daemon", timeout: float = 20.0) -> dict:
+         """Open a stream, read the first JSON record (the ack), then cancel it."""
+-        gen = self.stream(method, path, params, service=service, reset_reason="ack only")
++        gen = self.stream(method, path, params, service=service, timeout=timeout, reset_reason="ack only")
+         try:
+-            async with asyncio.timeout(timeout):
+-                async for record in gen:
+-                    return record
++            async for record in gen:
++                return record
+         finally:
+             await gen.aclose()
+         return {}
+ 
+     async def close(self) -> None:
+-        if not self._closed.is_set():
+-            try:
++        task = asyncio.current_task()
++        cancel_count = task.cancelling() if task is not None else 0
++        # Retire locally before awaiting transport cleanup: cancellation of
++        # close itself must never leave a reusable channel or blocked readers.
++        self._closed.set()
++        for stream in list(self._streams.values()):
++            stream._finish("connection closed")
++        if not self._receiver.done():
++            self._receiver.cancel()
++        try:
++            async with asyncio.timeout(0.2):
+                 await self.ws.close()
+-            except Exception:  # pragma: no cover
+-                pass
+-            self._closed.set()
++        except Exception:  # best effort, bounded; external cancellation propagates
++            pass
+         own_client = getattr(self, "_ws_client", None)
+         if own_client is not None:
+             try:
+-                await own_client.close()
+-            except Exception:  # pragma: no cover
++                async with asyncio.timeout(0.2):
++                    await own_client.close()
++            except Exception:
+                 pass
+         if not self._receiver.done():
+-            self._receiver.cancel()
+             try:
+-                await self._receiver
++                async with asyncio.timeout(0.2):
++                    await self._receiver
+             except asyncio.CancelledError:
++                if task is not None and task.cancelling() > cancel_count:
++                    raise
++            except TimeoutError:
+                 pass
+diff --git a/muse2api/media.py b/muse2api/media.py
+index 481133d..4e676cb 100644
+--- a/muse2api/media.py
++++ b/muse2api/media.py
+@@ -7,19 +7,22 @@ reachable over the same Noise gateway (``/media/raw/<path>``).
+ 
+ from __future__ import annotations
+ 
++import asyncio
++import io
+ import ipaddress
+ import mimetypes
+ import os
+ import re
+ import socket
++import tempfile
+ import uuid
+ from dataclasses import dataclass
+ from pathlib import Path
+ from typing import Any
+-from urllib.parse import urljoin, urlparse
++from urllib.parse import quote, urljoin, urlparse
+ 
+ from .config import proxy_map
+-from .gateway import HatchConnection
++from .gateway import HatchConnection, ProtocolCancelledError, ProtocolOperationError
+ 
+ # Hard ceiling for any media we accept from a client or hold in memory.
+ MAX_MEDIA_BYTES = 150 * 1024 * 1024
+@@ -34,9 +37,13 @@ class MediaFetchError(RuntimeError):
+     """A remote media URL was rejected or could not be fetched safely."""
+ 
+ 
+-class MediaTooLargeError(RuntimeError):
++class MediaTooLargeError(ProtocolOperationError):
+     """Downloaded media exceeded the configured ceiling."""
+ 
++    def __init__(self, message: str) -> None:
++        super().__init__(message, code="media_too_large", phase="download",
++                         delivery="accepted", retryable=False)
++
+ 
+ 
+ @dataclass(slots=True)
+@@ -260,51 +267,142 @@ async def fetch_public_media(
+ 
+ async def download_media(conn: HatchConnection, ref: MediaRef, *, impersonate: str = "chrome",
+                          max_bytes: int = MAX_MEDIA_BYTES,
+-                         proxy: str | None = None) -> bytes:
++                         proxy: str | None = None, timeout: float = 300.0) -> bytes:
++    """Compatibility byte API, limited during reception before accumulating."""
++    buffer = io.BytesIO()
++    await _download_media_into(conn, ref, buffer, impersonate=impersonate,
++                               max_bytes=max_bytes, proxy=proxy, timeout=timeout)
++    return buffer.getvalue()
++
++
++async def download_media_to(conn: HatchConnection, ref: MediaRef, destination: str | Path, *,
++                            impersonate: str = "chrome", proxy: str | None = None,
++                            max_bytes: int = MAX_MEDIA_BYTES, timeout: float = 300.0) -> int:
++    """Stream into a private temporary file, publishing only a complete result."""
++    target = Path(destination)
++    temporary: Path | None = None
++    try:
++        target.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
++        with tempfile.NamedTemporaryFile(mode="w+b", prefix=".download-", dir=target.parent,
++                                         delete=False) as handle:
++            temporary = Path(handle.name)
++            size = await _download_media_into(conn, ref, handle, impersonate=impersonate,
++                                              max_bytes=max_bytes, proxy=proxy, timeout=timeout)
++            handle.flush()
++            os.fsync(handle.fileno())
++        temporary.replace(target)
++        temporary = None
++        return size
++    except asyncio.CancelledError as exc:
++        raise ProtocolCancelledError(phase="download", delivery="accepted") from exc
++    except ProtocolOperationError:
++        raise
++    except Exception as exc:
++        raise ProtocolOperationError("generated media could not be saved", code="media_download_failed",
++                                     phase="download", delivery="accepted") from exc
++    finally:
++        if temporary is not None:
++            temporary.unlink(missing_ok=True)
++
++
++async def _download_media_into(conn: HatchConnection, ref: MediaRef, target, *,
++                               impersonate: str, max_bytes: int,
++                               proxy: str | None, timeout: float) -> int:
++    if max_bytes < 0 or timeout <= 0:
++        raise ValueError("media limit must be nonnegative and timeout positive")
+     paths: list[str] = []
+     if ref.path:
+-        clean = _normalize_path(ref.path)
++        clean = quote(_normalize_path(ref.path), safe="/")
+         # The gateway accepts both /media/raw and /fs/raw; try the direct media
+         # route first, then fall back to the filesystem route.
+-        paths.extend([f"/media/raw/{clean}", f"/fs/raw/{clean}"])
++        if ref.kind == "file":
++            paths.append(f"/fs/raw/{clean}")
++        else:
++            paths.extend([f"/media/raw/{clean}", f"/fs/raw/{clean}"])
+ 
+-    def check(data: bytes) -> bytes:
+-        if len(data) > max_bytes:
+-            raise MediaTooLargeError(
+-                f"downloaded media exceeds {max_bytes // (1024 * 1024)} MiB"
+-            )
+-        return data
++    def reset() -> None:
++        target.seek(0)
++        target.truncate(0)
++
++    def write(chunk: bytes, total: int) -> int:
++        if total + len(chunk) > max_bytes:
++            raise MediaTooLargeError("downloaded media exceeds byte limit")
++        target.write(chunk)
++        return total + len(chunk)
+ 
+     last_error: Exception | None = None
+-    for path in paths:
+-        try:
+-            response = await conn.request("GET", path, {}, timeout=300.0)
+-            if 200 <= response.status < 300 and response.body:
+-                return check(response.body)
+-            last_error = RuntimeError(f"{path} -> HTTP {response.status}")
+-        except MediaTooLargeError:
+-            raise
+-        except Exception as exc:  # noqa: BLE001
+-            last_error = exc
+-    # Signed VM URLs are not publicly reachable, but an external URL may be.
+-    if ref.url and ref.url.startswith(("http://", "https://")):
+-        try:
+-            from curl_cffi import CurlFollow
+-            from curl_cffi.requests import AsyncSession
+-
+-            proxies = proxy_map(proxy)
+-            async with AsyncSession(
+-                impersonate=impersonate,
+-                timeout=120,
+-                allow_redirects=CurlFollow.SAFE,
+-                **({"proxies": proxies} if proxies else {}),
+-            ) as client:
+-                response = await client.get(ref.url)
+-                if 200 <= response.status_code < 300 and response.content:
+-                    return check(response.content)
+-                last_error = RuntimeError(f"HTTP {response.status_code} for {ref.url}")
+-        except MediaTooLargeError:
+-            raise
+-        except Exception as exc:  # noqa: BLE001
+-            last_error = exc
+-    raise RuntimeError(f"could not download {ref.identity}: {last_error}")
++    deadline = asyncio.get_running_loop().time() + timeout
++    budget = asyncio.timeout(timeout)
++    try:
++        async with budget:
++            for path in paths:
++                reset()
++                size = 0
++                try:
++                    chunks = conn.iter_bytes("GET", path, max_bytes=max_bytes,
++                        timeout=max(0.0, deadline - asyncio.get_running_loop().time()))
++                    try:
++                        async for chunk in chunks:
++                            size = write(chunk, size)
++                    finally:
++                        await chunks.aclose()
++                    if size:
++                        return size
++                    last_error = RuntimeError("empty gateway media")
++                except ProtocolOperationError as exc:
++                    if exc.code in {"response_too_large", "media_too_large"}:
++                        raise MediaTooLargeError("downloaded media exceeds byte limit") from exc
++                    last_error = exc
++                except Exception as exc:
++                    last_error = exc
++            # A public media URL is a read fallback, never a new generation.
++            if ref.url and ref.url.startswith(("http://", "https://")):
++                from curl_cffi.requests import AsyncSession
++
++                proxies = proxy_map(proxy)
++                reset()
++                size = 0
++                current = ref.url
++                async with AsyncSession(impersonate=impersonate, timeout=min(timeout, 120),
++                    **({"proxies": proxies} if proxies else {})) as client:
++                    for _ in range(6):
++                        parsed = urlparse(current)
++                        if parsed.scheme not in {"http", "https"} or not parsed.hostname:
++                            raise MediaFetchError("invalid media URL")
++                        assert_public_host(parsed.hostname)
++                        response = await client.get(current, allow_redirects=False, stream=True)
++                        try:
++                            if response.is_redirect:
++                                location = response.headers.get("location")
++                                if not location:
++                                    raise MediaFetchError("media redirect has no location")
++                                current = urljoin(current, location)
++                                continue
++                            if not 200 <= response.status_code < 300:
++                                raise MediaFetchError(f"media HTTP {response.status_code}")
++                            declared = response.headers.get("content-length") or ""
++                            if declared.isdigit() and int(declared) > max_bytes:
++                                raise MediaTooLargeError("declared media exceeds byte limit")
++                            async for chunk in response.aiter_content():
++                                size = write(chunk, size)
++                            if not size:
++                                raise MediaFetchError("empty remote media")
++                            return size
++                        finally:
++                            await response.aclose()
++                    raise MediaFetchError("too many media redirects")
++            raise ProtocolOperationError("generated media could not be downloaded",
++                code="media_download_failed", phase="download", delivery="accepted") from last_error
++    except asyncio.CancelledError as exc:
++        if budget.expired():
++            raise ProtocolOperationError("media download timed out", code="media_download_failed",
++                phase="download", delivery="accepted") from exc
++        raise ProtocolCancelledError(phase="download", delivery="accepted") from exc
++    except MediaTooLargeError:
++        raise
++    except ProtocolOperationError as exc:
++        exc.phase, exc.delivery, exc.retryable = "download", "accepted", False
++        raise
++    except Exception as exc:
++        raise ProtocolOperationError("generated media could not be downloaded",
++            code="media_download_failed", phase="download", delivery="accepted") from exc
+diff --git a/pyproject.toml b/pyproject.toml
+index 5396125..6870e8b 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -26,6 +26,9 @@ muse2api = "muse2api.__main__:main"
+ [tool.setuptools]
+ packages = ["muse2api"]
+ 
++[tool.setuptools.package-data]
++muse2api = ["protocol.json"]
++
+ [tool.setuptools.dynamic]
+ version = {attr = "muse2api.__version__"}
+ 

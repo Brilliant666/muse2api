@@ -1,0 +1,32 @@
+# Only source files required by this image enter the build context. In
+# particular, .git, .env files, .protocol, local tests, and data stay outside.
+**
+!Dockerfile
+!requirements.txt
+!app.py
+!protocol_backend.py
+!config.py
+!store.py
+!engine.py
+!cdp.py
+!proxy.py
+!admin.html
+!version.json
+!LICENSE
+!tools/
+!tools/prepare_protocol.py
+!tools/get_muse_cookie.py
+!protocol-dependency/
+!protocol-dependency/manifest.json
+!protocol-dependency/integration.patch
+!extension/
+!extension/manifest.json
+!extension/popup.html
+!extension/popup.js
+!extension/README.md
+!extension/安装说明.txt
+!extension/_locales/
+!extension/_locales/en/
+!extension/_locales/en/messages.json
+!extension/_locales/zh_CN/
+!extension/_locales/zh_CN/messages.json

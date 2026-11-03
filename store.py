@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import copy
 import os
 import tempfile
 import threading
@@ -10,7 +11,7 @@ import uuid
 
 from proxy import public_proxy
 
-_LOCK = threading.Lock()
+_LOCK = threading.RLock()
 
 # 登录会话存在性检查；可用性仍须经上游认证（与 engine 一致）
 # hatch_vml 是可选工作区令牌，缺失不能据此拒绝会话导入
@@ -101,10 +102,13 @@ class Store:
         self.cfg = cfg
         self.accounts: list[dict] = _read(cfg.accounts_file, [])
         for a in self.accounts:
+            a.setdefault("credential_revision", 1)
             ce = a.get("cookies_exp") or {}
             if _is_pos(ce.get("hatch_vml")):
                 a["expires_at"] = int(ce["hatch_vml"])
         self.tasks: dict[str, dict] = _read(cfg.tasks_file, {})
+        self.protocol_operations_file = getattr(cfg, "protocol_operations_file", os.path.join(cfg.data_dir, "protocol_operations.json"))
+        self.protocol_operations = _read(self.protocol_operations_file, {})
 
     # ---------- 账号 ----------
     def add_account(self, cookies: dict, label: str = "",
@@ -119,14 +123,15 @@ class Store:
                    "expiry_anchor": None,
                    "enabled": True, "created_at": now,
                    "last_used": None, "last_keepalive": None, "use_count": 0,
-                   "ok": None, "note": "", "synced_at": None}
+                    "ok": None, "note": "", "synced_at": None,
+                    "credential_revision": 1}
             self.accounts.append(acc)
             _write(self.cfg.accounts_file, self.accounts)
-            return acc
+            return copy.deepcopy(acc)
 
     @staticmethod
     def public_account(account: dict) -> dict:
-        item = {k: v for k, v in account.items() if k not in ("cookies", "proxy")}
+        item = copy.deepcopy({k: v for k, v in account.items() if k not in ("cookies", "proxy")})
         item["proxy"] = public_proxy(account.get("proxy"))
         item["cookie_count"] = len(account.get("cookies", {}))
         return item
@@ -160,7 +165,8 @@ class Store:
         """选择可用账号：优先复用当前已预热的健康账号（减少切号重连耗时），每满 15 次或遇错自动轮转。
         exclude_ids: 需要排除的账号 ID 集合（例如正在被其他并发线程占用的账号）。"""
         with _LOCK:
-            live = [a for a in self.accounts if a.get("enabled", True) and a.get("cookies")]
+            live = [a for a in self.accounts if a.get("enabled", True) and a.get("cookies")
+                    and not a.get("protocol_blocked")]
             if not live:
                 return None
             blocked = set(exclude_ids or [])
@@ -186,7 +192,7 @@ class Store:
                                 a["last_used"] = time.time()
                                 a["use_count"] = a.get("use_count", 0) + 1
                                 _write(self.cfg.accounts_file, self.accounts)
-                            return a
+                            return copy.deepcopy(a)
             healthy = [a for a in live if a.get("ok") is not False]
             candidates = healthy if healthy else live
             candidates.sort(key=lambda a: (a.get("last_used") or 0.0, a.get("use_count") or 0))
@@ -197,7 +203,7 @@ class Store:
                 acc["last_used"] = time.time()
                 acc["use_count"] = acc.get("use_count", 0) + 1
                 _write(self.cfg.accounts_file, self.accounts)
-            return acc
+            return copy.deepcopy(acc)
 
     def touch_keepalive(self, aid: str, ok: bool | None = True, note: str = ""):
         """ok=None 仅记录未确认的检测；保留上次账号状态、成功保活时间和有效期。"""
@@ -227,9 +233,10 @@ class Store:
             _write(self.cfg.accounts_file, self.accounts)
 
     def get_account(self, aid: str) -> dict | None:
-        for a in self.accounts:
-            if a["id"] == aid:
-                return a
+        with _LOCK:
+            for a in self.accounts:
+                if a["id"] == aid:
+                    return copy.deepcopy(a)
         return None
 
     def update_account(self, aid: str, **kw) -> dict | None:
@@ -244,6 +251,8 @@ class Store:
         with _LOCK:
             for a in self.accounts:
                 if a["id"] == aid:
+                    if "cookies" in kw or "proxy" in kw:
+                        a["credential_revision"] = int(a.get("credential_revision", 1)) + 1
                     for k, v in kw.items():
                         if v is not None or k == "ok":
                             a[k] = v
@@ -256,8 +265,89 @@ class Store:
                         a["expires_at"] = account_expiry(
                             ce, a.get("expiry_anchor") or a.get("created_at"))
                     _write(self.cfg.accounts_file, self.accounts)
-                    return a
+                    return copy.deepcopy(a)
         return None
+
+    def persist_protocol_cookies(self, aid, revision, values, expires=None, reset_expiries=()):
+        """Compare-and-swap the runtime jar; stale callbacks never replace a new login.
+
+        values is a complete snapshot, so missing cookies are removed. Only real
+        expiry observations update expiry timestamps; no synthetic renewal occurs.
+        """
+        with _LOCK:
+            account = next((a for a in self.accounts if a["id"] == aid), None)
+            if account is None or int(account.get("credential_revision", 1)) != revision:
+                return False
+            current = account.get("cookies") or {}
+            new_values = {str(k): str(v) for k, v in values.items() if v}
+            known = {k: v for k, v in (account.get("cookies_exp") or {}).items()
+                     if k in new_values and k not in reset_expiries}
+            # A new value with no observed expires is a session cookie, not the old token's expiry.
+            for name, value in new_values.items():
+                if current.get(name) != value and name not in (expires or {}):
+                    known.pop(name, None)
+            known.update({k: int(v) for k, v in (expires or {}).items()
+                          if k in new_values and _is_pos(v)})
+            if current != new_values or known != account.get("cookies_exp", {}):
+                account.update(cookies=new_values, cookies_exp=known, synced_at=int(time.time()),
+                               expires_at=account_expiry(known, account.get("expiry_anchor") or account.get("created_at")))
+                _write(self.cfg.accounts_file, self.accounts)
+            return True
+
+    def begin_protocol_operation(self, request_id, account_id, kind, prompt, task_id=None):
+        with _LOCK:
+            if request_id in self.protocol_operations:
+                raise ValueError("request_id already has a protocol operation; recover it instead of resubmitting")
+            now = int(time.time())
+            item = {"id": request_id, "account_id": account_id, "kind": kind, "prompt": prompt,
+                    "task_id": task_id, "state": "preparing", "delivery": "not_sent",
+                    "phase": "prepare", "created_at": now, "updated_at": now}
+            self.protocol_operations[request_id] = item
+            _write(self.protocol_operations_file, self.protocol_operations)
+            return copy.deepcopy(item)
+
+    def update_protocol_operation(self, request_id, **changes):
+        with _LOCK:
+            item = self.protocol_operations.get(request_id)
+            if item is None:
+                return None
+            item.update(copy.deepcopy(changes), updated_at=int(time.time()))
+            account = next((a for a in self.accounts if a["id"] == item["account_id"]), None)
+            if account is not None:
+                if item.get("state") == "unknown":
+                    account["protocol_blocked"] = request_id
+                elif item.get("state") in {"completed", "failed", "delivery_failed"}:
+                    if account.get("protocol_blocked") == request_id:
+                        account.pop("protocol_blocked", None)
+                _write(self.cfg.accounts_file, self.accounts)
+            _write(self.protocol_operations_file, self.protocol_operations)
+            return copy.deepcopy(item)
+
+    def get_protocol_operation(self, request_id):
+        with _LOCK:
+            return copy.deepcopy(self.protocol_operations.get(request_id))
+
+    def list_protocol_operations(self, limit=100):
+        with _LOCK:
+            entries = sorted(self.protocol_operations.values(), key=lambda x: x.get("created_at", 0), reverse=True)
+            # Media URLs may contain signed credentials. The admin UI only needs identity/status.
+            public = []
+            for item in entries[:max(1, min(limit, 1000))]:
+                visible = {k: copy.deepcopy(v) for k, v in item.items() if k not in {"prompt", "media"}}
+                if isinstance(visible.get("result"), dict):
+                    visible["result"] = {k: v for k, v in visible["result"].items() if k not in {"path", "attachment"}}
+                public.append(visible)
+            return public
+
+    def recover_interrupted_protocol_operations(self):
+        with _LOCK:
+            changed = []
+            for item in list(self.protocol_operations.values()):
+                if item.get("state") in {"preparing", "running", "recovering"}:
+                    self.update_protocol_operation(item["id"], state="unknown", delivery="unknown",
+                                                   error="服务重启，原任务结果未确认；请查询恢复，勿重复生成")
+                    changed.append(item["id"])
+            return changed
 
     def stats(self) -> dict:
         now = int(time.time())

@@ -1,0 +1,33 @@
+{
+  "format_version": 1,
+  "source": {
+    "repository": "https://github.com/its-benjamin/muse2api-http.git",
+    "commit": "6309f64b44ce133a2428fadf966a395d503ce84f"
+  },
+  "baseline_files": {
+    "muse2api/chat.py": "25d239414cd32111a3c917346555f89017fd3fdf3750862f969499e8e2b66e76",
+    "muse2api/filesystem.py": "5a85040d9755e08077cdb53dcbc8b68e5cd79b407caea8305526bc2a980563c3",
+    "muse2api/gateway.py": "fb7e88c6d0d48e9d6adc4f6725c557d5a0b67fba66d751be829b6c1ec62cfd1e",
+    "muse2api/media.py": "777c5962a230d5c7e60770808a372884c108f8955be3c94682d9f6f50442798c",
+    "pyproject.toml": "f5dd5b98c90ea61206821c75e6712fdb7a1d06b7dd4be9f8582f458019ce17ba"
+  },
+  "normalize_lf": [
+    "muse2api/chat.py",
+    "muse2api/filesystem.py",
+    "muse2api/gateway.py",
+    "pyproject.toml"
+  ],
+  "patches": [
+    {
+      "path": "integration.patch",
+      "sha256": "2b31dc50b730b0870ab6e7099d7718e8ac43eebf6c61a9ed39eba6d63c7ebcf9"
+    }
+  ],
+  "output_files": {
+    "muse2api/chat.py": "6f842758d497460f7e006ff3b996b30fa1cd0874749d0cb4f4c7698ac7a298d0",
+    "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+    "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+    "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+    "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+  }
+}

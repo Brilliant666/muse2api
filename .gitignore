@@ -6,6 +6,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
 develop-eggs/
@@ -26,12 +27,16 @@ wheels/
 # Environment & Credentials
 .env
 .env.local
+.env.*
+!.env.example
 *.key
 *.pem
 
 # Runtime & User Data
 data/accounts.json
 data/tasks.json
+data/protocol_operations.json
+data/protocol/
 data/.installed_sha
 data/debug-*.json
 data/media/*
@@ -42,6 +47,13 @@ data/downloads/*
 data/mail_accounts.txt
 chrome-profile/
 muse2api-profiles/
+
+# Generated pinned protocol dependency and local protocol state
+/.protocol/
+.muse-state/
+cookies_muse.txt
+live-smoke*.json
+recovered-result.json
 
 # Logs & Backups
 *.log
