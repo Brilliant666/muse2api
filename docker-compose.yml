@@ -6,6 +6,8 @@ services:
       args:
         INCLUDE_BROWSER: ${MUSE_INCLUDE_BROWSER:-0}
     image: muse2api-python-protocol:local
+    # Chromium can orphan children; PID 1 must forward signals and reap them.
+    init: true
     restart: unless-stopped
     ports:
       - "${MUSE_BIND_ADDRESS:-127.0.0.1}:18610:18610"
