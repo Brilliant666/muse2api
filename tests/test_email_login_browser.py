@@ -120,6 +120,11 @@ class Page:
         self.env.page_calls.append((method, params))
         if method == "Input.insertText":
             self.env.inserted.append(params["text"])
+            # The observed official six-digit onChange invokes confirm-otp
+            # before Input.insertText returns, without a button click.
+            if self.env.prepared == "code" and len(params["text"]) == 6 and self.env.auto_complete:
+                self.env.auto_submissions += 1
+                self.env.state = dict(self.env.after_code)
         return {"result": {}}
 
     def js(self, expr, timeout=None):
@@ -136,6 +141,9 @@ class Page:
             return {"prepared": True}
         if "muse-email:click" in expr:
             kind = self.env.prepared
+            if kind == "code" and self.env.auto_submissions:
+                # Auto-completion already disabled/replaced the OTP form.
+                return {"submitted": False}
             self.env.clicks.append(kind)
             if self.env.fail_after_click:
                 raise TimeoutError("synthetic sensitive error must never escape")
@@ -156,6 +164,8 @@ class Environment:
         self.html = identity()
         self.clicks, self.inserted, self.pages, self.urls, self.page_calls, self.cookie_contexts = [], [], [], [], [], []
         self.identity_reads = 0
+        self.auto_submissions = 0
+        self.auto_complete = True
         self.fail_after_click = False
         self.submitted = True
         self.proc, self.browser = None, Browser(self)
@@ -329,7 +339,8 @@ class EmailLoginBrowserTests(unittest.TestCase):
         self.env.clock.hook = lambda now:self.driver.request_stop() if now >= stop_at else None
         self.assertEqual(self.driver.verify(CODE)["status"], "UNKNOWN")
         self.assertLessEqual(self.env.clock.now, stop_at + .25)
-        self.assertEqual(self.env.clicks, ["email", "code"])
+        self.assertEqual(self.env.clicks, ["email"])
+        self.assertEqual(self.env.auto_submissions, 1)
         self.assertEqual(self.env.browser.disposed, ["owned-context-1"])
 
     def test_stop_after_native_input_prevents_the_actual_click(self):
@@ -360,6 +371,39 @@ class EmailLoginBrowserTests(unittest.TestCase):
         self.assertEqual(self.env.clicks, [])
         self.assertEqual(list(self.env.root.glob("muse-email-login-*")), [])
 
+    def test_auto_completion_loading_observes_result_without_button_click(self):
+        self.begin()
+        self.env.after_code = {"url":"https://muse.ai/", "sending":True,
+                               "otp_ready":False,"email_ready":False}
+        complete_at = self.env.clock.now + .5
+        def complete(now):
+            if self.env.auto_submissions and now >= complete_at:
+                self.env.state = authenticated_state()
+        self.env.clock.hook = complete
+        self.assertEqual(self.driver.verify(CODE)["status"],"AUTHENTICATED")
+        self.assertEqual(self.env.auto_submissions,1)
+        self.assertEqual(self.env.clicks,["email"])
+        self.assertEqual(self.env.inserted,[EMAIL,CODE])
+
+    def test_auto_completion_navigated_form_accepts_cookie_and_identity(self):
+        self.begin()
+        self.env.after_code = authenticated_state()
+        self.assertEqual(self.driver.verify(CODE)["status"],"AUTHENTICATED")
+        self.assertEqual(self.env.auto_submissions,1)
+        self.assertEqual(self.env.clicks,["email"])
+        self.assertEqual(self.env.inserted,[EMAIL,CODE])
+
+    def test_auto_completion_absent_is_bounded_unknown_without_fallback_click(self):
+        self.begin()
+        self.env.auto_complete = False
+        started = self.env.clock.now
+        self.assertEqual(self.driver.verify(CODE)["status"],"UNKNOWN")
+        self.assertGreaterEqual(self.env.clock.now-started,45)
+        self.assertLessEqual(self.env.clock.now-started,45.25)
+        self.assertEqual(self.env.auto_submissions,0)
+        self.assertEqual(self.env.clicks,["email"])
+        self.assertEqual(self.env.inserted,[EMAIL,CODE])
+
     def test_constructor_and_availability_do_not_launch_or_attach(self):
         self.assertTrue(browser_available(self.env.cfg))
         self.assertTrue(self.driver.available())
@@ -377,7 +421,8 @@ class EmailLoginBrowserTests(unittest.TestCase):
         self.assertEqual(result["status"], "AUTHENTICATED")
         self.assertEqual(result["principal_id"], PRINCIPAL)
         self.assertTrue(result["challenge_email_matched"])
-        self.assertEqual(self.env.clicks, ["email", "code"])
+        self.assertEqual(self.env.clicks, ["email"])
+        self.assertEqual(self.env.auto_submissions, 1)
         self.assertEqual(self.env.inserted, [EMAIL, CODE])
         self.assertIn("--remote-debugging-port=0", self.env.proc.args)
         self.assertIn("--remote-debugging-address=127.0.0.1", self.env.proc.args)
@@ -470,10 +515,12 @@ class EmailLoginBrowserTests(unittest.TestCase):
         self.assertEqual(self.driver.verify("12")["status"], "INVALID_CODE")
         self.assertEqual(self.driver.verify(CODE)["status"], "INVALID_CODE")
         self.assertEqual(self.driver.verify(CODE)["status"], "INVALID_CODE")
-        self.assertEqual(self.env.clicks, ["email", "code"])
+        self.assertEqual(self.env.clicks, ["email"])
+        self.assertEqual(self.env.auto_submissions, 1)
         self.env.after_code = authenticated_state()
         self.assertEqual(self.driver.verify("654321")["status"], "AUTHENTICATED")
-        self.assertEqual(self.env.clicks, ["email", "code", "code"])
+        self.assertEqual(self.env.clicks, ["email"])
+        self.assertEqual(self.env.auto_submissions, 2)
 
     def test_captcha_or_forced_extra_step_fails_closed(self):
         self.env.state["blocked"] = True
@@ -501,7 +548,8 @@ class EmailLoginBrowserTests(unittest.TestCase):
         self.begin()
         result = self.driver.verify(CODE)
         self.assertEqual(result["status"], "UNKNOWN")
-        self.assertEqual(self.env.clicks, ["email", "code"])
+        self.assertEqual(self.env.clicks, ["email"])
+        self.assertEqual(self.env.auto_submissions, 1)
         self.assertLessEqual(self.env.clock.now, 47)
         self.assertEqual(sum(m == "Page.navigate" for m, _ in self.env.page_calls), 2)
 

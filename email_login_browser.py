@@ -259,6 +259,10 @@ class EmailLoginBrowser:
         self._check_stop()
         self._page.send("Input.insertText", {"text": value}, timeout=3)
         self._check_stop()
+        if marker == "code-submit":
+            # Official OTP onChange completes at six digits. The input itself
+            # may already have sent confirm-otp; never also click or resend.
+            return True
         click = _CLICK.replace("SELECTOR", json.dumps(selector)).replace("VALUE", json.dumps(value))
         self._check_stop()
         result = self._page.js(click, timeout=3)
