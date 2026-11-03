@@ -1,10 +1,12 @@
 # 验证记录
 
-最新实号测试 SHA：`b08f11000930674990c2834e1a9da091fd08a668`。本机 Windows 源码环境 **九案 PASS**，预算恰好 6/6 文本、2/2 图片、1/1 视频；真实断连 unknown/重启原操作恢复、Cookie 轮换/Store/重启认证和 Chrome 文本回退通过。图片/编辑完整解码，视频完整 120 帧和音轨解码。当前可进入限定环境的单账号试运行，真实 VM 唤醒和目标部署条件未覆盖，不能替换现网。
+九案生成功能测试 SHA：`b08f11000930674990c2834e1a9da091fd08a668`。本机 Windows 源码环境 **九案 PASS**，预算恰好 6/6 文本、2/2 图片、1/1 视频；真实断连 unknown/重启原操作恢复、Cookie 轮换/Store/重启认证和 Chrome 文本回退通过。图片/编辑完整解码，视频完整 120 帧和音轨解码。当前可进入限定环境的单账号试运行，真实 VM 唤醒和目标部署条件未覆盖，不能替换现网。
 
-完整结论和元数据见 [acceptance-report.md](acceptance-report.md)、[acceptance-results.json](acceptance-results.json)、[实号证据](evidence/live-functional-validation.json)。实号之后只更新报告，没有改业务代码或伪称新版本重跑。
+完整结论和元数据见 [acceptance-report.md](acceptance-report.md)、[acceptance-results.json](acceptance-results.json)、[实号证据](evidence/live-functional-validation.json)。九案之后仅新增零生成 VM 诊断工具与报告，没有改业务代码或伪称新版本重跑。
 
 此前 64 Python、6 JS、原有 25 Python 脚本/10 JS、native I/O、Docker 构建、init 清理和新增 13 项工具合成测试保留各自实际版本与结果；未重复测试仅为凑计数。下面是初始 `52d5acd` 之前的历史记录，不能当作最新状态。
+
+2026-11-03 零生成 VM 补验：工具 `b2f600e8a40a94280bbdb5f787f442c0c6d70f97`；约 30 分钟四个低频采样均为原 VM 的 RUNNING，仍为 **NOT_OBSERVED**，没有 bootstrap/wake/Noise/history 或新增生成。原账本/操作/任务摘要不变，Cookie 正常轮换写盘；诊断退出后已恢复隔离协议管理页。见 [补验证据](evidence/live-vm-wakeup.json)。
 
 ---
 

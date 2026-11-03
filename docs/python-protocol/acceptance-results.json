@@ -21,7 +21,7 @@
     "scope": "init:true only; application, protocol patch and Python test blobs unchanged",
     "targeted_test": "actual Chromium orphan count 8 -> 0"
   },
-  "evidence_delivery_note": "Following report commit changes documentation/evidence only; final_test_sha is the final executable/configuration test version, not a self-referential report commit",
+  "evidence_delivery_note": "final_test_sha retains nine-case validation; supplemental_test_sha binds VM-only observer. Following report commit changes documentation/evidence only.",
   "budget": {
     "limits": {
       "text": 6,
@@ -181,9 +181,10 @@
       "id": "real_vm_wakeup",
       "status": "NOT_OBSERVED",
       "evidence_level": "real Muse",
-      "detail": "No asleep/inactive -> RUNNING event observed; local restart and wake acknowledgement do not prove this",
+      "detail": "30-minute zero-generation supplement: four real session_info samples assigned/RUNNING on original VM; no explicit idle state, bootstrap/wake/Noise/history not executed; original ledger and operations unchanged.",
       "evidence": [
-        "evidence/acceptance-cases.json"
+        "evidence/acceptance-cases.json",
+        "evidence/live-vm-wakeup.json"
       ]
     },
     {
@@ -246,7 +247,7 @@
   "production_changed": false,
   "merged": false,
   "runtime_cleanup": {
-    "source_service_stopped": true,
+    "source_service_stopped": false,
     "containers_stopped": [
       "muse2api-acceptance-20261103-protocol",
       "muse2api-acceptance-20261103-browser",
@@ -254,8 +255,12 @@
     ],
     "images_and_isolated_synthetic_volume_retained": true,
     "shared_docker_restarted": false,
-    "source_service_state": "All acceptance source services and owned Chrome processes stopped; ports18611/19211 released",
-    "real_media_and_private_receipts_retained_outside_git": true
+    "source_service_state": "VM observer exited; previous protocol management service restored at localhost:18611; browser and diagnostics stopped",
+    "real_media_and_private_receipts_retained_outside_git": true,
+    "diagnostic_process_exited": true,
+    "diagnostic_connections_closed": true,
+    "original_nine_case_cleanup_evidence": "evidence/live-runtime-and-cleanup.json",
+    "docker_not_rechecked_in_vm_supplement": true
   },
   "minimum_user_input": "None needed to finish this budgeted round. Production replacement still needs a real idle-VM wake observation and target-runtime/multi-account/proxy/concurrency evidence where required; any new generation needs a separately agreed budget.",
   "previous_application_configuration_test_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
@@ -271,7 +276,7 @@
   "live_results": "evidence/live-functional-validation.json",
   "production_service_configuration_changed": false,
   "production_credential_reuse": "Explicit human authorization verified; private one-account handoff; no production service configuration or deployment changed",
-  "after_live_tests_changes": "Documentation and sanitized evidence only; no executable or dependency changes after real validation",
+  "after_live_tests_changes": "Documentation, sanitized evidence, and zero-generation VM diagnostic tooling only; application/protocol/dependency/deployment unchanged after nine-case validation",
   "pre_generation_tooling_validation": {
     "sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
     "case_tool_tests": 8,
@@ -291,5 +296,24 @@
       "evidence/live-account-readiness.json"
     ],
     "scope": "Historical tooling-only phase before this real round; zero generation calls at that phase"
+  },
+  "final_test_sha_scope": "Original nine generation cases; later VM-only observer uses supplemental_test_sha",
+  "supplemental_test_sha": "b2f600e8a40a94280bbdb5f787f442c0c6d70f97",
+  "supplemental_vm_wakeup": {
+    "status": "NOT_OBSERVED",
+    "test_sha": "b2f600e8a40a94280bbdb5f787f442c0c6d70f97",
+    "evidence": "evidence/live-vm-wakeup.json",
+    "started_at": "2026-11-03T07:55:43Z",
+    "finished_at": "2026-11-03T08:25:46Z",
+    "session_info_get_count": 4,
+    "wake_count": 0,
+    "history_get_count": 0,
+    "additional_generation": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "original_ledger_and_operations_unchanged": true,
+    "management_service_restored_running": true
   }
 }

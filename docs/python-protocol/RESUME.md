@@ -1,6 +1,6 @@
 # 验收结果与后续查询
 
-本轮真实测试已完成，SHA `b08f11000930674990c2834e1a9da091fd08a668`，九案全部 PASS。预算 **6/6 文本、2/2 图片、1/1 视频** 已用满。测试服务与独立 Chrome 均已停止，私密账本和媒体保留在仓库外；不再等待账号导入。
+本轮真实测试已完成，SHA `b08f11000930674990c2834e1a9da091fd08a668`，九案全部 PASS。预算 **6/6 文本、2/2 图片、1/1 视频** 已用满。九案结束时测试服务与独立 Chrome 均已停止；后续按用户要求恢复了隔离协议管理页。私密账本和媒体保留在仓库外，不再等待账号输入完成九案。
 
 [验收报告](acceptance-report.md) · [机器结果](acceptance-results.json) · [案例账本](evidence/acceptance-cases.json)
 
@@ -33,3 +33,19 @@
 真实 VM 休眠/失活→RUNNING 未观察到，不能用本地重启或 wake HTTP 成功替代。实号多账号/代理、真实并发 3、真实 delivery_failed 恢复也没有本轮实号证据；相关受控验证单列。现网 3 是未修改的部署参数。
 
 如目标替换需要这些条件，应先确定独立测试安排及新增生成预算。任何新生成都不属于本轮剩余额度。本轮继续使用现有 Draft PR #1，不创建重复 PR，不合并、不迁移或切换生产。
+
+## 零生成 VM 补验与后续观察
+
+2026-11-03 的约 30 分钟自然空闲观察已完成：四次真实 session 查询均为原 VM 的 RUNNING，结果仍为 **NOT_OBSERVED**；未执行 bootstrap/wake/Noise/history。原账本消耗仍为 6/2/1，九个意图、八个完成操作和三个任务均未改变。本地协议管理页已恢复运行，Chrome 和诊断进程均已停止，见 [补验证据](evidence/live-vm-wakeup.json)。
+
+新增 tools/live_vm_wake.py 仅用于零生成观察。必须沿用原私密根、原 ledger 和原 Store，不能新建空账本；它从私密 T5 读取实际关联 ID，Git 里的 operation-T5 只是匿名别名。先确认没有配置或任务，再暂停并确认隔离服务退出，才可让诊断独占 Store。运行期间若服务重启，工具立即退出；不要同时导入 app 或创建另一个 Store 持有者。
+
+在用户授权新的观察窗口后，可于原 worktree 使用以下入口。$privateRoot 指原先包含 application/、live-cases/ledger.json 的私密根，receipts 只是同根下新的诊断回执目录，不能用它替换账本：
+
+```powershell
+.venv/Scripts/python.exe tools/live_vm_wake.py --env-file .env --private-root $privateRoot --receipts (Join-Path $privateRoot 'vm-wake-next-observation') --observe-minutes 30 --interval-seconds 600
+```
+
+默认最多 30 分钟、约 10 分钟一次真实 session 查询，观察期间不建网关。只有捕获明确休眠状态且仍为原 VM，才执行真实 bootstrap(force=True)，记录实际 wake 和真实 RUNNING，再直接 GET 原 chat.history，核对原用户消息 ID、原 prompt 和同 turn 完整回复；不调用生成、审批或 completed recover。缺失/过渡状态、重新分配、未走实际 wake 均不能作为原 VM 唤醒通过。
+
+结束后以私密 result.json 的 finished_at 和最终状态为准，核对原 ledger、意图/操作集合及 Cookie 回写，再仅关闭诊断连接，恢复事先约定的测试服务状态。当前已用满的生成预算不因观察、换 receipts 或重启而重置。

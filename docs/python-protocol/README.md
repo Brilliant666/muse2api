@@ -2,7 +2,7 @@
 
 本分支保留原 muse2api 的 API、账号池、Store、管理页与媒体目录，通过同进程 Python 协议模块连接 Muse。浏览器后端仍可选择。本分支是供 Codex 接手真实验收的集成版本；已完成的离线检查和未执行的项目见 [VALIDATION.md](VALIDATION.md)。
 
-2026-11-03 实号验收已完成：本机 Windows 源码环境九案全部通过，预算实用 6 文本、2 图片、1 视频；真实 unknown/重启恢复、Cookie 轮换和 Chrome 回退均有证据。达到单账号试运行门槛，尚未达到现网替换门槛；真实 VM 唤醒、目标 Linux 容器实号及所需代理/多账号/并发仍待验。完整版本和边界见 [验收报告](acceptance-report.md)。
+2026-11-03 实号验收已完成：本机 Windows 源码环境九案全部通过，预算实用 6 文本、2 图片、1 视频；真实 unknown/重启恢复、Cookie 轮换和 Chrome 回退均有证据。达到单账号试运行门槛，尚未达到现网替换门槛；真实 VM 唤醒、目标 Linux 容器实号及所需代理/多账号/并发仍待验。后续零生成 VM 观察在约 30 分钟内四次采样均为原 VM 的 RUNNING，仍为 NOT_OBSERVED，未执行 wake/Noise/history；原 6/2/1 账本不变。完整版本和边界见 [验收报告](acceptance-report.md)。
 
 ## 从仓库开始
 
