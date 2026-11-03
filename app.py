@@ -32,6 +32,7 @@ import base64
 import binascii
 import io
 import hashlib
+import hmac
 import json
 import logging
 import os
@@ -265,6 +266,110 @@ GEN_LOCK = ConcurrencyLock(limit=CFG.max_concurrency)
 ACCOUNT_POOL = AccountPoolManager(store)
 IMAGE_TASK_LOCK = threading.Lock()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+# Login has its own isolated browser and never calls the generation backend.
+_EMAIL_LOGIN_MANAGER = None
+_EMAIL_LOGIN_MANAGER_LOCK = threading.Lock()
+
+
+def _email_identity_hash(principal: str) -> str:
+    """Only a keyed fingerprint, never the upstream principal, enters accounts.json."""
+    path = os.path.join(CFG.data_dir, "email-login-identity.key")
+    try:
+        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except FileExistsError:
+        pass
+    else:
+        with os.fdopen(fd, "wb") as stream:
+            stream.write(os.urandom(32))
+            stream.flush()
+            os.fsync(stream.fileno())
+    with open(path, "rb") as stream:
+        salt = stream.read(33)
+    if len(salt) != 32:
+        raise ValueError("LOGIN_IDENTITY_KEY_INVALID")
+    return hmac.new(salt, principal.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def _save_email_login_account(email: str, result: dict) -> dict:
+    """Bind the current OTP challenge to one authenticated identity under a lease."""
+    email = email.strip().casefold()
+    principal = result.get("principal_id")
+    cookies = result.get("cookies")
+    if (result.get("status") != "AUTHENTICATED"
+            or result.get("challenge_email_matched") is not True
+            or not isinstance(principal, str) or not principal.strip()
+            or len(principal) > 512 or any(ord(c) < 32 for c in principal)
+            or not isinstance(cookies, dict) or not cookies.get("hatch_sess")
+            or any(not isinstance(k, str) or not isinstance(v, str) for k, v in cookies.items())):
+        raise ValueError("LOGIN_IDENTITY_UNVERIFIED")
+    note = "邮箱登录认证已入池；生成能力尚未测试"
+    # Account selection, maintenance and login replacement share this condition.
+    # A replacement increments credential_revision, rejecting stale runtime CAS.
+    with ACCOUNT_POOL.cond:
+        fingerprint = _email_identity_hash(principal)
+        accounts = [store.get_account(item["id"]) for item in store.list_accounts()]
+        accounts = [item for item in accounts if item]
+        same_identity = [a for a in accounts if a.get("login_identity_hash") == fingerprint]
+        same_email = [a for a in accounts if str(a.get("login_email") or "").casefold() == email]
+        if (len(same_identity) > 1
+                or any(a.get("login_identity_hash") != fingerprint for a in same_email)
+                or any(str(a.get("login_email") or "").casefold() not in ("", email) for a in same_identity)):
+            raise ValueError("LOGIN_IDENTITY_CONFLICT")
+        expires = result.get("expires") or {}
+        if not isinstance(expires, dict):
+            raise ValueError("LOGIN_COOKIE_EXPIRY_INVALID")
+        if not same_identity:
+            account = store.add_account(dict(cookies), email, cookies_exp=expires,
+                                        login_email=email, login_identity_hash=fingerprint)
+            return {"id": account["id"], "authenticated": True, "generation_tested": False}
+        account = same_identity[0]
+        aid = account["id"]
+        active_states = {"preparing", "running", "unknown", "recovering"}
+        if (aid in ACCOUNT_POOL.busy_accounts or account.get("protocol_blocked")
+                or any(op.get("account_id") == aid and op.get("state") in active_states
+                       for op in list(store.protocol_operations.values()))
+                or any(task.get("account") == aid and task.get("status") in {"queued", "processing", "unknown"}
+                       for task in list(store.tasks.values()))):
+            raise ValueError("LOGIN_ACCOUNT_BUSY_OR_QUARANTINED")
+        ACCOUNT_POOL.busy_accounts.add(aid)
+        try:
+            store.update_account(aid, cookies=dict(cookies), cookies_exp=expires,
+                                 login_email=email, login_identity_hash=fingerprint,
+                                 expiry_anchor=int(time.time()), synced_at=0,
+                                 last_keepalive=0, checked_at=0, ok=None, note=note)
+        finally:
+            ACCOUNT_POOL.busy_accounts.discard(aid)
+            ACCOUNT_POOL.cond.notify_all()
+        return {"id": aid, "authenticated": True, "generation_tested": False}
+
+
+def _email_login_available() -> bool:
+    from email_login_browser import browser_available
+    return browser_available(CFG)
+
+
+def _email_login_manager():
+    global _EMAIL_LOGIN_MANAGER
+    with _EMAIL_LOGIN_MANAGER_LOCK:
+        if _EMAIL_LOGIN_MANAGER is None:
+            from email_login import LoginManager
+            from email_login_browser import EmailLoginBrowser
+            try:
+                _EMAIL_LOGIN_MANAGER = LoginManager(
+                    CFG.data_dir, lambda: EmailLoginBrowser(CFG), _save_email_login_account,
+                    max_jobs=10, otp_timeout=600)
+            except (OSError, ValueError, RuntimeError) as exc:
+                raise HTTPException(503, "邮箱登录队列暂不可用，请检查私密数据目录") from exc
+        return _EMAIL_LOGIN_MANAGER
+
+
+def _email_login_snapshot(manager):
+    snapshot = manager.snapshot()
+    # This is a filesystem capability check, not a Chrome launch or upstream check.
+    snapshot["available"] = _email_login_available() and snapshot.get("available") is not False
+    return snapshot
 
 
 def _bind_account_proxy(account: dict):
@@ -1981,6 +2086,64 @@ def abandon_protocol_operation(operation_id: str, payload: dict = Body(default={
     return result
 
 
+# ------------------------- 管理：邮箱 OTP 登录 -------------------------
+class EmailLoginRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    emails: list[str] = Field(min_length=1, max_length=10)
+
+
+class EmailLoginCodeRequest(BaseModel):
+    model_config = {"extra": "forbid"}
+    code: SecretStr
+
+    @field_validator("code")
+    @classmethod
+    def validate_code(cls, value):
+        if not re.fullmatch(r"[0-9]{6}", value.get_secret_value().strip()):
+            raise ValueError("请输入六位数字验证码")
+        return SecretStr(value.get_secret_value().strip())
+
+
+def _email_login_action(action, *args):
+    try:
+        return action(*args)
+    except KeyError as exc:
+        raise HTTPException(404, "邮箱登录任务不存在") from exc
+    except (ValueError, RuntimeError) as exc:
+        # Only one known local code is mapped; never forward driver error text.
+        if str(exc) == "login_job_not_found":
+            raise HTTPException(404, "邮箱登录任务不存在") from exc
+        raise HTTPException(409, "邮箱登录请求未接受，请检查邮箱、任务状态与验证码") from exc
+
+
+@app.get("/admin/email-login/jobs")
+def email_login_jobs(_=Depends(auth)):
+    return _email_login_snapshot(_email_login_manager())
+
+
+@app.post("/admin/email-login/jobs")
+def create_email_login_jobs(req: EmailLoginRequest, _=Depends(auth)):
+    if not _email_login_available():
+        raise HTTPException(503, "邮箱登录助手不可用：此环境未安装可用 Chrome/Chromium，原有 Cookie 导入仍可使用")
+    manager = _email_login_manager()
+    _email_login_action(manager.create, req.emails)
+    return _email_login_snapshot(manager)
+
+
+@app.post("/admin/email-login/jobs/{job_id}/code")
+def submit_email_login_code(job_id: str, req: EmailLoginCodeRequest, _=Depends(auth)):
+    manager = _email_login_manager()
+    _email_login_action(manager.submit_code, job_id, req.code.get_secret_value())
+    return _email_login_snapshot(manager)
+
+
+@app.post("/admin/email-login/jobs/{job_id}/cancel")
+def cancel_email_login_job(job_id: str, _=Depends(auth)):
+    manager = _email_login_manager()
+    _email_login_action(manager.cancel, job_id)
+    return _email_login_snapshot(manager)
+
+
 # ------------------------- 管理：账号池 -------------------------
 @app.get("/admin/accounts")
 def list_accounts(_=Depends(auth)):
@@ -2945,6 +3108,10 @@ async def admin_repo_push(payload: dict = Body(default={}), _=Depends(auth)):
 
 @app.on_event("startup")
 async def _startup():
+    try:
+        _email_login_manager()  # Worker remains idle; no browser is constructed here.
+    except HTTPException:
+        log.warning("邮箱登录队列不可用；原有后端继续运行")
     store.recover_interrupted_protocol_operations()
     if _protocol_backend():
         engine.start()
@@ -2972,4 +3139,6 @@ async def _startup():
 
 @app.on_event("shutdown")
 def _shutdown():
+    if _EMAIL_LOGIN_MANAGER is not None:
+        _EMAIL_LOGIN_MANAGER.close()
     engine.stop()

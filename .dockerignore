@@ -4,6 +4,9 @@
 !Dockerfile
 !requirements.txt
 !app.py
+!email_login.py
+!email_login_browser.py
+!muse_identity.py
 !protocol_backend.py
 !config.py
 !store.py

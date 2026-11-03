@@ -112,7 +112,9 @@ class Store:
 
     # ---------- 账号 ----------
     def add_account(self, cookies: dict, label: str = "",
-                    cookies_exp: dict | None = None) -> dict:
+                    cookies_exp: dict | None = None, *,
+                    login_email: str | None = None,
+                    login_identity_hash: str | None = None) -> dict:
         with _LOCK:
             aid = uuid.uuid4().hex[:12]
             exp = {k: int(v) for k, v in (cookies_exp or {}).items()
@@ -125,6 +127,12 @@ class Store:
                    "last_used": None, "last_keepalive": None, "use_count": 0,
                     "ok": None, "note": "", "synced_at": None,
                     "credential_revision": 1}
+            # Login ownership must be durable in the same write as its Cookie.
+            # Existing Cookie-only imports keep their original record shape.
+            if login_email is not None:
+                acc["login_email"] = login_email
+            if login_identity_hash is not None:
+                acc["login_identity_hash"] = login_identity_hash
             self.accounts.append(acc)
             _write(self.cfg.accounts_file, self.accounts)
             return copy.deepcopy(acc)
