@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "timezone": "Asia/Shanghai",
+  "status": "NOT_OBSERVED",
+  "scope": "Real idle-VM wake only; original nine generation cases not repeated",
+  "base_report_sha": "1e1fa8bdd4606cff493955a6d140edd16fa2bb7b",
+  "application_validation_sha": "b08f11000930674990c2834e1a9da091fd08a668",
+  "diagnostic_test_sha": "b2f600e8a40a94280bbdb5f787f442c0c6d70f97",
+  "diagnostic_test_tree": "06249a7150b89ddd68b218bfa3edfc5e32896a9e",
+  "diagnostic_tool_sha256": "552c94f27d3e642af9e1d7b59b31007f689aca8ac977da2f79ae41cec3dd0420",
+  "private_result_sha256": "8e5115fe04eacf314c82ccc6f56c9f0c1cb6ebe34b7bdfacd05ba3a567b1577a",
+  "observation": {
+    "started_at": "2026-11-03T07:55:43Z",
+    "finished_at": "2026-11-03T08:25:46Z",
+    "local_started_at": "2026-11-03 15:55:43",
+    "local_finished_at": "2026-11-03 16:25:46",
+    "planned_maximum_seconds": 1800,
+    "actual_observation_elapsed_seconds": 1801.75,
+    "planned_query_interval_seconds": 600,
+    "samples": [
+      {
+        "at": "2026-11-03T07:55:45Z",
+        "elapsed_seconds": 0.516,
+        "phase": "observe",
+        "method": "GET",
+        "path": "/api/session",
+        "response_received_at": "2026-11-03T07:55:45Z",
+        "status": "assigned",
+        "vm_state": "RUNNING",
+        "vm_fingerprint": "f1103dc5d12eb307",
+        "has_vm_id": true,
+        "has_endpoint": true,
+        "matches_original_vm": true
+      },
+      {
+        "at": "2026-11-03T08:05:45Z",
+        "elapsed_seconds": 601.032,
+        "phase": "observe",
+        "method": "GET",
+        "path": "/api/session",
+        "response_received_at": "2026-11-03T08:05:46Z",
+        "status": "assigned",
+        "vm_state": "RUNNING",
+        "vm_fingerprint": "f1103dc5d12eb307",
+        "has_vm_id": true,
+        "has_endpoint": true,
+        "matches_original_vm": true
+      },
+      {
+        "at": "2026-11-03T08:15:45Z",
+        "elapsed_seconds": 1201.032,
+        "phase": "observe",
+        "method": "GET",
+        "path": "/api/session",
+        "response_received_at": "2026-11-03T08:15:46Z",
+        "status": "assigned",
+        "vm_state": "RUNNING",
+        "vm_fingerprint": "f1103dc5d12eb307",
+        "has_vm_id": true,
+        "has_endpoint": true,
+        "matches_original_vm": true
+      },
+      {
+        "at": "2026-11-03T08:25:45Z",
+        "elapsed_seconds": 1801.047,
+        "phase": "observe",
+        "method": "GET",
+        "path": "/api/session",
+        "response_received_at": "2026-11-03T08:25:46Z",
+        "status": "assigned",
+        "vm_state": "RUNNING",
+        "vm_fingerprint": "f1103dc5d12eb307",
+        "has_vm_id": true,
+        "has_endpoint": true,
+        "matches_original_vm": true
+      }
+    ],
+    "explicit_idle_captured": false,
+    "raw_payload_vm_identity_independently_verified": true,
+    "continuous_state_not_monitored": true,
+    "external_client_activity_not_excluded": true
+  },
+  "actions": {
+    "session_info_get_count": 4,
+    "http_post_count": 0,
+    "bootstrap_force_count": 0,
+    "wake_count": 0,
+    "noise_connections": 0,
+    "chat_history_get_count": 0,
+    "new_generation_posts": 0,
+    "approval_operations": 0,
+    "completed_recover_or_cached_media_used": false,
+    "vm_reassigned_observed": false,
+    "bootstrap": "NOT_RUN",
+    "actual_wake": "NOT_RUN",
+    "noise_connection": "NOT_RUN",
+    "original_history_read": "NOT_RUN"
+  },
+  "budget": {
+    "additional_authorization": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "consumed_before": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "consumed_after": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "additional_consumed": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    }
+  },
+  "original_data": {
+    "same_original_private_root_and_ledger": true,
+    "ledger_sha256_before": "b1f6c6120d2b9606b40fb8a57520384bc3ffa436d86348169c73270b15a30808",
+    "ledger_sha256_after": "b1f6c6120d2b9606b40fb8a57520384bc3ffa436d86348169c73270b15a30808",
+    "intent_count_before": 9,
+    "intent_count_after": 9,
+    "intent_ids_unchanged": true,
+    "operation_count_before": 8,
+    "operation_count_after": 8,
+    "operation_id_set_sha256_before": "3b6d20bd7b579ef559838d413ded0544b039cf8401a480d62b6f84c09228e0fb",
+    "operation_id_set_sha256_after": "3b6d20bd7b579ef559838d413ded0544b039cf8401a480d62b6f84c09228e0fb",
+    "operation_file_sha256_before": "6d9367ee2dfd531755766b347a78f54befce57436cba1dbe7e9c0f70ebef6767",
+    "operation_file_sha256_after": "6d9367ee2dfd531755766b347a78f54befce57436cba1dbe7e9c0f70ebef6767",
+    "task_count_before": 3,
+    "task_count_after": 3,
+    "task_file_sha256_before": "5370df482ffa3d40945235c44c41b7478015dbb42b6d734dae1e5ba8271025fc",
+    "task_file_sha256_after": "5370df482ffa3d40945235c44c41b7478015dbb42b6d734dae1e5ba8271025fc",
+    "completed_operation_states_unchanged": true,
+    "actual_identity_source": "Original private ledger T5 operation, not public operation-T5 alias"
+  },
+  "cookies": {
+    "before": {
+      "credential_revision": 3,
+      "cookies": {
+        "hatch_sess": "88cb09a944fe3533",
+        "hatch_vml": "321319b1387a0735",
+        "datr": "04057f757e0b9f2e",
+        "dpr": "6b86b273ff34fce1",
+        "wd": "67f6925a4d565f9b",
+        "theme": "df7eec4b7a1e4721",
+        "layout_state": "a0d43d3487092f55",
+        "hatch_gw": "03c239437b8e119e"
+      },
+      "expires": {
+        "hatch_sess": 1796280021,
+        "hatch_vml": 1793860955,
+        "hatch_gw": 1825224021,
+        "dpr": 1794293241,
+        "datr": 1794293241,
+        "wd": 1794293336,
+        "layout_state": 1794293241,
+        "theme": 1794293241
+      }
+    },
+    "after": {
+      "credential_revision": 3,
+      "cookies": {
+        "hatch_sess": "2b969aa4ed15745e",
+        "hatch_vml": "59ffc07c8d9564fa",
+        "datr": "04057f757e0b9f2e",
+        "dpr": "6b86b273ff34fce1",
+        "wd": "67f6925a4d565f9b",
+        "theme": "df7eec4b7a1e4721",
+        "layout_state": "a0d43d3487092f55",
+        "hatch_gw": "0f118c2fe86b86d3"
+      },
+      "expires": {
+        "hatch_sess": 1796286346,
+        "hatch_vml": 1793867146,
+        "hatch_gw": 1825230346,
+        "dpr": 1794293241,
+        "datr": 1794293241,
+        "wd": 1794293336,
+        "layout_state": 1794293241,
+        "theme": 1794293241
+      }
+    },
+    "rotated_names": [
+      "hatch_sess",
+      "hatch_vml",
+      "hatch_gw"
+    ],
+    "latest_store_used": true,
+    "persisted_after_matches_disk": true,
+    "old_cookie_imported": false,
+    "manual_revision_unchanged": true
+  },
+  "isolation": {
+    "initial_active_operations": 0,
+    "initial_runtime_count": 0,
+    "initial_tasks_completed": 3,
+    "initial_operations_completed": 8,
+    "recent_configuration_http_mutations": 0,
+    "background_keepalive_interval_seconds": 900,
+    "isolated_source_service_paused": true,
+    "diagnostic_backend_only_no_app_keepalive": true,
+    "service_port_conflicts_observed": false,
+    "diagnostic_connections_closed": true,
+    "diagnostic_process_exited": true,
+    "diagnostic_lock_released": true,
+    "production_other_clients_shared_docker_remote_vm_not_stopped": true,
+    "service_state_restored": "running protocol management service, concurrency1/worker1, no browser",
+    "restore_health": {
+      "checked_at": "2026-11-03T08:26:51.459050+00:00",
+      "admin_url": "http://127.0.0.1:18611/admin",
+      "checks": [
+        {
+          "path": "/admin",
+          "http_status": 200
+        },
+        {
+          "path": "/admin/backend",
+          "http_status": 200,
+          "backend": {
+            "backend": "protocol",
+            "running": true,
+            "browser_running": false,
+            "active_operations": 0,
+            "runtime_count": 0
+          }
+        },
+        {
+          "path": "/admin/accounts",
+          "http_status": 200,
+          "account_count": 1,
+          "enabled_count": 1
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "No explicit idle pre-state; wake/Noise/history not executed",
+    "Four samples do not prove continuous RUNNING or exclude other clients",
+    "Linux live generation, concurrency3, multi-account/proxy remain outside this supplement"
+  ],
+  "tooling_checks": [
+    "Syntax passed",
+    "Seven non-idle/missing/transitional-state exclusions passed",
+    "Original user-ID/prompt/same-turn reply positive case and cross-turn/changed-prompt rejection passed",
+    "Generation endpoint excluded by HTTP allowlist; source independently audited"
+  ],
+  "decision": "Retain NOT_OBSERVED; no cached recovery, local restart or wake acknowledgement substituted for missing idle/wake/history evidence"
+}

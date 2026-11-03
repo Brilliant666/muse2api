@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "report_created_at": "2026-11-03T06:59:23.155965+00:00",
+  "case_id": "T5",
+  "status": "PASS",
+  "evidence_level": "Real Muse content; actual local SSE client disconnect, real service process restart, and recovery of the original operation",
+  "audit_scope": "Read-only audit of the originally designated seven T5 receipts plus the explicitly authorized persisted post-recovery snapshot. The original pre-restart receipt was re-read for in-memory identity comparison. No network requests, process control, test reruns, account files or Cookie files were accessed.",
+  "tested_sha": "b08f11000930674990c2834e1a9da091fd08a668",
+  "application_version_note": "Parent agent reports application unchanged at the specified test SHA; this limited audit did not inspect Git or application source.",
+  "account_alias": "test-account-1",
+  "submission_and_disconnect": {
+    "generation_post_attempts": 1,
+    "budget_category": "text",
+    "budget_units": 1,
+    "automatic_replay": false,
+    "actual_nonempty_content_seen": true,
+    "initial_delta_characters": 2,
+    "operation_state_at_disconnect": "running",
+    "session_and_node_persisted_before_disconnect": true,
+    "state_after_disconnect": "unknown",
+    "delivery_after_disconnect": "accepted",
+    "account_quarantined": true,
+    "active_operations_after_cleanup": 0,
+    "bounded_active_operation_cleanup_observed": true
+  },
+  "lock_release_evidence": {
+    "protected_maintenance_completed": true,
+    "elapsed_seconds": 1.719,
+    "interpretation": "The existing protected account maintenance API successfully completed. Its application contract acquires both GEN_LOCK capacity and the account maintenance lease; this is an indirect behavioral observation of acquisition, not a direct read of internal lock variables.",
+    "direct_internal_lock_variables_observed": false,
+    "original_operation_remained_unknown": true,
+    "account_remained_quarantined": true,
+    "local_operation_count_unchanged": true,
+    "generation_calls_added_by_maintenance": 0
+  },
+  "restart_persistence": {
+    "actual_interpreter_replacement_observed_by_parent": true,
+    "raw_process_pid_record_in_audited_file_set": true,
+    "restart_health_passed": true,
+    "same_operation_set_reported_at_restart": true,
+    "original_unknown_and_quarantine_preserved": true,
+    "backend_active_operations_at_restart": 0,
+    "pre_restart_operation_count_directly_counted": 8,
+    "root_recorded_interpreter_pids": {
+      "before": 352468,
+      "after": 357784
+    },
+    "process_evidence_source": "Actual process observations recorded by the parent agent in the added persisted-store snapshot; the auditor did not independently monitor the OS"
+  },
+  "identity_comparison": {
+    "same_operation_id_before_disconnect_through_final_recovery": true,
+    "same_account_before_disconnect_through_final_recovery": true,
+    "same_session_before_disconnect_through_final_recovery": true,
+    "same_vm_before_disconnect_through_final_recovery": true,
+    "same_session_key_before_disconnect_through_final_recovery": true,
+    "same_node_directly_compared_before_disconnect_after_disconnect_and_pre_restart": true,
+    "post_recovery_node_equality_reported_by_parent_public_result": true,
+    "post_recovery_raw_session_node_record_available_to_this_audit": true,
+    "note": "The added persisted-store snapshot was taken after recovery and browser fallback T6. Its original operation account/session/VM/session-key values and stored session node were compared directly to the pre-restart receipt in memory. No original identifiers are copied.",
+    "same_node_independently_compared_before_restart_and_post_recovery": true,
+    "same_session_independently_compared_before_restart_and_post_recovery": true
+  },
+  "recovery": {
+    "original_operation_completed": true,
+    "delivery": "completed",
+    "resubmitted": false,
+    "recovered_characters": 3359,
+    "initial_delta_characters": 2,
+    "recovered_text_matches_final_operation_result": true,
+    "recovered_text_sha256": "93e663c866aad461f4e28ac2ec2c76e21d97fc80339c21884d77d2ed83dbd427",
+    "independently_counted_ordered_numbered_items": 60,
+    "local_operation_count_before": 8,
+    "exact_post_recovery_operation_id_set_available_to_this_audit": true,
+    "account_quarantine_cleared_reported_by_parent": true,
+    "historical_cancellation_error_metadata_retained_in_completed_record": true,
+    "historical_metadata_note": "The authoritative final state and delivery are completed and the recovery API returned ok:true. Historical cancellation fields remain as prior-operation metadata. The parent checked that the current operation UI renders state, not the historical error field; no business-code change was made.",
+    "local_operation_count_after_independently_counted": 8,
+    "exact_operation_id_set_unchanged_independently_verified": true,
+    "account_quarantine_clear_in_persisted_post_recovery_snapshot": true,
+    "snapshot_phase": "Persisted local state after original-operation recovery and browser fallback T6; T6 did not add a protocol operation or session"
+  },
+  "generation_count_boundary": {
+    "real_generation_attempts_for_this_case": 1,
+    "recovery_generation_resubmission": false,
+    "evidence": [
+      "One recorded T5 generation POST attempt",
+      "Same original operation/account/session/VM identity through recovery",
+      "Exact persisted operation ID set is unchanged before restart and after recovery/T6 (8 operations)",
+      "Stored node independently unchanged in the added post-recovery session snapshot",
+      "Recovery explicitly returned resubmitted:false"
+    ],
+    "upstream_wire_submission_counter_directly_captured_by_this_auditor": false
+  },
+  "not_proven": [
+    "Other text or media cases",
+    "Cookie rotation",
+    "VM sleep/wake; preserved VM identity is a different property",
+    "Multi-account or proxy behavior"
+  ],
+  "private_evidence_file_sha256": {
+    "disconnect-receipt.json": "85d6fee8c45b2321b29bc427f718206a87f43ee64e6f0d8c2d2518ce971114a7",
+    "pre-restart-state.json": "f47c9500a7aa0bec49b7fd0235d38fd664504d5fb249b47d0b1224b07e455054",
+    "restart-health.json": "a5416ac3871985520d00e371a14086a0264131579146ed8f24445117bad6e5bd",
+    "operation.json": "17e78b423ee3839b373b6ef0154120e788c997f5d8d7b3f47fb78f2a47bfb9a2",
+    "recovery.json": "974fb4269a16f17380901409467e138f9c11091ef2400042eee44b4f22c34f65",
+    "public-result.json": "3e9b85f515753250f8d513bb8bd6c8f78c634a0a21537a63d44ecbed721a7ef4",
+    "post-disconnect-maintenance.json": "9f1945a4935505951170d7aed8d9e5275ebae8584669ebf731a5b59345f5147a",
+    "post-recovery-store-snapshot.json": "e180f6b56041c92c1675d2e06b203fba767e18d0693cdb2d6e36f481922708a4"
+  },
+  "audit_performed_no_network_requests": true,
+  "audit_reran_no_tests": true,
+  "audit_read_no_account_or_cookie_files": true,
+  "report_updated_at": "2026-11-03T07:02:16.334602+00:00",
+  "account_context": {
+    "origin": "Existing Muse account from the live account pool, reused for this run with explicit human authorization reported by the parent agent",
+    "isolation": "The local application data is isolated; the account is reused, not a newly dedicated account",
+    "credential_values_in_this_audit": false
+  }
+}

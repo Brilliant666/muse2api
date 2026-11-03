@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "scope": "credential readiness only; no generation POST",
+  "verified_at": "2026-11-03T06:20:30.940884+00:00",
+  "application_source_sha": "129488a39417e616b709dff2becfc5c178d0357b",
+  "client_tooling_sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
+  "management_url": "http://127.0.0.1:18611/admin",
+  "enabled_test_accounts_observed": 1,
+  "MUSE_COOKIE_present_at_direct_config_check": false,
+  "configuration_loader": "project .venv + project config.py, no preexisting MUSE2API_HOME override",
+  "coordinated_prior_session_check": {
+    "origin": "production account pool, not dedicated test account",
+    "reported_result": "HTTP 200 / assigned",
+    "counts_as_this_acceptance_pass": false,
+    "credential_handoff_made": true
+  },
+  "real_generation_consumed": {
+    "text": 6,
+    "image": 2,
+    "video": 1
+  },
+  "next_required": "None for this completed round; generation budget exhausted. Target deployment coverage is separately listed.",
+  "resolved_by": "Later human authorization expressly permitted this existing account; private handoff imported once and the service session check passed",
+  "private_handoff_MUSE_COOKIE_nonempty": true,
+  "session_validation_ok": true,
+  "management_page_current_state": "stopped after completed acceptance",
+  "production_service_configuration_changed": false,
+  "credential_reuse_authorization_verified": true,
+  "initial_pre_handoff_check": {
+    "MUSE_COOKIE_absent_in_worktree_env": true,
+    "account_pool_empty": true,
+    "external_session_check_not_counted_as_acceptance": true
+  },
+  "account_import_verified_at": "2026-11-03T06:24:10.658058+00:00",
+  "round_completed_at": "2026-11-03T06:49:05.879489+00:00"
+}

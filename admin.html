@@ -330,6 +330,23 @@
       <div class="stat"><div class="k">媒体文件</div><div class="v" id="sMedia">0</div></div>
     </div>
 
+    <div class="card" id="emailLoginCard">
+      <h3>邮箱验证码批量登录 <span class="tag">最多 10 个待完成任务</span></h3>
+      <div class="hint">每行一个已获授权的 Muse 邮箱。助手逐个发送验证码，收到后手动填写；不接收收件箱链接。成功仅表示认证入池，生成能力尚未测试。</div>
+      <label for="emailLoginEmails">邮箱列表</label>
+      <textarea id="emailLoginEmails" rows="3" placeholder="test-one@example.com&#10;test-two@example.com" autocomplete="off" spellcheck="false"></textarea>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px">
+        <button id="emailLoginAdd" onclick="createEmailLoginJobs()">加入登录队列</button>
+        <button class="ghost" onclick="loadEmailLoginJobs()">刷新登录状态</button>
+        <span class="hint" id="emailLoginAvailability" role="status">正在检查登录助手…</span>
+      </div>
+      <div class="hint" style="margin-top:10px">验证码不保存，提交后立即清空。失败、取消或重启后不会自动重新发码；请检查任务状态，再主动创建新任务。</div>
+      <div class="table-wrap" style="margin-top:12px"><table>
+        <thead><tr><th>邮箱</th><th>登录状态</th><th>验证码与操作</th></tr></thead>
+        <tbody id="emailLoginJobs"></tbody>
+      </table></div>
+    </div>
+
     <div class="card">
       <h3>添加账号 <span class="tag">支持批量</span></h3>
       <div class="hint" data-i18n="add-account-hint">
@@ -528,7 +545,7 @@
   <section class="tab" id="tab-tasks">
     <div class="card">
       <h3>生成任务记录 <span class="tag" id="taskCount">0</span></h3>
-      <div class="hint">生视频是异步任务，状态会从 queued → processing → succeeded / failed。</div>
+      <div class="hint">异步任务会记录生成进度。结果待确认或文件待取回时，请先查询恢复，避免重复生成。</div>
       <div style="margin-bottom:12px;display:flex;gap:9px">
         <button class="ghost mini" onclick="loadTasks()">刷新</button>
         <button class="danger mini" onclick="clearTasks()">清空全部</button>
@@ -539,6 +556,14 @@
           <th>耗时</th><th>创建时间</th><th>结果 / 错误</th><th></th>
         </tr></thead>
         <tbody id="taskBody"><tr><td colspan="8" class="empty">加载中…</td></tr></tbody>
+      </table></div>
+    </div>
+    <div class="card" id="protocolRecovery" hidden>
+      <h3>协议请求记录</h3>
+      <div class="hint">查询恢复会查看原会话并取回已有结果。放弃恢复会解除账号占用，但不会停止 Muse 端的生成。</div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>请求 ID</th><th>账号</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead>
+        <tbody id="protocolBody"></tbody>
       </table></div>
     </div>
   </section>
@@ -800,6 +825,70 @@ function setLang(v){
 }
 /* 整句：中文 → 英文 */
 const I18N_EN = {
+  "邮箱验证码批量登录": "Bulk email OTP login",
+  "最多 10 个待完成任务": "Up to 10 pending jobs",
+  "每行一个已获授权的 Muse 邮箱。助手逐个发送验证码，收到后手动填写；不接收收件箱链接。成功仅表示认证入池，生成能力尚未测试。": "Enter one authorized Muse email per line. Codes are sent one account at a time and entered manually; inbox links are not accepted. Success means authenticated and imported; generation has not been tested.",
+  "邮箱列表": "Email list",
+  "加入登录队列": "Queue login",
+  "刷新登录状态": "Refresh login status",
+  "正在检查登录助手…": "Checking login helper…",
+  "验证码不保存，提交后立即清空。失败、取消或重启后不会自动重新发码；请检查任务状态，再主动创建新任务。": "Codes are not saved and are cleared immediately after submission. Failure, cancellation or restart never automatically resends a code; check the job before creating another.",
+  "邮箱": "Email",
+  "登录状态": "Login status",
+  "验证码与操作": "Code and actions",
+  "登录助手可用，逐个处理邮箱": "Login helper available; emails run serially",
+  "邮箱登录助手不可用：此环境未安装可用 Chrome/Chromium，原有 Cookie 导入仍可使用": "Email login is unavailable: no usable Chrome/Chromium is installed. Cookie import remains available.",
+  "邮箱登录认证已入池；生成能力尚未测试": "Authenticated and imported; generation has not been tested",
+  "尚无邮箱登录任务": "No email login jobs",
+  "请填写 1 至 10 个邮箱": "Enter 1 to 10 email addresses",
+  "请输入六位数字验证码": "Enter a six-digit code",
+  "邮箱登录请求未接受，请检查邮箱、任务状态与验证码": "Login request was not accepted; check emails, job status and code",
+  "邮箱登录任务不存在": "Email login job not found",
+  "邮箱登录队列暂不可用，请检查私密数据目录": "Email login queue unavailable; check the private data directory",
+  "排队中": "Queued",
+  "正在发码": "Sending code",
+  "等待验证码": "Waiting for code",
+  "正在验证": "Verifying",
+  "正在入池": "Importing account",
+  "认证已入池": "Authenticated and imported",
+  "登录失败": "Login failed",
+  "需要人工处理": "Manual action required",
+  "登录结果未知": "Login outcome unknown",
+  "已取消": "Cancelled",
+  "验证码已过期": "Code expired",
+  "重启已中断": "Interrupted by restart",
+  "六位验证码": "Six-digit code",
+  "提交验证码": "Submit code",
+  "验证码不正确，请重新填写": "Incorrect code; enter it again",
+  "账号暂不可更新，请检查繁忙、隔离或身份冲突": "Account could not be updated; check busy/quarantine state and identity conflicts",
+  "异步任务会记录生成进度。结果待确认或文件待取回时，请先查询恢复，避免重复生成。": "Async tasks record generation progress. If the outcome is unknown or a file is pending delivery, recover the existing request before submitting again.",
+  "协议请求记录": "Protocol requests",
+  "查询恢复会查看原会话并取回已有结果。放弃恢复会解除账号占用，但不会停止 Muse 端的生成。": "Recovery checks the original session and retrieves existing results. Abandoning recovery releases the account but does not stop generation at Muse.",
+  "请求 ID": "Request ID",
+  "结果待确认": "Outcome unknown",
+  "文件待取回": "File awaiting delivery",
+  "尚未提交": "Not submitted",
+  "已提交": "Submitted",
+  "处理中": "In progress",
+  "已完成": "Completed",
+  "已放弃恢复": "Recovery abandoned",
+  "查询恢复": "Recover result",
+  "放弃恢复": "Abandon recovery",
+  "暂无请求记录": "No requests yet",
+  "放弃恢复后将解除该账号的占用，但不会停止 Muse 端的生成。请确认已检查原会话，继续使用账号可能与尚未结束的任务重叠。是否放弃恢复？": "Abandoning recovery releases the account but does not stop generation at Muse. Check the original session first; new requests may overlap with work still running. Abandon recovery?",
+  "已放弃恢复；上游任务未取消": "Recovery abandoned; upstream work was not cancelled",
+  "查询恢复已完成，请查看任务结果": "Recovery finished; check the task result",
+  "当前模式暂不支持实时额度查询，已有额度为缓存记录": "Live quota queries are unavailable in this mode; existing quota data is cached",
+  "正在验证账号会话…": "Checking the account session…",
+  "正在为账号池续期并验证会话…": "Renewing and checking account sessions…",
+  "结果需要确认": "Result needs confirmation",
+  "请在任务记录中查询恢复，勿重复提交。": "Recover the result in Tasks; do not submit again.",
+  "协议版本": "Protocol build",
+  "协议版本 · 使用配套更新": "Protocol build · coordinated updates",
+  "当前版本需要使用配套更新包，避免原版更新覆盖协议改造。": "Use a coordinated update package for this build to preserve the protocol integration.",
+  "当前版本需要使用配套更新包": "Use a coordinated update package for this build",
+  "协议": "Protocol",
+  "待命": "Standby",
   "取消": "Cancel",
   "http://proxy.example.com:8080 或 socks5://proxy.example.com:1080": "http://proxy.example.com:8080 or socks5://proxy.example.com:1080",
   "请先保存该账号的代理": "Save a proxy for this account first",
@@ -1410,6 +1499,7 @@ if (LANG === 'en') {
 /* ================= 基础 ================= */
 const $ = id => document.getElementById(id);
 const KEY_STORE = 'muse2api_key';
+let backendInfo = {backend: 'browser'};
 let KEY = localStorage.getItem(KEY_STORE) || new URLSearchParams(location.search).get('key') || '';
 $('key').value = KEY;
 $('dBase').textContent = location.origin + '/v1';
@@ -1460,6 +1550,7 @@ async function api(path, opts){
     if (data) {
       if (typeof data.detail === 'string') msg = data.detail;
       else if (Array.isArray(data.detail)) msg = data.detail.map(e => e.msg || 'Invalid value').join('; ');
+      else if (data.detail && typeof data.detail.message === 'string') msg = data.detail.message;
       else if (typeof data.message === 'string') msg = data.message;
       else if (data.error) msg = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
     }
@@ -1641,6 +1732,7 @@ function quotaBadge(a){
 }
 
 async function queryQuota(aid, btn){
+  if (backendInfo.quota_supported === false) return toast('当前模式暂不支持实时额度查询，已有额度为缓存记录', 'warn');
   if (btn){ btn.disabled = true; btn.textContent = '查询中…'; }
   try{
     const q = await api(`/admin/accounts/${aid}/quota`, {method:'POST'});
@@ -1745,7 +1837,7 @@ async function loadPool(){
         <td><div class="acts">
           <button class="ghost mini" onclick="testAcc('${a.id}')">测试</button>
           <button class="ghost mini" onclick="keepaliveOne('${a.id}')" title="静默刷新会话令牌与有效期">保活</button>
-          <button class="ghost mini" onclick="queryQuota('${a.id}', this)">额度</button>
+          <button class="ghost mini" onclick="queryQuota('${a.id}', this)" ${backendInfo.quota_supported === false ? 'disabled title="当前模式暂不支持实时额度查询，已有额度为缓存记录"' : ''}>额度</button>
           <button class="ghost mini" onclick="openProxy('${a.id}')">代理</button>
           <button class="ghost mini" onclick="toggleAcc('${a.id}', ${!a.enabled})">${a.enabled ? '禁用' : '启用'}</button>
           <button class="ghost mini" onclick="renameAcc('${a.id}','${esc(a.label)}')">改名</button>
@@ -1779,7 +1871,7 @@ async function addAccount(fromManual){
 }
 
 async function testAcc(id){
-  toast('正在真实打开 muse.ai 校验会话…');
+  toast('正在验证账号会话…');
   try{
     const r = await api(`/admin/accounts/${id}/test`, {method:'POST'});
     const quotaStatus = r.quota_error ? `；额度读取失败：${r.quota_error}` : r.quota ? `；额度已刷新：${r.quota.weekly_used_pct ?? '?'}%` : '';
@@ -1904,7 +1996,7 @@ async function keepaliveOne(id){
 async function keepaliveAll(){
   const btn = $('btnKeepaliveAll');
   if (btn) { btn.disabled = true; btn.innerText = '保活执行中…'; }
-  toast('正在唤醒无头浏览器，为账号池执行静默续期与保活…', 'warn');
+  toast('正在为账号池续期并验证会话…', 'warn');
   try{
     const r = await api('/admin/accounts/keepalive?force=true', {method:'POST'});
     if (r.status === 'busy') {
@@ -1953,7 +2045,50 @@ async function delAcc(id, label){
 }
 
 /* ================= 任务记录 ================= */
+function operationLabel(state){
+  return ({unknown:'结果待确认', delivery_failed:'文件待取回', not_submitted:'尚未提交',
+    submitted:'已提交', running:'处理中', completed:'已完成', failed:'失败',
+    abandoned:'已放弃恢复'})[state] || state || '—';
+}
+function protocolActions(id, state){
+  if (!id || !['unknown','delivery_failed'].includes(state)) return '';
+  return `<button class="ghost mini" data-protocol-action="recover" data-protocol-operation="${esc(id)}">查询恢复</button> ` +
+    `<button class="ghost mini" data-protocol-action="abandon" data-protocol-operation="${esc(id)}">放弃恢复</button>`;
+}
+async function loadProtocolOperations(){
+  $('protocolRecovery').hidden = backendInfo.backend !== 'protocol';
+  if ($('protocolRecovery').hidden) return;
+  try{
+    const d = await api('/admin/protocol/operations?limit=60');
+    const ops = d.operations || [];
+    $('protocolBody').innerHTML = ops.map(o => `<tr>
+      <td class="mono">${esc(o.id)}</td><td class="mono">${esc(o.account_id)}</td>
+      <td><span class="badge ${['unknown','delivery_failed'].includes(o.state) ? 'warn' : 'mute'}">${esc(operationLabel(o.state))}</span></td>
+      <td class="mono">${fmtTime(o.created_at)}</td><td>${protocolActions(o.id, o.state)}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="empty">暂无请求记录</td></tr>';
+  }catch(e){ $('protocolBody').innerHTML = `<tr><td colspan="5" class="empty">${esc(e.message)}</td></tr>`; }
+}
+async function handleProtocolAction(btn){
+  const action = btn.dataset.protocolAction, id = btn.dataset.protocolOperation;
+  if (!['recover','abandon'].includes(action) || !id || btn.disabled) return;
+  if (action === 'abandon' && !confirm('放弃恢复后将解除该账号的占用，但不会停止 Muse 端的生成。请确认已检查原会话，继续使用账号可能与尚未结束的任务重叠。是否放弃恢复？')) return;
+  btn.disabled = true;
+  try{
+    const result = await api('/admin/protocol/operations/' + encodeURIComponent(id) + '/' + action, {
+      method:'POST', body:JSON.stringify(action === 'recover' ? {timeout:60} : {confirm:true})});
+    const state = result.state || result.operation?.state;
+    toast(action === 'abandon' ? '已放弃恢复；上游任务未取消' : (state ? operationLabel(state) : '查询恢复已完成，请查看任务结果'),
+      ['unknown','delivery_failed'].includes(state) ? 'warn' : 'ok');
+    loadTasks(); loadPool(); loadMedia();
+  }catch(e){ toast(e.message, 'warn'); }
+  finally{ btn.disabled = false; }
+}
+document.addEventListener('click', event => {
+  const btn = event.target.closest?.('[data-protocol-action]');
+  if (btn) handleProtocolAction(btn);
+});
 async function loadTasks(){
+  loadProtocolOperations();
   try{
     const d = await api('/admin/tasks?limit=60');
     const ts = d.tasks || [];
@@ -1969,11 +2104,11 @@ async function loadTasks(){
         <td class="mono">${esc(t.id)}</td>
         <td>${t.kind === 'video' ? '<span class="badge info">视频</span>' : '<span class="badge info">图片</span>'}</td>
         <td><span class="ellip" title="${esc(t.prompt)}">${esc(t.prompt)}</span></td>
-        <td><span class="badge ${cls}">${esc(t.status)}</span></td>
+        <td><span class="badge ${cls}">${esc(operationLabel(t.status))}</span></td>
         <td class="mono">${t.elapsed ? t.elapsed + 's' : '—'}</td>
         <td class="mono">${fmtTime(t.created_at)}</td>
         <td>${out}</td>
-        <td><button class="danger mini" onclick="delTask('${t.id}')">删</button></td>
+        <td><div class="acts">${protocolActions(t.operation_id, t.status)}<button class="danger mini" onclick="delTask('${t.id}')">删</button></div></td>
       </tr>`;
     }).join('');
   }catch(e){
@@ -2143,6 +2278,11 @@ async function runImage(){
     while (r.status !== 'completed') {
       if (Date.now() >= deadline) throw new Error('等待超过 15 分钟，请在任务记录查看结果，勿重复提交');
       if (r.status === 'failed') throw new Error(r.error || '图片生成失败');
+      if (['unknown','delivery_failed'].includes(r.status)) {
+        const pending = new Error('请在任务记录中查询恢复，勿重复提交。' + (r.error || ''));
+        pending.resultPending = true;
+        throw pending;
+      }
       box.textContent = `任务 ${taskId} · ${r.status} · 已等待 ${Math.floor((Date.now()-t0)/1000)} 秒`;
       await new Promise(resolve => setTimeout(resolve, 3000));
       try {
@@ -2159,7 +2299,8 @@ async function runImage(){
       <pre class="out">${esc(JSON.stringify(r, null, 2))}</pre>`;
     loadMedia();
   }catch(e){
-    box.innerHTML = `<b style="color:var(--bad)">✗ 生成失败</b><pre class="out">${esc(e.message)}</pre>`;
+    box.innerHTML = `<b style="color:var(${e.resultPending ? '--warn' : '--bad'})">${e.resultPending ? '结果需要确认' : '✗ 生成失败'}</b><pre class="out">${esc(e.message)}</pre>`;
+    if (e.resultPending) loadTasks();
   }finally{ btn.disabled = false; btn.textContent = '开始生成图片'; }
 }
 
@@ -2189,6 +2330,10 @@ async function runVideo(){
       }else if (s.status === 'failed'){
         box.innerHTML = `<b style="color:var(--bad)">✗ 生成失败</b><pre class="out">${esc(s.error||'')}</pre>`;
         btn.disabled = false; btn.textContent = '开始生成视频';
+      }else if (['unknown','delivery_failed'].includes(s.status)){
+        box.innerHTML = `<b style="color:var(--warn)">${esc(operationLabel(s.status))}</b><p>请在任务记录中查询恢复，勿重复提交。</p><pre class="out">${esc(s.error||'')}</pre>`;
+        btn.disabled = false; btn.textContent = '开始生成视频';
+        loadTasks();
       }else{
         box.innerHTML = `<span class="spin"></span>任务 ${esc(s.status)} · 已等待 ${el}s（视频通常 60–120 秒）…`;
         setTimeout(tick, 4000);
@@ -2225,6 +2370,17 @@ function dismissUpdateBanner(){
 async function loadRepoStatus(force){
   try{
     let s = await api('/admin/update/check' + (force ? '?force=true' : ''));
+    if (s.disabled || s.updater_supported === false || backendInfo.updater_supported === false) {
+      _lastRepoStatus = s;
+      $('repoBadge').className = 'badge info';
+      $('repoBadge').textContent = '协议版本';
+      $('btnRepoTop').classList.remove('updpill-alert');
+      $('repoTopTxt').textContent = '协议版本 · 使用配套更新';
+      $('repoStatusDesc').textContent = '当前版本需要使用配套更新包，避免原版更新覆盖协议改造。';
+      $('updateBanner').classList.remove('show');
+      for (const id of ['btnRepoPull','btnBannerUpgrade']) $(id).disabled = true;
+      return;
+    }
     // 若服务端网络无法直连 GitHub API，则由用户浏览器端直接请求 GitHub API 兜底检测
     if (!s.remote_sha){
       try{
@@ -2304,6 +2460,7 @@ async function loadRepoStatus(force){
 }
 
 async function upgradeNow(){
+  if (backendInfo.updater_supported === false || _lastRepoStatus?.disabled) return toast('当前版本需要使用配套更新包', 'warn');
   if (!confirm('确定立即从 GitHub 官方仓库 (czg86389-hub/muse2api) 拉取最新代码并自动重启服务吗？\n\n（注：本地 .env 密钥、账号池 Cookie 和已生成的媒体文件均会自动保留，不受任何影响）')) return;
   const btn1 = $('btnRepoPull'), btn2 = $('btnBannerUpgrade');
   if (btn1) { btn1.disabled = true; btn1.innerHTML = '<span class="spin"></span>正在在线更新…'; }
@@ -2330,14 +2487,110 @@ async function upgradeNow(){
   }
 }
 
+/* ================= 邮箱 OTP 登录队列 ================= */
+const EMAIL_LOGIN_TERMINAL = new Set(['AUTHENTICATED','FAILED','BLOCKED','UNKNOWN','CANCELLED','EXPIRED','INTERRUPTED']);
+const EMAIL_LOGIN_LABELS = {QUEUED:'排队中',STARTING:'正在发码',SENDING_CODE:'正在发码',WAITING_FOR_CODE:'等待验证码',VERIFYING:'正在验证',SAVING:'正在入池',AUTHENTICATED:'认证已入池',FAILED:'登录失败',BLOCKED:'需要人工处理',UNKNOWN:'登录结果未知',CANCELLED:'已取消',EXPIRED:'验证码已过期',INTERRUPTED:'重启已中断'};
+let emailLoginLoading = false;
+function renderEmailLoginJobs(snapshot){
+  const available = snapshot.available === true;
+  $('emailLoginAdd').disabled = !available;
+  $('emailLoginAvailability').textContent = t(available ? '登录助手可用，逐个处理邮箱' : '邮箱登录助手不可用：此环境未安装可用 Chrome/Chromium，原有 Cookie 导入仍可使用');
+  const body = $('emailLoginJobs');
+  const jobs = Array.isArray(snapshot.jobs) ? snapshot.jobs : [];
+  const retained = new Set();
+  if (body.querySelector('[data-empty]')) body.replaceChildren();
+  for (const job of jobs){
+    const id = String(job.id || '');
+    retained.add(id);
+    // Stable DOM nodes preserve an unfinished OTP during status polling.
+    let row = Array.from(body.children).find(node => node.dataset.jobId === id);
+    if (!row){
+      row = document.createElement('tr'); row.dataset.jobId = id;
+      for(let i=0;i<3;i++) row.appendChild(document.createElement('td'));
+      body.appendChild(row);
+    }
+    row.children[0].textContent = String(job.email || '');
+    const state = String(job.status || job.state || 'UNKNOWN');
+    let label = t(EMAIL_LOGIN_LABELS[state] || '登录结果未知');
+    if (job.error_code === 'INVALID_CODE') label += ' · ' + t('验证码不正确，请重新填写');
+    if (job.error_code === 'SAVE_ACCOUNT_FAILED') label += ' · ' + t('账号暂不可更新，请检查繁忙、隔离或身份冲突');
+    if (state === 'AUTHENTICATED') label += ' · ' + t('邮箱登录认证已入池；生成能力尚未测试');
+    row.children[1].textContent = label;
+    if (row.dataset.state === state) continue;
+    row.dataset.state = state;
+    const actions = row.children[2]; actions.replaceChildren();
+    if (state === 'WAITING_FOR_CODE'){
+      const form = document.createElement('form');
+      form.style.cssText = 'display:flex;gap:7px;flex-wrap:wrap;align-items:center';
+      const input = document.createElement('input');
+      input.type = 'password'; input.inputMode = 'numeric'; input.autocomplete = 'one-time-code';
+      input.maxLength = 6; input.pattern = '[0-9]{6}'; input.required = true;
+      input.placeholder = t('六位验证码'); input.setAttribute('aria-label',t('六位验证码'));
+      input.style.width = '130px';
+      const submit = document.createElement('button'); submit.type = 'submit'; submit.textContent = t('提交验证码');
+      form.append(input,submit);
+      form.onsubmit = async event => {
+        event.preventDefault();
+        const code = input.value.trim(); input.value = '';
+        if (!/^[0-9]{6}$/.test(code)){ toast(t('请输入六位数字验证码'),'warn'); return; }
+        submit.disabled = true;
+        try{
+          renderEmailLoginJobs(await api('/admin/email-login/jobs/' + encodeURIComponent(id) + '/code',{method:'POST',body:JSON.stringify({code})}));
+        }catch(e){toast(e.message,'bad');}
+        finally{submit.disabled = false;}
+      };
+      actions.appendChild(form);
+    }
+    if (!EMAIL_LOGIN_TERMINAL.has(state)){
+      const cancel = document.createElement('button'); cancel.className = 'ghost'; cancel.type = 'button'; cancel.textContent = t('取消');
+      cancel.disabled = state === 'SAVING';
+      cancel.onclick = async () => {
+        cancel.disabled = true;
+        try{renderEmailLoginJobs(await api('/admin/email-login/jobs/' + encodeURIComponent(id) + '/cancel',{method:'POST'}));}
+        catch(e){toast(e.message,'bad');}
+        finally{cancel.disabled = state === 'SAVING';}
+      };
+      actions.appendChild(cancel);
+    }
+  }
+  for (const row of Array.from(body.children)) if (!retained.has(row.dataset.jobId)) row.remove();
+  if (!jobs.length){
+    const row = document.createElement('tr'); row.dataset.empty = 'true';
+    const cell = document.createElement('td'); cell.colSpan = 3; cell.textContent = t('尚无邮箱登录任务');
+    row.appendChild(cell); body.appendChild(row);
+  }
+}
+async function loadEmailLoginJobs(){
+  if (emailLoginLoading) return;
+  emailLoginLoading = true;
+  try{ renderEmailLoginJobs(await api('/admin/email-login/jobs')); }
+  catch(e){ $('emailLoginAvailability').textContent = t(e.message); $('emailLoginAdd').disabled = true; }
+  finally{ emailLoginLoading = false; }
+}
+async function createEmailLoginJobs(){
+  const emails = $('emailLoginEmails').value.split(/[\n,;]+/).map(value => value.trim()).filter(Boolean);
+  if (!emails.length || emails.length > 10){toast(t('请填写 1 至 10 个邮箱'),'warn'); return;}
+  $('emailLoginAdd').disabled = true;
+  try{
+    renderEmailLoginJobs(await api('/admin/email-login/jobs',{method:'POST',body:JSON.stringify({emails})}));
+    $('emailLoginEmails').value = '';
+  }catch(e){toast(e.message,'bad'); await loadEmailLoginJobs();}
+}
+
 /* ================= 总览刷新 ================= */
 async function loadStatus(){
   try{
     const d = await api('/admin/status');
     $('pSvc').className = 'pill on';
     $('pSvc').innerHTML = '<span class="led"></span>服务 <b>正常</b>';
-    $('pBr').className = 'pill ' + (d.browser_running ? 'on' : 'off');
-    $('pBr').innerHTML = `<span class="led"></span>浏览器 <b>${d.browser_running ? '运行中' : '空闲'}</b>`;
+    backendInfo = d.backend && typeof d.backend === 'object' ? d.backend : {backend:'browser'};
+    if (backendInfo.backend === 'protocol') {
+      $('pBr').className = 'pill ' + (backendInfo.running ? 'on' : '');
+      $('pBr').innerHTML = '<span class="led"></span>协议 <b>' + (backendInfo.running ? '运行中' : '待命') + '</b>';
+    } else {
+      $('pBr').className = 'pill ' + (d.browser_running ? 'on' : 'off');
+      $('pBr').innerHTML = `<span class="led"></span>浏览器 <b>${d.browser_running ? '运行中' : '空闲'}</b>`;
+    }
     $('sMedia').textContent = d.media_count ?? 0;
     if (d.base_url){ $('dBase').textContent = d.base_url; $('inBase').value = d.base_url; }
   }catch(e){
@@ -2351,11 +2604,12 @@ async function loadStatus(){
   }
 }
 
-function refreshAll(){ loadStatus(); loadPool(); loadApikey(); loadRepoStatus(false); }
+async function refreshAll(){ await loadStatus(); loadPool(); loadApikey(); loadRepoStatus(false); loadEmailLoginJobs(); }
 
 refreshAll();
 setInterval(() => {
   loadStatus(); loadPool();
+  if ($('tab-pool').classList.contains('active')) loadEmailLoginJobs();
   if ($('tab-tasks').classList.contains('active')) loadTasks();
 }, 8000);
 setInterval(() => {

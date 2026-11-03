@@ -1,0 +1,27 @@
+{
+  "tooling_sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
+  "testing": "Original delegated actual executions; no re-run merely to collect reports",
+  "application_configuration_unchanged": true,
+  "files": {
+    "tools/live_protocol_case.py": {
+      "git_blob": "c422c182af693d4299a8911705e90314876a1ab7",
+      "tested_worktree_sha256": "9b40b97b5664560f3db869aea341c5b49a5680bde088a5986468ff1a415ee96d"
+    },
+    "tools/live_protocol_disconnect.py": {
+      "git_blob": "7686872951c224187d1a4f76136f6b6c5fa74e06",
+      "tested_worktree_sha256": "ec1fc8b7dc5c2677d370582d4c01e199e9f65da0df394891ebfc62e3c86a77a0"
+    },
+    "tools/decode_acceptance_media.py": {
+      "git_blob": "a5e302e626e28c1583b27f2bd51b26da4b395684",
+      "tested_worktree_sha256": "0c044616bd286540dc7243b88de66bb50d698e735a3de24e537ae82533e59a75"
+    },
+    "tests/test_live_protocol_case.py": {
+      "git_blob": "a48fd3335ed0fef3cf6c51d75da1dd33a46ba84c",
+      "tested_worktree_sha256": "0b6ba3f59cd8878a53fdc8d2036b4554696101f8276e88c6fb98fb4498d4b3b8"
+    },
+    "tests/test_live_protocol_disconnect.py": {
+      "git_blob": "f8e22843e1092e6b347037e73217fa1a5029905a",
+      "tested_worktree_sha256": "98faa7a9554cc4f6b0296c4b983e7bdafd20e6b16a3347989dde576638da2d17"
+    }
+  }
+}

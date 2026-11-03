@@ -1,0 +1,20 @@
+{
+  "started_at": 1793683665,
+  "completed": true,
+  "scope": "running service HTTP smoke test, not full lifecycle certification",
+  "backend": {
+    "backend": "protocol",
+    "browser_running": false,
+    "running": true,
+    "runtime_count": 0,
+    "active_operations": 0,
+    "quota_supported": false,
+    "browser_controls": false,
+    "updater_supported": false,
+    "live_validation": "required"
+  },
+  "metadata": "passed",
+  "enabled_accounts": 0,
+  "live_generation": "not_requested",
+  "finished_at": 1793683665
+}

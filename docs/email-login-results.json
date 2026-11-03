@@ -1,0 +1,658 @@
+{
+  "schema_version": 1,
+  "scope": "Windows real email-code authentication and enrollment only; generation remains stopped",
+  "status": "PASS",
+  "base_sha": "93a62d26dd8e173695111d150dc87e83d2578f5a",
+  "implementation_sha": "9df622f5dfe1fa916fa41035384fb1ff546f0d39",
+  "auto_submit_fix_sha": "6a4be0720934317655a358c251add2f03e021356",
+  "final_runtime_test_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+  "selected_existing_accounts": 10,
+  "user_skipped": 1,
+  "authenticated_accounts": 9,
+  "distinct_upstream_identities": 9,
+  "real_successful_manager_jobs": 8,
+  "separate_real_pilot_successes": 1,
+  "generated_requests": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "cases": [
+    {
+      "account_alias": "email-test-01",
+      "status": "SKIPPED",
+      "upstream_identity_fingerprint": null,
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 0,
+      "local_manager_verification_attempts": 0,
+      "generation_requests": 0,
+      "reason": "User explicitly requested skipping this account after no code was received",
+      "manual_initial_form_attempts": 1,
+      "verification_attempts_total": 0
+    },
+    {
+      "account_alias": "email-test-02",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "b1bd1f56e42a26ca8e697da4e9b8463478d7c41d2a5ac23e6aeda36fd6cbb601",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 0,
+      "local_manager_verification_attempts": 0,
+      "generation_requests": 0,
+      "path": "Real browser pilot followed by authenticated internal account-save callback before service startup",
+      "manual_form_attempts_conservatively_charged": 2,
+      "observed_native_code_delivery_count": 1,
+      "verification_attempts_total": 1,
+      "source_sha": "9df622f5dfe1fa916fa41035384fb1ff546f0d39",
+      "note": "Initial click preceded frontend auth readiness; no proof of a second upstream code delivery. This pilot is outside the eight successful Manager jobs."
+    },
+    {
+      "account_alias": "email-test-03",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "e266db86c790f06786ddf878bae585e083638b1913d94a8666f525dfb0f8849e",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 3,
+      "local_manager_verification_attempts": 3,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 6.628,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 3,
+      "receipt_sha256": "a0c001c01a9435ab4dfec6cdcda3e2195aae0f7f0f4b7fb403236f11874b443f"
+    },
+    {
+      "account_alias": "email-test-04",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "d4ad5de21eca6f574364c528591f8cb535224fecf4a7c69ae52a74007684e20b",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 3,
+      "local_manager_verification_attempts": 1,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 6.561,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 2,
+      "receipt_sha256": "511cd4f73e0c93f76e933f7c1d12d18f765adbdb0a1f38a462ae1402f9ad28bc",
+      "extra_diagnostic": "One verification in the existing challenge by a diagnostic driver returned INVALID_CODE; its Manager job was subsequently cancelled, not rewritten as success. It is additional to Manager attempt counters."
+    },
+    {
+      "account_alias": "email-test-05",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "890430ac2586a4a46ac21ca5276fe797f458ccd50e394acdaed77325d38481d8",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 2,
+      "local_manager_verification_attempts": 2,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 5.078,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 2,
+      "receipt_sha256": "c9a7d1cc793cbb1753a8e9d2aab3490637da68ed77ff137beb1da7f23723c214"
+    },
+    {
+      "account_alias": "email-test-06",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "772fcb0306b43d742da396866d1d1631b1127c1bdabafc9e45a49945f6c7895c",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 1,
+      "local_manager_verification_attempts": 1,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 7.115,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 1,
+      "receipt_sha256": "6b8d99892184a0cf101a1e06aecb0a38a3c5839a03d38c23ec268d9f6ecefb26"
+    },
+    {
+      "account_alias": "email-test-07",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "7b24dccf69c0d3e3dc6f22acdeab560f7269660d010038c1f1ccc8f3bea3191f",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 1,
+      "local_manager_verification_attempts": 1,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 6.634,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 1,
+      "receipt_sha256": "1b32cf1d1b8c76c0b120a1d8aa6534e9ec6f5abe5ce78b31bd5bd475171ca603"
+    },
+    {
+      "account_alias": "email-test-08",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "4bd2bfe8263217e3c1d2d628f635bcb496e691b44fbe4973288cd043c585e788",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 1,
+      "local_manager_verification_attempts": 1,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 6.598,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 1,
+      "receipt_sha256": "b162adaa2b50649c70e630f285b9df7bce07ab7079c241c7dee513ae6d4f91dd"
+    },
+    {
+      "account_alias": "email-test-09",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "0648de040cef5e43bd257f925a3f58f08cf33e4a2927c1ed1865efd81c7e5711",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 1,
+      "local_manager_verification_attempts": 1,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 7.105,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 1,
+      "receipt_sha256": "9f3676e11d6828eda88c0e6d82f25dbe4e2553a941bd072a0ac46ca2d8258449"
+    },
+    {
+      "account_alias": "email-test-10",
+      "status": "PASS",
+      "upstream_identity_fingerprint": "9e2226a4cf3d2d4e5a71c22c05266dca3a20b5b4110aa57fd1ffd648691b8636",
+      "same_store_identity_hash_scheme": "HMAC-SHA256 with private Store key; no raw principal in Git",
+      "local_manager_begin_count": 1,
+      "local_manager_verification_attempts": 1,
+      "generation_requests": 0,
+      "path": "Actual management API -> LoginManager -> native browser -> authenticated identity -> atomic Store enrollment",
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "final_code_submit_to_local_terminal_seconds": 6.098,
+      "final_verification_attempts": 1,
+      "verification_attempts_total": 1,
+      "receipt_sha256": "30a1699de198c5efe3d53d833227f83ca44926b2688442e9f88803270e565a7b"
+    }
+  ],
+  "retained_manager_history": {
+    "counts": {
+      "UNKNOWN": 3,
+      "CANCELLED": 14,
+      "AUTHENTICATED": 8
+    },
+    "jobs": [
+      {
+        "job_alias": "email-test-03-job-1",
+        "account_alias": "email-test-03",
+        "status": "UNKNOWN",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": "UNKNOWN",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707373.9003456
+      },
+      {
+        "job_alias": "email-test-03-job-2",
+        "account_alias": "email-test-03",
+        "status": "UNKNOWN",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": "UNKNOWN",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708270.5075328
+      },
+      {
+        "job_alias": "email-test-03-job-3",
+        "account_alias": "email-test-03",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709507.4350674,
+        "updated_at": 1793709848.003322
+      },
+      {
+        "job_alias": "email-test-04-job-1",
+        "account_alias": "email-test-04",
+        "status": "CANCELLED",
+        "begin_count": 1,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707831.3165026
+      },
+      {
+        "job_alias": "email-test-04-job-2",
+        "account_alias": "email-test-04",
+        "status": "CANCELLED",
+        "begin_count": 1,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708767.1054585
+      },
+      {
+        "job_alias": "email-test-04-job-3",
+        "account_alias": "email-test-04",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709507.4350674,
+        "updated_at": 1793709892.4691608
+      },
+      {
+        "job_alias": "email-test-05-job-1",
+        "account_alias": "email-test-05",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707525.8982115
+      },
+      {
+        "job_alias": "email-test-05-job-2",
+        "account_alias": "email-test-05",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708431.6671443
+      },
+      {
+        "job_alias": "email-test-05-job-3",
+        "account_alias": "email-test-05",
+        "status": "UNKNOWN",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": "UNKNOWN",
+        "created_at": 1793708918.5640035,
+        "updated_at": 1793709042.6093605
+      },
+      {
+        "job_alias": "email-test-05-job-4",
+        "account_alias": "email-test-05",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709414.7919273,
+        "updated_at": 1793709448.4031603
+      },
+      {
+        "job_alias": "email-test-06-job-1",
+        "account_alias": "email-test-06",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707525.9288933
+      },
+      {
+        "job_alias": "email-test-06-job-2",
+        "account_alias": "email-test-06",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708431.6876445
+      },
+      {
+        "job_alias": "email-test-06-job-3",
+        "account_alias": "email-test-06",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709507.4350674,
+        "updated_at": 1793709601.0207136
+      },
+      {
+        "job_alias": "email-test-07-job-1",
+        "account_alias": "email-test-07",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707525.959895
+      },
+      {
+        "job_alias": "email-test-07-job-2",
+        "account_alias": "email-test-07",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708431.6941435
+      },
+      {
+        "job_alias": "email-test-07-job-3",
+        "account_alias": "email-test-07",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709507.4350674,
+        "updated_at": 1793709670.793195
+      },
+      {
+        "job_alias": "email-test-08-job-1",
+        "account_alias": "email-test-08",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707525.9673953
+      },
+      {
+        "job_alias": "email-test-08-job-2",
+        "account_alias": "email-test-08",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708431.7186456
+      },
+      {
+        "job_alias": "email-test-08-job-3",
+        "account_alias": "email-test-08",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709507.4350674,
+        "updated_at": 1793709724.7258375
+      },
+      {
+        "job_alias": "email-test-09-job-1",
+        "account_alias": "email-test-09",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707525.9738948
+      },
+      {
+        "job_alias": "email-test-09-job-2",
+        "account_alias": "email-test-09",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708431.7251453
+      },
+      {
+        "job_alias": "email-test-09-job-3",
+        "account_alias": "email-test-09",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709507.4350674,
+        "updated_at": 1793709762.578329
+      },
+      {
+        "job_alias": "email-test-10-job-1",
+        "account_alias": "email-test-10",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793707267.9526155,
+        "updated_at": 1793707525.980895
+      },
+      {
+        "job_alias": "email-test-10-job-2",
+        "account_alias": "email-test-10",
+        "status": "CANCELLED",
+        "begin_count": 0,
+        "verification_attempts": 0,
+        "error_code": "USER_CANCELLED",
+        "created_at": 1793708172.3038547,
+        "updated_at": 1793708431.749644
+      },
+      {
+        "job_alias": "email-test-10-job-3",
+        "account_alias": "email-test-10",
+        "status": "AUTHENTICATED",
+        "begin_count": 1,
+        "verification_attempts": 1,
+        "error_code": null,
+        "created_at": 1793709507.4350674,
+        "updated_at": 1793709813.3219981
+      }
+    ],
+    "unknown_records_rewritten": false,
+    "cancelled_before_begin_jobs_are_not_code_deliveries": true,
+    "diagnostic_verification_not_hidden_in_manager_counters": true
+  },
+  "identity_and_cookie_evidence": {
+    "basis": [
+      "New BrowserContext per login",
+      "Visible OTP challenge email exactly matches requested email",
+      "Valid muse.ai hatch_sess",
+      "Authenticated AuthContextProvider viewerId equals prelude.user.identifier",
+      "Same private Store HMAC principal fingerprint for deduplication"
+    ],
+    "all_nine_cookie_rows_persisted": true,
+    "accounts_file_sha256": "7294b3e247142c6b2152f24fd523ad35fb4383355b1513d7f2010483b7050b58",
+    "verified_identity_count": 9,
+    "upstream_generation_or_media_capability_tested": false,
+    "legacy_cookie_only_records_identity_deduplication_proved": false,
+    "credentials_mailbox_urls_raw_ids_in_git": false
+  },
+  "browser_lifecycle": {
+    "final_successful_8_manager_jobs_same_owned_process": true,
+    "owned_root_process_peak_in_final_batch": 1,
+    "remaining_account_contexts_before_idle_close": 0,
+    "owned_chrome_processes_after_idle_close": 0,
+    "management_service_retained": true,
+    "management_url": "http://127.0.0.1:18613/admin",
+    "original_18611_unchanged": true,
+    "automatic_keepalive_disabled_in_test_launcher": true,
+    "v1_generation_POSTs_rejected_by_test_launcher": true,
+    "wrapper_sha256": "8fdda2e008d50d0834c22b7d0f99a0b28c0716ae6b3858c6dde745ee5cb32c18",
+    "runtime_source_binding": {
+      "source_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "files": {
+        "app.py": "3f87134ce4a9396d05221f33f59d75d6f3518f1554ec1064e0129945a7df0a3e",
+        "store.py": "33197b34a427cf1a034f975500f9f37299ad9e917e765af02edbc574a16f0d79",
+        "email_login.py": "a5c1a6ecc4ae45036e59e3a7647c5bec5bce748a4fedc40a581762e04fdb58bd",
+        "email_login_browser.py": "b259b00d1535fa1ffa37c3498788af1bfb0ae03b1bbc5ff8861b51f421e3fa98",
+        "muse_identity.py": "2d134d8da22f6b564cc36d6c64ee6f55a916546f45c3d85aac0be74bfa24aee9",
+        "admin.html": "2806d8d0945a52e701a9aa928b1e324a7fbd47a3ed29655d8c5d3869e219dcff"
+      },
+      "login_only": true,
+      "automatic_keepalive": false
+    },
+    "intermediate_restart_notes": [
+      "Initial test process was terminated only after all login jobs were terminal, its owned Chrome closed, and Store writes quiescent; account snapshot retained",
+      "Subsequent isolated restarts were graceful via a private stop marker; service/browser/listener absence was verified",
+      "No ordinary Chrome, original 18611 service, shared Docker or production restarted"
+    ]
+  },
+  "reproduced_defects": [
+    {
+      "problem": "Official OTP component auto-submits on six digits; an additional button test/click caused premature UNKNOWN",
+      "red_source_sha": "9df622f5dfe1fa916fa41035384fb1ff546f0d39",
+      "fix_sha": "6a4be0720934317655a358c251add2f03e021356",
+      "real_unknown_retained": "email-test-03 first Manager job",
+      "anonymous_official_asset_sha256": [
+        "bca4813e25327a69a5e4af0b06f7f69395e7cb80612e00d365dcbce8bf12d49b",
+        "c6be7ea3a627fa23f180b777cb21ed5fd841091db6a1208dd9d3a09ec4ada98b"
+      ],
+      "controlled_red_green_cases": 3,
+      "final_explicit_OTP_clicks": 0,
+      "anonymous_public_asset_sources": []
+    },
+    {
+      "problem": "Read-only Runtime.evaluate timeout during authenticated page navigation ended observation early",
+      "real_trace": {
+        "alias": "email-test-05",
+        "status": "UNKNOWN",
+        "at": 1793709042.5868618,
+        "phase": "VERIFYING",
+        "identity_reloaded": false,
+        "exception_type": "TimeoutError",
+        "frames": [
+          {
+            "file": "email_login_browser.py",
+            "line": 369,
+            "function": "verify"
+          },
+          {
+            "file": "email_login_browser.py",
+            "line": 239,
+            "function": "_snapshot"
+          },
+          {
+            "file": "cdp.py",
+            "line": 44,
+            "function": "js"
+          },
+          {
+            "file": "cdp.py",
+            "line": 41,
+            "function": "send"
+          }
+        ]
+      },
+      "red_source_sha": "6a4be0720934317655a358c251add2f03e021356",
+      "fix_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "fix": "Catch only observation TimeoutError within original 45-second deadline; never repeat OTP input or authentication POST, and never reset deadline or repeat the single optional official GET",
+      "controlled_red_green_cases": 6,
+      "real_followup": "Eight consecutive final-source Manager jobs authenticated and were persisted"
+    }
+  ],
+  "controlled_validation": {
+    "initial_combined": {
+      "source_equivalent_sha": "9df622f5dfe1fa916fa41035384fb1ff546f0d39",
+      "tests": 54,
+      "status": "PASS",
+      "elapsed_seconds": 5.444,
+      "log_sha256": "92405be0ff6f5c708e81afe76e3316c4c0f60498eb62a2e58e967f68e24a8c05",
+      "test_files_raw_sha256": {
+        "tests/test_email_login.py": "3422edeeea22608d916c17879f4e60b2955134e67f932e01547ebc2ab6a1298f",
+        "tests/test_email_login_browser.py": "73b32ccae588d58ed34f1148435b9791f7d1f6d042baaa79944a7a0b47663696",
+        "tests/test_email_login_app.py": "8351f66ec316647115c21c7e4d6a5b1c70159408fea5203291058c5d0b6dfdf1"
+      },
+      "source_files_raw_sha256": {
+        "email_login.py": "a5c1a6ecc4ae45036e59e3a7647c5bec5bce748a4fedc40a581762e04fdb58bd",
+        "email_login_browser.py": "5c97ab09037e051f7a1eb40463c0c284d0f626052d698b0daa9264c01122afdc",
+        "muse_identity.py": "2d134d8da22f6b564cc36d6c64ee6f55a916546f45c3d85aac0be74bfa24aee9",
+        "app.py": "3f87134ce4a9396d05221f33f59d75d6f3518f1554ec1064e0129945a7df0a3e",
+        "admin.html": "2806d8d0945a52e701a9aa928b1e324a7fbd47a3ed29655d8c5d3869e219dcff",
+        "store.py": "33197b34a427cf1a034f975500f9f37299ad9e917e765af02edbc574a16f0d79",
+        ".dockerignore": "d731a82de537f1b55778c897ad8e764c95ff1cf1ca747de8b83de23655f654d6"
+      }
+    },
+    "after_auto_submit_fix_combined": {
+      "source_equivalent_sha": "6a4be0720934317655a358c251add2f03e021356",
+      "tests": 57,
+      "status": "PASS",
+      "elapsed_seconds": 4.705,
+      "log_sha256": "0f6b4ed163de9e50a63bfa0fb5be2f6378f7768dc2a6f3e7ff3df316d80d8667",
+      "test_files_raw_sha256": {
+        "tests/test_email_login.py": "3422edeeea22608d916c17879f4e60b2955134e67f932e01547ebc2ab6a1298f",
+        "tests/test_email_login_browser.py": "54661d12cd589b90f99c28735df32be05c920f8c9380aa8805b5c63c6ed23b7a",
+        "tests/test_email_login_app.py": "8351f66ec316647115c21c7e4d6a5b1c70159408fea5203291058c5d0b6dfdf1"
+      },
+      "source_files_raw_sha256": {
+        "email_login.py": "a5c1a6ecc4ae45036e59e3a7647c5bec5bce748a4fedc40a581762e04fdb58bd",
+        "email_login_browser.py": "3d040dcf8a22d788801b6aafba031ec608efb7a8fe7ea1b6f4b792fb6c9dcfce",
+        "muse_identity.py": "2d134d8da22f6b564cc36d6c64ee6f55a916546f45c3d85aac0be74bfa24aee9",
+        "app.py": "3f87134ce4a9396d05221f33f59d75d6f3518f1554ec1064e0129945a7df0a3e",
+        "admin.html": "2806d8d0945a52e701a9aa928b1e324a7fbd47a3ed29655d8c5d3869e219dcff",
+        "store.py": "33197b34a427cf1a034f975500f9f37299ad9e917e765af02edbc574a16f0d79"
+      }
+    },
+    "final_driver": {
+      "source_equivalent_sha": "bd04b5b5e169b8b23bf63e41e1b442349523603d",
+      "python": "3.12.16",
+      "command": "python -m unittest discover -s tests -p test_email_login_browser.py -v",
+      "tests": 40,
+      "status": "PASS",
+      "elapsed_seconds": 1.091,
+      "driver_raw_sha256": "b259b00d1535fa1ffa37c3498788af1bfb0ae03b1bbc5ff8861b51f421e3fa98",
+      "tests_raw_sha256": "111abeead790efbc68ec488a8f198b9ed97a620a51bcd112d946333edeb16fe9",
+      "receipt_kind": "Original tool-captured stdout/stderr; no physical log was created, no log hash invented",
+      "log_sha256": null,
+      "peers": "Fake CDP/processes and Node execution of DOM fixtures; not a real browser or Muse"
+    },
+    "unchanged_manager_and_api": {
+      "manager_tests": 14,
+      "api_tests": 9,
+      "source_sha": "9df622f5dfe1fa916fa41035384fb1ff546f0d39",
+      "manager_raw_sha256": "a5c1a6ecc4ae45036e59e3a7647c5bec5bce748a4fedc40a581762e04fdb58bd",
+      "api_raw_sha256": "3f87134ce4a9396d05221f33f59d75d6f3518f1554ec1064e0129945a7df0a3e",
+      "note": "These files are unchanged through the final runtime SHA; their earlier combined results are not relabeled as a final all-suite rerun",
+      "tests_raw_sha256": {
+        "tests/test_email_login.py": "3422edeeea22608d916c17879f4e60b2955134e67f932e01547ebc2ab6a1298f",
+        "tests/test_email_login_app.py": "8351f66ec316647115c21c7e4d6a5b1c70159408fea5203291058c5d0b6dfdf1"
+      }
+    },
+    "original_protocol_regression": {
+      "source_sha": "9df622f5dfe1fa916fa41035384fb1ff546f0d39",
+      "python_tests": 64,
+      "javascript_tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "curl_import_stub": false,
+      "native_or_muse_network_proved": false,
+      "report_sha256": "3067ab439dbaa13853b42ec95ab75457533ad612529d88a2feffa393d111d30f"
+    }
+  },
+  "generation_and_history_preservation": {
+    "historical_phase1": {
+      "ledger": {
+        "sha256": "b1f6c6120d2b9606b40fb8a57520384bc3ffa436d86348169c73270b15a30808",
+        "count": 9,
+        "unchanged": true
+      },
+      "operations": {
+        "sha256": "6d9367ee2dfd531755766b347a78f54befce57436cba1dbe7e9c0f70ebef6767",
+        "count": 8,
+        "unchanged": true
+      },
+      "tasks": {
+        "sha256": "5370df482ffa3d40945235c44c41b7478015dbb42b6d734dae1e5ba8271025fc",
+        "count": 3,
+        "unchanged": true
+      }
+    },
+    "historical_phase1_budget": [
+      6,
+      2,
+      1
+    ],
+    "historical_phase2_ledger_sha256": "7b59725580ae290ad30809f6f7af827235d28f7af31e9be14db299faaf52875b",
+    "historical_phase2_budget": [
+      3,
+      1,
+      0
+    ],
+    "historical_phase2_ledger_unchanged": true,
+    "login_instance_store_counts": {
+      "protocol_operations.json": 0,
+      "tasks.json": 0
+    },
+    "new_generation_requests": 0,
+    "original_admin_18611_http": 200,
+    "new_admin_18613_http": 200,
+    "new_pool_count": 9
+  },
+  "not_run": [
+    "Real generation with these nine identities",
+    "Real concurrency3/5 generation or two-hour soak",
+    "Linux real email-code login",
+    "Updated Docker image build for this email-login addition",
+    "Full graphical browser acceptance of the new admin card (DOM/network fixture and real protected HTTP API were validated)",
+    "Pure HTTP OTP authentication independent of a browser",
+    "CAPTCHA, new-account terms acceptance or permission expansion"
+  ],
+  "future_policy": "Leave generation stopped. Preserve all earlier generation ledgers and login UNKNOWN/CANCELLED records. Any new real generation requires fresh user steering; no replay of unknown generation operations."
+}

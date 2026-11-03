@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "phase1": {
+    "ledger_preserved": true,
+    "consumed": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "cases": 9,
+    "operations": 8,
+    "tasks": 3,
+    "files": {
+      "ledger": {
+        "sha256": "b1f6c6120d2b9606b40fb8a57520384bc3ffa436d86348169c73270b15a30808",
+        "count": 9,
+        "after_sha256": "b1f6c6120d2b9606b40fb8a57520384bc3ffa436d86348169c73270b15a30808",
+        "unchanged": true
+      },
+      "operations": {
+        "sha256": "6d9367ee2dfd531755766b347a78f54befce57436cba1dbe7e9c0f70ebef6767",
+        "count": 8,
+        "after_sha256": "6d9367ee2dfd531755766b347a78f54befce57436cba1dbe7e9c0f70ebef6767",
+        "unchanged": true
+      },
+      "tasks": {
+        "sha256": "5370df482ffa3d40945235c44c41b7478015dbb42b6d734dae1e5ba8271025fc",
+        "count": 3,
+        "after_sha256": "5370df482ffa3d40945235c44c41b7478015dbb42b6d734dae1e5ba8271025fc",
+        "unchanged": true
+      }
+    },
+    "git_historical_evidence_modified": false
+  },
+  "phase2": {
+    "all_real_sends_stopped": true,
+    "generation_post_intents": 4,
+    "actual_operation_count": 4,
+    "unknown_operations": 0,
+    "completed_operations": 3,
+    "failed_operations": 1,
+    "task_count": 1,
+    "user_stop_preserved": true,
+    "new_test_services_stopped": true,
+    "containers": [
+      {
+        "alias": "initial-zero-generation-service",
+        "state": "exited",
+        "exit_code": 143,
+        "complete_metrics_footer": false,
+        "note": "Pre-fix instrumentation history retained; not used as full live-batch metrics"
+      },
+      {
+        "alias": "L1-r2",
+        "state": "exited",
+        "exit_code": 0,
+        "finished_at": "2026-11-03T10:43:59.080987021Z",
+        "complete_metrics_footer": true
+      }
+    ],
+    "one_shot_original_history_diagnostic_exited": true,
+    "diagnostic_connections_closed": true,
+    "dedicated_Chrome_profile_stopped": true,
+    "original_18611_admin_http_status_at_closeout": 200,
+    "original_18611_stopped_or_reconfigured": false,
+    "latest_cookie_persisted": true,
+    "old_cookie_reimported_after_linux_started": false,
+    "private_raw_evidence_retained": true,
+    "stopped_test_containers_and_images_retained": true,
+    "shared_Docker_or_production_restarted": false
+  }
+}

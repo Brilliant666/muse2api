@@ -1,0 +1,275 @@
+{
+  "status": "PASS",
+  "timestamp_utc": "2026-11-03T05:27:55.216447+00:00",
+  "scope": "original regressions; synthetic peers and isolated headless browser; no Muse account",
+  "python": "3.12.16 (main, Oct 26 2026, 14:10:56) [MSC v.1944 64 bit (AMD64)]",
+  "chromium": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+  "live_muse_tested": false,
+  "generation_calls_to_muse": 0,
+  "python_scripts": 25,
+  "results": [
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 1.391,
+      "stdout": "",
+      "stderr": "test_authenticated_http_and_connect_and_shutdown (__main__.AccountProxyTests.test_authenticated_http_and_connect_and_shutdown) ... ok\ntest_context_creation_failure_never_falls_back_direct (__main__.AccountProxyTests.test_context_creation_failure_never_falls_back_direct) ... ok\ntest_keepalive_and_pre_renew_use_account_proxy (__main__.AccountProxyTests.test_keepalive_and_pre_renew_use_account_proxy) ... ok\ntest_proxy_changes_replace_warm_sessions (__main__.AccountProxyTests.test_proxy_changes_replace_warm_sessions) ... ok\ntest_validation_and_secret_preservation (__main__.AccountProxyTests.test_validation_and_secret_preservation) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.684s\n\nOK\n",
+      "test_count": 5,
+      "test_count_source": "unittest summary",
+      "script": "tests/test_account_proxy.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.672,
+      "stdout": "PASS: proxy snapshots, busy edits/maintenance, isolated diagnostics, no secret leak or false account success\n",
+      "stderr": "",
+      "script": "tests/test_account_proxy_routing.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.64,
+      "stdout": "public_base=<unset> base_url='' cmd_base=http://host:18610 cmd_ok=PASS\npublic_base=https://api.example.com base_url='https://api.example.com/v1' cmd_base=https://api.example.com cmd_ok=PASS\nPASS 12 checks; no live accounts/network/browser\n",
+      "stderr": "",
+      "test_count": 12,
+      "test_count_source": "script assertion summary",
+      "script": "tests/test_admin_base_url.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.953,
+      "stdout": "generation_lock_covers_retry_cleanup=PASS queue_wait_bounded=PASS\nasync_generation_http=202 returned_before_completion=True\ncompleted_b64_roundtrip=PASS polling_does_not_regenerate=PASS\nmultipart_and_json_reference_forwarding=PASS\nmulti_reference_video_forwarding=PASS\nmulti_reference_validation=PASS\ndedicated_task_endpoint=PASS idempotency_reuse=PASS conflict_rejected=PASS\nsync_compatibility=PASS\nfailure_terminal=PASS authentication=PASS missing_task=PASS\nbounded_queue=PASS\nrestart_marks_interrupted_tasks_failed=PASS\nPASS async image API regression\n2026-11-03 13:27:35,016 [INFO] muse2api: 【自动保活守护进程】已启动，检测周期: 15 分钟\n",
+      "stderr": "",
+      "script": "tests/test_async_images.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.422,
+      "stdout": "PASS: two context downloads isolated, cleaned, and context failure never falls back\n",
+      "stderr": "",
+      "script": "tests/test_browser_context_downloads.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.968,
+      "stdout": "PASS: test_concurrency_lock\nPASS: test_account_pool_manager\nPASS: test_parallel_generation_simulation\nALL CONCURRENCY TESTS PASSED!\n",
+      "stderr": "",
+      "script": "tests/test_concurrency.py",
+      "previous_attempts": [
+        {
+          "status": "FAIL",
+          "exit_code": 1,
+          "timed_out": false,
+          "seconds": 1.11,
+          "stdout": "PASS: test_concurrency_lock\nPASS: test_account_pool_manager\n",
+          "stderr": "Traceback (most recent call last):\n  File \"C:\\Users\\brilliant\\Documents\\ChatGPT\\muse2api-protocol-acceptance\\tests\\test_concurrency.py\", line 154, in <module>\n    test_parallel_generation_simulation()\n  File \"C:\\Users\\brilliant\\Documents\\ChatGPT\\muse2api-protocol-acceptance\\tests\\test_concurrency.py\", line 143, in test_parallel_generation_simulation\n    assert concurrency_observed, \"两个任务应在独立的线程中同时并发执行！\"\n           ^^^^^^^^^^^^^^^^^^^^\nAssertionError: 两个任务应在独立的线程中同时并发执行！\n",
+          "script": "tests/test_concurrency.py"
+        }
+      ],
+      "fix": "Test now supplies its own two-slot ConcurrencyLock instead of relying on deployment concurrency; runner remains concurrency 1.",
+      "targeted_rerun_timestamp_utc": "2026-11-03T05:28:29.067831+00:00"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.109,
+      "stdout": "PASS: server and every cookie importer require only hatch_sess; hatch_vml is optional\n",
+      "stderr": "",
+      "script": "tests/test_cookie_requirements.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.078,
+      "stdout": "PASS: bilingual upgrade notice, version badge, release instructions and download link\n",
+      "stderr": "",
+      "script": "tests/test_extension_upgrade_notice.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.609,
+      "stdout": "PASS: extension ZIP and file list exactly match the full source tree\n",
+      "stderr": "",
+      "script": "tests/test_extension_zip.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.641,
+      "stdout": "2030-03-18 01:46:40,000 [INFO] muse2api: 【自动保活】正在为账号 due (due) 执行静默续期与 VM 唤醒...\n2030-03-18 01:46:40,000 [INFO] muse2api: 【自动保活】账号 due 执行结果: ok=True expires_at=None\nPASS: maintenance use tracking and keepalive cadence\n",
+      "stderr": "",
+      "script": "tests/test_keepalive_scheduling.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.625,
+      "stdout": "PASS: all media deletion tests passed!\n",
+      "stderr": "",
+      "script": "tests/test_media_delete.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 7.828,
+      "stdout": "{\"extract_b64\": \"c2VsZWN0ZWQ=\", \"fallback_video_rejected\": true, \"global_download_clicked\": false, \"invalid_reference_rejected\": true, \"multi_reference_uploaded\": 2, \"outside_remove_ignored\": 1, \"result_sources\": [\"data:image/png;base64,b3V0cHV0\"], \"stale_selected\": \"new-image\", \"tid_video_cover_rejected\": true, \"upload_only_accepted\": false, \"video_selected\": \"clip.mp4\"}\nPASS: input preview excluded; exact selected bytes; all old sources ignored; video retained; crossmodal fallback rejected; tid-video cover rejected; scoped download; multi-reference upload; upload failure closed\n",
+      "stderr": "",
+      "script": "tests/test_media_selection.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.625,
+      "stdout": "PASS: composer readiness and undelivered video fast-fail\nPASS: explicit refusal propagated; idle no-thread stopped; normal wait preserved\n",
+      "stderr": "",
+      "script": "tests/test_muse_video_delivery.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.797,
+      "stdout": "",
+      "stderr": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.604s\n\nOK\n",
+      "test_count": 2,
+      "test_count_source": "unittest summary",
+      "script": "tests/test_prepare_protocol.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.218,
+      "stdout": "PASS: account-bound and repeated quota reads use disposable isolated pages\n",
+      "stderr": "",
+      "script": "tests/test_quota_account_binding.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.141,
+      "stdout": "",
+      "stderr": "test_decimal_percentages (__main__.QuotaLocalizationTests.test_decimal_percentages) ... ok\ntest_extra_only_is_not_weekly_usage (__main__.QuotaLocalizationTests.test_extra_only_is_not_weekly_usage) ... ok\ntest_original_english (__main__.QuotaLocalizationTests.test_original_english) ... ok\ntest_percentage_upper_bound (__main__.QuotaLocalizationTests.test_percentage_upper_bound) ... ok\ntest_plan_only_is_not_success (__main__.QuotaLocalizationTests.test_plan_only_is_not_success) ... ok\ntest_profile_and_language_are_excluded (__main__.QuotaLocalizationTests.test_profile_and_language_are_excluded) ... ok\ntest_simplified_example (__main__.QuotaLocalizationTests.test_simplified_example) ... ok\ntest_traditional_example (__main__.QuotaLocalizationTests.test_traditional_example) ... ok\ntest_unrelated_and_empty_text (__main__.QuotaLocalizationTests.test_unrelated_and_empty_text) ... ok\ntest_zero_is_success_and_integer (__main__.QuotaLocalizationTests.test_zero_is_success_and_integer) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.001s\n\nOK\n",
+      "test_count": 10,
+      "test_count_source": "unittest summary",
+      "script": "tests/test_quota_localization.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 1.375,
+      "stdout": "safe_defaults_local_private_denied_data_and_raw_base64_allowed=PASS\nexplicit_legacy_local_and_private_opt_ins=PASS\nprivate_loopback_link_local_mapped_and_mixed_dns_refused=PASS\npublic_ipv4_ipv6_allowed_proxy_and_auto_redirect_disabled=PASS\nall_redirect_codes_rechecked_private_refused_public_allowed=PASS\nchecked_ip_pinned_original_host_and_tls_sni=PASS\nall_endpoints_reject_before_task_multi_reference_prepared_in_order=PASS\nPASS reference image safety regression\n",
+      "stderr": "",
+      "script": "tests/test_ref_image_safety.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.765,
+      "stdout": "PASS: reference count, item, conflict, MIME and byte limits\nPASS: endpoint JSON conflicts plus multipart count, per-file and total byte limits\n",
+      "stderr": "",
+      "script": "tests/test_reference_limits.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.672,
+      "stdout": "PASS: model refusal is propagated without rotating to another account\n",
+      "stderr": "",
+      "script": "tests/test_refusal_rotation.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.922,
+      "stdout": "{\"case\": \"401\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"403\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"429\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"503\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"redirect\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"non_json\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"non_object\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"unassigned\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"timeout\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"connection\", \"prior\": true, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": true}\n{\"case\": \"assigned\", \"prior\": true, \"protected_unchanged\": false, \"result_ok\": true, \"stored_ok\": true}\n{\"case\": \"401\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"403\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"429\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"503\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"redirect\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"non_json\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"non_object\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"unassigned\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"timeout\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"connection\", \"prior\": null, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": null}\n{\"case\": \"assigned\", \"prior\": null, \"protected_unchanged\": false, \"result_ok\": true, \"stored_ok\": true}\n{\"case\": \"401\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"403\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"429\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"503\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"redirect\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"non_json\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"non_object\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"unassigned\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"timeout\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"connection\", \"prior\": false, \"protected_unchanged\": true, \"result_ok\": false, \"stored_ok\": false}\n{\"case\": \"assigned\", \"prior\": false, \"protected_unchanged\": false, \"result_ok\": true, \"stored_ok\": true}\npre_renew 401 auth_error True stored_ok False\n2030-03-18 01:46:40,000 [WARNING] muse2api: HTTP 预续签账号 451b74b012ab 异常: /api/session HTTP 403：访问被拒绝，请检查服务器出口/地区/访问限制；不能据此判定 Cookie 失效\npre_renew 403 auth_error False stored_ok True\n2030-03-18 01:46:40,000 [WARNING] muse2api: HTTP 预续签账号 5ca302ff8505 异常: /api/session HTTP 503：上游请求未成功，请稍后重试并检查服务器网络\npre_renew 503 auth_error False stored_ok True\npre_renew assigned auth_error False stored_ok True\npage loading workspace MuseGenerationError\npage Sign in MuseAuthError\nno_gw_account_check essential_ok True\ninvalid_cookie_check essential_ok False api_missing ['hatch_sess']\nPASS 177 checks; no live accounts/network/browser\n",
+      "stderr": "",
+      "test_count": 177,
+      "test_count_source": "script assertion summary",
+      "script": "tests/test_session_health.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.656,
+      "stdout": "PASS: session-only import, unknown initial health, assigned accepted, 401 rejected, unavailable not accepted\n",
+      "stderr": "",
+      "script": "tests/test_session_only_import.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 1.422,
+      "stdout": "PASS: SOCKS5/SOCKS5h auth, remote DNS, IPv4/IPv6, wrong-password no-direct, no secret forwarding, cleanup\n",
+      "stderr": "",
+      "script": "tests/test_socks_proxy.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.406,
+      "stdout": "{\"claim_no_attachment\": {\"elapsed\": 45.0, \"outcome\": \"timeout\"}, \"claim_only_cover\": {\"elapsed\": 45.0, \"outcome\": \"timeout\"}, \"claim_then_refusal\": {\"elapsed\": 15.0, \"error\": \"模型未生成媒体，仅返回文本: 视频没生成成功：你这个账号所在的国家/地区目前不支持视频生成。\", \"outcome\": \"MuseModelRefusalError\"}, \"claim_then_upload_failed\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: The video was generated, but the upload failed.\", \"outcome\": \"MuseModelRefusalError\"}, \"cn_claim_15\": {\"elapsed\": 15.6, \"outcome\": \"video\"}, \"cn_claim_30\": {\"elapsed\": 30.0, \"outcome\": \"video\"}, \"cn_claim_60\": {\"elapsed\": 60.0, \"outcome\": \"video\"}, \"cn_ready_15\": {\"elapsed\": 15.6, \"outcome\": \"video\"}, \"cn_ready_30\": {\"elapsed\": 30.0, \"outcome\": \"video\"}, \"cn_ready_60\": {\"elapsed\": 60.0, \"outcome\": \"video\"}, \"cn_short_15\": {\"elapsed\": 15.6, \"outcome\": \"video\"}, \"cn_short_30\": {\"elapsed\": 30.0, \"outcome\": \"video\"}, \"cn_short_60\": {\"elapsed\": 60.0, \"outcome\": \"video\"}, \"en_claim_15\": {\"elapsed\": 15.6, \"outcome\": \"video\"}, \"en_claim_30\": {\"elapsed\": 30.0, \"outcome\": \"video\"}, \"en_claim_60\": {\"elapsed\": 60.0, \"outcome\": \"video\"}, \"en_ready_15\": {\"elapsed\": 15.6, \"outcome\": \"video\"}, \"en_ready_30\": {\"elapsed\": 30.0, \"outcome\": \"video\"}, \"en_ready_60\": {\"elapsed\": 60.0, \"outcome\": \"video\"}, \"explicit_refusal\": {\"elapsed\": 8.4, \"error\": \"模型未生成媒体，仅返回文本: 视频没生成成功：你这个账号所在的国家/地区目前不支持视频生成。\", \"outcome\": \"MuseModelRefusalError\"}, \"failed_after_claim\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: 视频已生成，但随后处理失败，无法提供视频。\", \"outcome\": \"MuseModelRefusalError\"}, \"negated_cn\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: 视频没有生成成功，请重新尝试。\", \"outcome\": \"MuseModelRefusalError\"}, \"negated_contraction\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: Your video hasn't been generated. Please try again.\", \"outcome\": \"MuseModelRefusalError\"}, \"negated_could_not\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: The video could not be generated.\", \"outcome\": \"MuseModelRefusalError\"}, \"negated_couldnt\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: The video couldn't be generated.\", \"outcome\": \"MuseModelRefusalError\"}, \"negated_en\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: The video has not been generated successfully. Please try again.\", \"outcome\": \"MuseModelRefusalError\"}, \"negated_none\": {\"elapsed\": 9.6, \"error\": \"模型未生成媒体，仅返回文本: No video has been generated.\", \"outcome\": \"MuseModelRefusalError\"}, \"stop_lifecycle\": {\"elapsed\": 30.0, \"outcome\": \"video\"}, \"verified_report_15\": {\"elapsed\": 15.6, \"outcome\": \"video\"}, \"verified_report_30\": {\"elapsed\": 30.0, \"outcome\": \"video\"}, \"verified_report_60\": {\"elapsed\": 60.0, \"outcome\": \"video\"}}\nPASS: 31 late-video, deadline, cover and refusal cases\n",
+      "stderr": "",
+      "test_count": 31,
+      "test_count_source": "script assertion summary",
+      "script": "tests/test_video_late_attachment.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.266,
+      "stdout": "RESULT generated elapsed 20.4\n",
+      "stderr": "",
+      "script": "tests/test_vm_wait.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.328,
+      "stdout": "PASS: suspended, running, and failed-verification wake cases\n",
+      "stderr": "",
+      "script": "tests/test_wake_confirmation.py"
+    },
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.079,
+      "stdout": "PASS 502 Cloudflare HTML -> neutral Chinese hint, no HTML leak, no nginx claim\nPASS 502 nginx HTML -> same neutral 502 hint, no timeout claim\nPASS 503 non-JSON -> status hint\nPASS 504 non-JSON -> status hint\nPASS 500 non-JSON -> status hint\nPASS 429 non-JSON -> status hint\nPASS JSON detail preserved\nPASS JSON error.message and error object still handled\nPASS 401 branch unchanged\nPASS success response passthrough unchanged\nALL PASS\n",
+      "stderr": "",
+      "test_count": 10,
+      "test_count_source": "individual JavaScript PASS lines",
+      "script": "tests/test_admin_api_error_messages.mjs"
+    }
+  ],
+  "evidence_note": "Initial full run had only concurrency fixture failure. After fixing that test premise, only the changed concurrency script was rerun; prior passing results were retained.",
+  "targeted_rerun_command": ".venv/Scripts/python.exe tools/test_original.py --chromium 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe' --only test_concurrency.py --report docs/python-protocol/evidence/acceptance-original-concurrency-rerun.json"
+}

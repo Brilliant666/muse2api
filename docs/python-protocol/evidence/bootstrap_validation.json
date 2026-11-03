@@ -1,0 +1,9 @@
+{
+  "scope": "actual git archive + raw hashes + reviewed five-file patch + final hashes, using local temporary fixture commit; no network clone or Docker build",
+  "reviewed_source_commit": "6309f64b44ce133a2428fadf966a395d503ce84f",
+  "checks_run": 8,
+  "passed": true,
+  "failures": 0,
+  "errors": 0,
+  "changed_protocol_files_verified": 5
+}

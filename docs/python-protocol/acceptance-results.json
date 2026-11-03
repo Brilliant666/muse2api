@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "timezone": "Asia/Shanghai",
+  "repository": "Brilliant666/muse2api",
+  "branch": "codex/python-protocol-integration",
+  "pull_request": "https://github.com/Brilliant666/muse2api/pull/1",
+  "status": "PASS",
+  "achieved_grade": 2,
+  "grade1_build_offline": "PASS",
+  "grade2_single_account_trial": "PASS",
+  "grade3_production_replacement": "BLOCKED",
+  "start_sha": "52d5acd74ec54757fe228a4f3daed6099046739a",
+  "final_test_sha": "b08f11000930674990c2834e1a9da091fd08a668",
+  "final_test_tree": "e80f1466d49ac12e6b368d65988b9db6d1ef7c8d",
+  "python_suite_and_image_source_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
+  "after_suite_change": {
+    "files": [
+      "docker-compose.yml"
+    ],
+    "scope": "init:true only; application, protocol patch and Python test blobs unchanged",
+    "targeted_test": "actual Chromium orphan count 8 -> 0"
+  },
+  "evidence_delivery_note": "final_test_sha retains nine-case validation; supplemental_test_sha binds VM-only observer. Following report commit changes documentation/evidence only.",
+  "budget": {
+    "limits": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "consumed": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "remaining": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "send_intents": 9,
+    "rule": "Persist the send intent and conservatively charge its budget before POST. Failures, timeouts and unknown outcomes count. An intent whose non-delivery cannot be proved must not be automatically retried; recover the original operation or leave it pending."
+  },
+  "checks": [
+    {
+      "id": "fixed_git_preparation",
+      "status": "PASS",
+      "evidence_level": "real Git",
+      "detail": "Pinned clone, verified archive/patch digests, two EOL regression cases",
+      "evidence": [
+        "evidence/acceptance-preparation.json",
+        "evidence/acceptance-original.json"
+      ]
+    },
+    {
+      "id": "clean_install",
+      "status": "PASS",
+      "evidence_level": "real native dependencies",
+      "detail": "Python 3.12.16 clean venv pip install; patched muse2api-http 0.2.0, curl_cffi 0.17.0, cryptography 50.0.2",
+      "evidence": [
+        "evidence/acceptance-dependencies.json"
+      ]
+    },
+    {
+      "id": "offline_protocol",
+      "status": "PASS",
+      "evidence_level": "synthetic peers + real application/framework",
+      "detail": "64 Python cases (61 baseline + 3 OS-process recovery), 6 JavaScript cases; no failures/skips",
+      "evidence": [
+        "evidence/acceptance-offline.json"
+      ]
+    },
+    {
+      "id": "original_regressions",
+      "status": "PASS",
+      "evidence_level": "synthetic peers + actual isolated Edge",
+      "detail": "25 Python scripts including 2 new preparer tests; original admin JS 10 behaviors; targeted concurrency rerun retained",
+      "evidence": [
+        "evidence/acceptance-original.json",
+        "evidence/acceptance-original-concurrency-rerun.json"
+      ]
+    },
+    {
+      "id": "native_transport",
+      "status": "PASS",
+      "evidence_level": "real curl HTTP/WebSocket to loopback peers",
+      "detail": "6 cases on Windows and 6 in Linux Docker; identity-cipher boundary means no real Noise/TLS authentication claim",
+      "evidence": [
+        "evidence/acceptance-native.json",
+        "evidence/acceptance-native-docker.json"
+      ]
+    },
+    {
+      "id": "docker_build_start",
+      "status": "PASS",
+      "evidence_level": "actual Docker Engine",
+      "detail": "Protocol and browser images built; source and container HTTP metadata/auth/models passed; no browser binary/process in default protocol image",
+      "evidence": [
+        "evidence/acceptance-docker-builds.json",
+        "evidence/acceptance-docker-runtime.json",
+        "evidence/acceptance-docker-metadata.json"
+      ]
+    },
+    {
+      "id": "controlled_restart_recovery",
+      "status": "PASS",
+      "evidence_level": "actual OS processes + synthetic gateway",
+      "detail": "Kill after one acknowledged submission; recover original account/session/node/VM; mismatched VM rejected; delivery_failed re-download only",
+      "evidence": [
+        "evidence/acceptance-recovery.json",
+        "evidence/acceptance-offline.json"
+      ]
+    },
+    {
+      "id": "browser_image_and_persistence",
+      "status": "PASS",
+      "evidence_level": "actual Chromium + synthetic persisted task/media",
+      "detail": "Browser image boots, same service key/volume, synthetic completed task and identical media bytes retained; actual DOM selection test passed",
+      "evidence": [
+        "evidence/acceptance-browser-fallback.json",
+        "evidence/acceptance-browser-chromium.json"
+      ]
+    },
+    {
+      "id": "chromium_orphan_reaping",
+      "status": "PASS",
+      "evidence_level": "actual Docker init and Chromium processes",
+      "detail": "Before fix 8 zombies reparented to PID 1; Compose init:true / --init targeted rerun leaves 0 Chromium or zombie processes",
+      "evidence": [
+        "evidence/acceptance-init-runtime.json",
+        "evidence/acceptance-init-cleanup.json"
+      ]
+    },
+    {
+      "id": "live_chat_responses",
+      "status": "PASS",
+      "evidence_level": "real Muse",
+      "detail": "T1-T4 ordinary/SSE Chat and Responses passed; stop/DONE or ordered response.completed and exact delta/final output checked",
+      "evidence": [
+        "evidence/live-functional-validation.json"
+      ]
+    },
+    {
+      "id": "live_disconnect_restart",
+      "status": "PASS",
+      "evidence_level": "real Muse",
+      "detail": "T5 real running-turn disconnect -> unknown/quarantine -> new interpreter -> original 3359 characters/60 items; same identities and operation set, resubmitted:false",
+      "evidence": [
+        "evidence/live-disconnect-recovery.json"
+      ]
+    },
+    {
+      "id": "live_browser_fallback",
+      "status": "PASS",
+      "evidence_level": "real Muse",
+      "detail": "Actual isolated Chrome browser backend returned successful assistant text and preserved account/tasks/media",
+      "evidence": [
+        "evidence/live-functional-validation.json",
+        "evidence/live-runtime-and-cleanup.json"
+      ]
+    },
+    {
+      "id": "live_images_edits_video_decode",
+      "status": "PASS",
+      "evidence_level": "real Muse",
+      "detail": "I1/I2 complete WebP decode; V1 5-second H.264 video full 120-frame and audio decode; sizes/hashes recorded",
+      "evidence": [
+        "evidence/live-media-validation.json"
+      ]
+    },
+    {
+      "id": "real_cookie_rotation",
+      "status": "PASS",
+      "evidence_level": "real Muse",
+      "detail": "hatch_sess and hatch_vml rotated; hatch_gw newly issued. Store persistence and fresh-process original recovery authenticated without reimport",
+      "evidence": [
+        "evidence/live-cookie-lifecycle.json"
+      ]
+    },
+    {
+      "id": "real_vm_wakeup",
+      "status": "NOT_OBSERVED",
+      "evidence_level": "real Muse",
+      "detail": "30-minute zero-generation supplement: four real session_info samples assigned/RUNNING on original VM; no explicit idle state, bootstrap/wake/Noise/history not executed; original ledger and operations unchanged.",
+      "evidence": [
+        "evidence/acceptance-cases.json",
+        "evidence/live-vm-wakeup.json"
+      ]
+    },
+    {
+      "id": "live_multi_account_proxy",
+      "status": "NOT_RUN",
+      "evidence_level": "real Muse",
+      "detail": "Only one authorized reused account, no designated proxy/second account; controlled isolation coverage remains separate",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "active_account_resource_metrics",
+      "status": "PASS",
+      "evidence_level": "real Muse",
+      "detail": "Runtime/process TCP and RSS snapshots recorded; no independent wire reconnect count or performance/parallel-load claim",
+      "evidence": [
+        "evidence/live-runtime-and-cleanup.json"
+      ]
+    },
+    {
+      "id": "windows_docker_published_port",
+      "status": "BLOCKED",
+      "evidence_level": "actual Windows -> Docker published port",
+      "detail": "Previous environment check refused Windows access to the Docker-published port while container loopback passed. Not re-tested in the real Windows-source round.",
+      "evidence": [
+        "evidence/acceptance-docker-runtime.json"
+      ],
+      "retested_in_real_round": false
+    },
+    {
+      "id": "linux_container_real_muse",
+      "status": "NOT_RUN",
+      "evidence_level": "target platform",
+      "detail": "Docker images build/start and Linux native loopback I/O passed. Actual Muse generation ran in Windows source service, not Linux container. Budget exhausted.",
+      "evidence": [
+        "evidence/live-functional-validation.json"
+      ]
+    },
+    {
+      "id": "live_concurrency_3",
+      "status": "NOT_RUN",
+      "evidence_level": "real parallel load",
+      "detail": "This round used one account, concurrency1/worker1. Production concurrency3 remains an unchanged deployment parameter; not real-load-tested.",
+      "evidence": [
+        "evidence/live-runtime-and-cleanup.json"
+      ]
+    },
+    {
+      "id": "real_delivery_failure_recovery",
+      "status": "NOT_OBSERVED",
+      "evidence_level": "real Muse",
+      "detail": "All real media delivery succeeded. delivery_failed original-file recovery remains controlled/native/cross-process coverage, not an injected real failure.",
+      "evidence": [
+        "evidence/acceptance-native.json",
+        "evidence/acceptance-recovery.json"
+      ]
+    }
+  ],
+  "production_changed": false,
+  "merged": false,
+  "runtime_cleanup": {
+    "source_service_stopped": false,
+    "containers_stopped": [
+      "muse2api-acceptance-20261103-protocol",
+      "muse2api-acceptance-20261103-browser",
+      "muse2api-acceptance-20261103-browser-init"
+    ],
+    "images_and_isolated_synthetic_volume_retained": true,
+    "shared_docker_restarted": false,
+    "source_service_state": "VM observer exited; previous protocol management service restored at localhost:18611; browser and diagnostics stopped",
+    "real_media_and_private_receipts_retained_outside_git": true,
+    "diagnostic_process_exited": true,
+    "diagnostic_connections_closed": true,
+    "original_nine_case_cleanup_evidence": "evidence/live-runtime-and-cleanup.json",
+    "docker_not_rechecked_in_vm_supplement": true
+  },
+  "minimum_user_input": "None needed to finish this budgeted round. Production replacement still needs a real idle-VM wake observation and target-runtime/multi-account/proxy/concurrency evidence where required; any new generation needs a separately agreed budget.",
+  "previous_application_configuration_test_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
+  "final_test_scope": "All nine real Muse cases, real Cookie rotation/Store persistence/fresh-process authentication, and actual Chrome fallback",
+  "status_scope": "Nine budgeted real functional cases on native Windows source environment; not production replacement",
+  "grade2_scope": "Native Windows source service, one human-authorized reused account with isolated local data/profile",
+  "live_generation_case_count": 9,
+  "live_generation_counts": {
+    "text": 6,
+    "image": 2,
+    "video": 1
+  },
+  "live_results": "evidence/live-functional-validation.json",
+  "production_service_configuration_changed": false,
+  "production_credential_reuse": "Explicit human authorization verified; private one-account handoff; no production service configuration or deployment changed",
+  "after_live_tests_changes": "Documentation, sanitized evidence, and zero-generation VM diagnostic tooling only; application/protocol/dependency/deployment unchanged after nine-case validation",
+  "pre_generation_tooling_validation": {
+    "sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
+    "case_tool_tests": 8,
+    "disconnect_tool_tests": 5,
+    "decoder_positive_files": 3,
+    "decoder_expected_rejections": 2,
+    "real_generation_calls": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "account_readiness": "RESOLVED by later explicit human reuse authorization and private handoff; actual import and session validation passed",
+    "evidence": [
+      "evidence/live-case-tooling.json",
+      "evidence/live-disconnect-tooling.json",
+      "evidence/live-media-decoder-tooling.json",
+      "evidence/live-account-readiness.json"
+    ],
+    "scope": "Historical tooling-only phase before this real round; zero generation calls at that phase"
+  },
+  "final_test_sha_scope": "Original nine generation cases; later VM-only observer uses supplemental_test_sha",
+  "supplemental_test_sha": "b2f600e8a40a94280bbdb5f787f442c0c6d70f97",
+  "supplemental_vm_wakeup": {
+    "status": "NOT_OBSERVED",
+    "test_sha": "b2f600e8a40a94280bbdb5f787f442c0c6d70f97",
+    "evidence": "evidence/live-vm-wakeup.json",
+    "started_at": "2026-11-03T07:55:43Z",
+    "finished_at": "2026-11-03T08:25:46Z",
+    "session_info_get_count": 4,
+    "wake_count": 0,
+    "history_get_count": 0,
+    "additional_generation": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "original_ledger_and_operations_unchanged": true,
+    "management_service_restored_running": true
+  }
+}

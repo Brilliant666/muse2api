@@ -1,23 +1,28 @@
-version: '3.8'
-
 services:
   muse2api:
-    build: .
-    image: muse2api:latest
-    container_name: muse2api
-    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        INCLUDE_BROWSER: ${MUSE_INCLUDE_BROWSER:-0}
+    image: muse2api-python-protocol:local
+    # Chromium can orphan children; PID 1 must forward signals and reap them.
+    init: true
+    restart: unless-stopped
     ports:
-      - "18610:18610"
+      - "${MUSE_BIND_ADDRESS:-127.0.0.1}:18610:18610"
     environment:
-      # 管理与 API 鉴权 Key（从 .env 或宿主环境读取，留空则自动生成）
-      - MUSE2API_KEY=${MUSE2API_KEY:-}
-      # 服务对外基准 URL，如 https://your-domain.com（留空则管理前端自动检测当前域名）
-      - MUSE2API_PUBLIC_BASE=
-      # 超时配置（秒）
-      - MUSE2API_IMAGE_TIMEOUT=240
-      - MUSE2API_VIDEO_TIMEOUT=600
-      - MUSE2API_CHAT_TIMEOUT=300
+      MUSE_BACKEND: ${MUSE_BACKEND:-protocol}
+      MUSE2API_KEY: ${MUSE2API_KEY:?Set MUSE2API_KEY in the environment or an explicit --env-file}
+      MUSE2API_PUBLIC_BASE: ${MUSE2API_PUBLIC_BASE:-}
+      MUSE2API_IMAGE_TIMEOUT: ${MUSE2API_IMAGE_TIMEOUT:-240}
+      MUSE2API_VIDEO_TIMEOUT: ${MUSE2API_VIDEO_TIMEOUT:-600}
+      MUSE2API_CHAT_TIMEOUT: ${MUSE2API_CHAT_TIMEOUT:-300}
+      MUSE2API_CONCURRENCY: ${MUSE2API_CONCURRENCY:-2}
+      MUSE_PROTOCOL_MEDIA_MAX_BYTES: ${MUSE_PROTOCOL_MEDIA_MAX_BYTES:-268435456}
+      MUSE_PROTOCOL_IMPERSONATE: ${MUSE_PROTOCOL_IMPERSONATE:-chrome}
+      MUSE_PROTOCOL_SHUTDOWN_TIMEOUT: ${MUSE_PROTOCOL_SHUTDOWN_TIMEOUT:-15}
     volumes:
-      # 持久化账号配置、任务日志及媒体文件
       - ./data:/app/data
-    shm_size: '2gb' # 保证 Chromium 渲染多标签页时不因 /dev/shm 耗尽崩溃
+    # Needed only when INCLUDE_BROWSER=1 and MUSE_BACKEND=browser.
+    shm_size: "2gb"

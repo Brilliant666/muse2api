@@ -1,0 +1,139 @@
+{
+  "status": "PASS",
+  "scope": "installed protocol + native loopback HTTP/WebSocket",
+  "live_native_transport_tested": true,
+  "live_muse_tested": false,
+  "noise_handshake_tested": false,
+  "real_generation_calls": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "cases": [
+    {
+      "case_id": "N1_HTTP_COOKIE_STORE",
+      "level": "native curl I/O; synthetic loopback peer",
+      "status": "PASS",
+      "set_cookie_order": "deletion then replacement",
+      "expiry_persisted": true,
+      "session_expiry_reset": true,
+      "cookie_deletion": true,
+      "store_reloaded": true,
+      "elapsed_seconds": 0.045
+    },
+    {
+      "case_id": "N2_HTTP_STATUS_CONTRACT",
+      "level": "native curl I/O; synthetic loopback peer",
+      "status": "PASS",
+      "exceptions": {
+        "401": "MuseAuthError",
+        "403": "MuseAuthError",
+        "503": "MuseUpstreamError"
+      },
+      "elapsed_seconds": 0.132
+    },
+    {
+      "case_id": "N3_HTTP_VM_WAKE_SYNTHETIC",
+      "level": "native curl I/O; synthetic loopback peer",
+      "status": "PASS",
+      "wake_posts": 1,
+      "synthetic_vm_sleep_to_running": true,
+      "real_vm_wakeup_tested": false,
+      "elapsed_seconds": 1.572
+    },
+    {
+      "case_id": "N4_WS_PROTOCOL_MEDIA",
+      "level": "native curl I/O; synthetic loopback peer",
+      "status": "PASS",
+      "bytes": 96,
+      "sha256": "3485944d866e111acab9605a4f859b596df1f63d592503ec7bc62b8a880dadc1",
+      "protocol_module_used": true,
+      "noise_handshake_tested": false,
+      "elapsed_seconds": 0.002
+    },
+    {
+      "case_id": "N5_WS_MEDIA_LIMIT",
+      "level": "native curl I/O; synthetic loopback peer",
+      "status": "PASS",
+      "limit_bytes": 32,
+      "read_requests": 1,
+      "previous_file_preserved": true,
+      "temporary_files": 0,
+      "remaining_streams": 0,
+      "elapsed_seconds": 0.001
+    },
+    {
+      "case_id": "N6_WS_MEDIA_TIMEOUT",
+      "level": "native curl I/O; synthetic loopback peer",
+      "status": "PASS",
+      "timeout_seconds": 0.25,
+      "partial_published": false,
+      "temporary_files": 0,
+      "remaining_streams": 0,
+      "elapsed_seconds": 0.252
+    }
+  ],
+  "installed_protocol": "/usr/local/lib/python3.12/site-packages/muse2api",
+  "versions": {
+    "curl_cffi": "0.17.0",
+    "cryptography": "50.0.2",
+    "muse2api-http": "0.2.0",
+    "websockets": "17.4"
+  },
+  "http_calls": [
+    {
+      "method": "GET",
+      "path": "/api/session",
+      "count": 4
+    },
+    {
+      "method": "GET",
+      "path": "/status/401",
+      "count": 1
+    },
+    {
+      "method": "GET",
+      "path": "/status/403",
+      "count": 1
+    },
+    {
+      "method": "GET",
+      "path": "/status/503",
+      "count": 1
+    },
+    {
+      "method": "POST",
+      "path": "/api/hatch/noise-notary-token",
+      "count": 1
+    },
+    {
+      "method": "POST",
+      "path": "/api/hatch/token",
+      "count": 1
+    },
+    {
+      "method": "POST",
+      "path": "/api/hatch/vm/wake",
+      "count": 1
+    }
+  ],
+  "websocket_calls": [
+    {
+      "method": "GET",
+      "path": "/fs/raw/complete.bin",
+      "count": 1
+    },
+    {
+      "method": "GET",
+      "path": "/fs/raw/oversize.bin",
+      "count": 1
+    },
+    {
+      "method": "GET",
+      "path": "/fs/raw/slow.bin",
+      "count": 1
+    }
+  ],
+  "websocket_frames_received_by_peer": 4,
+  "generation_submissions": 0
+}

@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "finished_at": "2026-11-03T16:36:28.996006+00:00",
+  "overall": "NOT_READY",
+  "closure_reason": "User requested prompt closeout; no new generation or long batches started after that instruction",
+  "repository": "Brilliant666/muse2api",
+  "pr": {
+    "number": 1,
+    "draft": true,
+    "merged": false
+  },
+  "start_sha": "d99ba0618f6ee94aee424e0910e531fdaf43d5b9",
+  "final_code_test_sha": "90da5530fdb28259bd34698a18b80e38fc78b35e",
+  "final_sdk_fix_sha": "21ed2cd7913e527de8561b358182c7ac2432c95c",
+  "final_sdk_chat_sha256": "ea7356e5987bdacbda75fb38253bcc76395f273a0df2920f894259d9218d21ab",
+  "source_pin": "6309f64b44ce133a2428fadf966a395d503ce84f",
+  "accounts": {
+    "distinct_authorized_identities": 9,
+    "identity_preflight": "PASS: Windows authenticated HTML and Linux native curl HTML match",
+    "initial_quota_source": "Windows current settings UI; all nine weekly used 0 percent",
+    "linux_quota_query": "NOT_RUN: protocol unsupported",
+    "tenth_exclusive_identity": "BLOCKED"
+  },
+  "budget": {
+    "phase1_separate_immutable": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "phase2_total_limits": {
+      "text": 560,
+      "image": 35,
+      "video": 5
+    },
+    "old_phase2_consumed": {
+      "text": 3,
+      "image": 1,
+      "video": 0
+    },
+    "new_resumed_consumed": {
+      "text": 15,
+      "image": 4,
+      "video": 1
+    },
+    "phase2_total_consumed": {
+      "text": 18,
+      "image": 5,
+      "video": 1
+    },
+    "remaining": {
+      "text": 542,
+      "image": 30,
+      "video": 4
+    },
+    "failures_and_timeouts_charged": true,
+    "automatic_generation_retry": false
+  },
+  "initial_outcomes": {
+    "new_cases": 20,
+    "tool": {
+      "PASS": 19,
+      "FAIL": 1
+    },
+    "business": {
+      "PASS": 18,
+      "FAIL": 2
+    },
+    "preserved_failures": [
+      "L2-011 premature no-media result",
+      "D10-001 commentary returned as final"
+    ]
+  },
+  "supplements": {
+    "L2-011": {
+      "original_media_recovery": "PASS",
+      "new_generation_posts": 0,
+      "bytes": 39704,
+      "full_decode": "PASS",
+      "original_failure_preserved": true
+    },
+    "D10-001": {
+      "original_remote_final_read": "PASS",
+      "final_marker_characters": 14,
+      "new_generation_posts": 0,
+      "original_completed_cached_progress_not_modified": true
+    }
+  },
+  "statuses": {
+    "actual_linux_build_install_start": "PASS: initial and media-fix services; final SDK build/install plus zero-generation native GET only",
+    "linux_image_edit_video_full_decode": "PASS: individual cases; failed original retained separately",
+    "current_round_real_vm_sleep_wake_original_history": "PASS",
+    "first_phase_vm_history": "NOT_OBSERVED: unchanged historical verdict",
+    "real_cookie_rotation_and_latest_persistence": "PASS: nine accounts",
+    "new_final_sdk_real_generation": "NOT_RUN",
+    "final_five_case_native_postcheck": "NOT_RUN",
+    "C3R_mixed_120": "NOT_RUN",
+    "C5R_10_accounts": "BLOCKED",
+    "SOAKR_10_accounts": "BLOCKED",
+    "SOAK9_partial_two_hours": "NOT_RUN",
+    "D01_real_linux_disconnect_restart_recovery": "NOT_RUN",
+    "live_401_403_429_quota_proxy_cookie_race_vm_mismatch_truncated_delivery_injection": "NOT_RUN",
+    "real_provider_429_ban_quota_exhaustion_this_round": "NOT_OBSERVED",
+    "optional_live_session_state_observer": "NOT_RUN: five controlled tests only"
+  },
+  "tests": {
+    "standard_offline": {
+      "python": 79,
+      "javascript": 6,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "controlled_only": true,
+      "media_commentary_15_are_subset_of_79": true,
+      "code_sha": "90da5530fdb28259bd34698a18b80e38fc78b35e"
+    },
+    "resume_controller": {
+      "passed": 19,
+      "controlled_only": true,
+      "file_sha256": "b2c88eab7020915e157b197323700588190af4370591043694ea05f4246fdfb2"
+    },
+    "optional_session_probe": {
+      "passed": 5,
+      "controlled_only": true,
+      "code_sha": "90da5530fdb28259bd34698a18b80e38fc78b35e"
+    },
+    "metrics_contract": {
+      "passed": 6,
+      "controlled_only": true,
+      "code_sha": "90da5530fdb28259bd34698a18b80e38fc78b35e"
+    },
+    "earlier_tools": [
+      {
+        "name": "Windows account preflight",
+        "passed": 15,
+        "sha": "f54b21436d39a219b5ce8241a452ed758ad06f73"
+      },
+      {
+        "name": "Linux identity preflight",
+        "passed": 14,
+        "sha": "f54b21436d39a219b5ce8241a452ed758ad06f73"
+      },
+      {
+        "name": "disconnect diagnostic",
+        "passed": 6,
+        "sha": "7eb327c86c4ce2097472b5deab00fd5e75fd8e69"
+      },
+      {
+        "name": "original history diagnostic",
+        "passed": 8,
+        "sha": "7eb327c86c4ce2097472b5deab00fd5e75fd8e69"
+      }
+    ],
+    "no_counts_summed_across_overlapping_checkpoints": true
+  },
+  "four_judgments": {
+    "python_in_process_concurrency_3": "UNPROVEN: real peak concurrency 1; no evidence requiring language migration",
+    "scheduling_and_lifecycle": "Fix accurate completion before releasing account; minimal SDK fixes done, final live/c3/fairness/idle cleanup unverified",
+    "json_store": "RETAIN single worker and exclusive Store; no measured migration requirement; power-loss and larger-scale durability not proven",
+    "linux_multiaccount_trial_or_preproduction": "NOT_READY: final live fix/C3/soak/fault gaps and ten-identity threshold"
+  },
+  "runtime_closeout": {
+    "resumed_generation_containers_stopped": true,
+    "owned_diagnostic_connections_and_chrome_closed": true,
+    "original_18611_preserved": true,
+    "login_admin": "http://127.0.0.1:18613/admin",
+    "login_only_no_generation": true,
+    "automatic_upstream_keepalive": false,
+    "latest_test_cookies_cas_synced_to_login_store": true,
+    "no_production_or_merge": true
+  },
+  "evidence": {
+    "cases": "evidence/phase2-resumed-cases.json",
+    "resources": "evidence/phase2-resumed-resources.json",
+    "environment": "evidence/phase2-resumed-environment.json",
+    "preservation": "evidence/phase2-resumed-preservation.json"
+  }
+}

@@ -68,6 +68,12 @@ class Config:
     host: str = field(default_factory=lambda: _env("MUSE2API_HOST", "0.0.0.0"))
     port: int = field(default_factory=lambda: int(_env("MUSE2API_PORT", "18610")))
 
+    # Existing installs stay on the browser backend until explicitly switched.
+    backend: str = field(default_factory=lambda: _env("MUSE_BACKEND", "browser").strip().lower())
+    protocol_media_max_bytes: int = field(default_factory=lambda: int(_env("MUSE_PROTOCOL_MEDIA_MAX_BYTES", str(256 * 1024 * 1024))))
+    protocol_shutdown_timeout: int = field(default_factory=lambda: int(_env("MUSE_PROTOCOL_SHUTDOWN_TIMEOUT", "15")))
+    protocol_impersonate: str = field(default_factory=lambda: _env("MUSE_PROTOCOL_IMPERSONATE", "chrome"))
+
     # 浏览器
     chromium: str = field(default_factory=_detect_chromium)
     cdp_port: int = field(default_factory=lambda: int(_env("MUSE2API_CDP_PORT", "19210")))
@@ -150,9 +156,19 @@ class Config:
     def tasks_file(self) -> str:
         return os.path.join(self.data_dir, "tasks.json")
 
+    @property
+    def protocol_operations_file(self) -> str:
+        return os.path.join(self.data_dir, "protocol_operations.json")
+
     def ensure_dirs(self):
-        for d in (self.base_dir, self.data_dir, self.media_dir, self.download_dir,
-                  self.profile_dir):
+        if self.backend not in {"browser", "protocol"}:
+            raise ValueError("MUSE_BACKEND must be browser or protocol")
+        if self.protocol_media_max_bytes < 1:
+            raise ValueError("MUSE_PROTOCOL_MEDIA_MAX_BYTES must be positive")
+        directories = [self.base_dir, self.data_dir, self.media_dir]
+        if self.backend == "browser":
+            directories.extend((self.download_dir, self.profile_dir))
+        for d in directories:
             os.makedirs(d, exist_ok=True)
 
 

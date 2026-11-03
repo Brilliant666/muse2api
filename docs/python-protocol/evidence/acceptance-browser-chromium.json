@@ -1,0 +1,119 @@
+{
+  "status": "PASS",
+  "scope": "real Chromium in browser image; local DOM fixture; no Muse",
+  "command": [
+    "wsl.exe",
+    "-d",
+    "docker-desktop",
+    "-u",
+    "root",
+    "--",
+    "/tmp/docker-desktop-root/mnt/host/c/Users/brilliant/AppData/Local/Temp/muse2api-acceptance-20261103/docker-linux/docker",
+    "--host",
+    "unix:///proc/1480/root/var/run/docker.sock",
+    "exec",
+    "--env",
+    "PYTHONPATH=/app",
+    "muse2api-acceptance-20261103-browser",
+    "python",
+    "/tmp/test_media_selection.py",
+    "/app/engine.py"
+  ],
+  "returncode": 0,
+  "stdout": "{\"extract_b64\": \"c2VsZWN0ZWQ=\", \"fallback_video_rejected\": true, \"global_download_clicked\": false, \"invalid_reference_rejected\": true, \"multi_reference_uploaded\": 2, \"outside_remove_ignored\": 1, \"result_sources\": [\"data:image/png;base64,b3V0cHV0\"], \"stale_selected\": \"new-image\", \"tid_video_cover_rejected\": true, \"upload_only_accepted\": false, \"video_selected\": \"clip.mp4\"}\nPASS: input preview excluded; exact selected bytes; all old sources ignored; video retained; crossmodal fallback rejected; tid-video cover rejected; scoped download; multi-reference upload; upload failure closed\n",
+  "stderr": "",
+  "seconds": 7.375,
+  "live_generation_calls": 0,
+  "process_cleanup": {
+    "python": "3.12.16 (main, Oct 28 2026, 02:01:35) [GCC 12.2.0]",
+    "browser_processes_after_fixture": [
+      {
+        "pid": 59,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      },
+      {
+        "pid": 60,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      },
+      {
+        "pid": 81,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      },
+      {
+        "pid": 82,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      },
+      {
+        "pid": 110,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      },
+      {
+        "pid": 144,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      },
+      {
+        "pid": 190,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      },
+      {
+        "pid": 201,
+        "state": "Z (zombie)",
+        "name": "chromium"
+      }
+    ],
+    "live_browsers": 0
+  },
+  "pre_fix_cleanup": {
+    "status": "FAIL",
+    "orphan_zombies": [
+      {
+        "pid": 59,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      },
+      {
+        "pid": 60,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      },
+      {
+        "pid": 81,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      },
+      {
+        "pid": 82,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      },
+      {
+        "pid": 110,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      },
+      {
+        "pid": 144,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      },
+      {
+        "pid": 190,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      },
+      {
+        "pid": 201,
+        "parent_pid": 1,
+        "state": "Z (zombie)"
+      }
+    ],
+    "cause": "Uvicorn is PID 1 without an init reaper"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "recorded_at": "2026-11-03T14:57:42.240947+08:00",
+  "status": "PASS",
+  "scope": "Metadata-only consolidation of three already completed real Muse media cases; no decoding, requests or generation performed while creating this report",
+  "checks_performed_now": "Read only the three supplied sanitized public-result.json summaries; verify statuses, complete-decode indicators, valid SHA-256, dimensions, frame/duration consistency, references and observed left/right colors",
+  "cases_passed": 3,
+  "cases": [
+    {
+      "case_id": "I1",
+      "status": "PASS",
+      "evidence_level": "real Muse result; metadata-only review of previously completed full decode",
+      "source_summary_sha256": "9eb83357fe010df2e2e41942053fe402015cbf98ed4f7a9a6b8aae26248d4efe",
+      "create_http_status": 202,
+      "one_generation_intent": true,
+      "automatic_replay": false,
+      "task_status": "completed",
+      "operation_state": "completed",
+      "media": {
+        "bytes": 36342,
+        "sha256": "b5b1a55c5c534e69d92a12823cbec4d8aac38a03e4af7103bfeb10fde12cf97b",
+        "format": "WEBP",
+        "width": 1600,
+        "height": 1600,
+        "frames_decoded": 1,
+        "verify_passed": true,
+        "full_decode_passed": true
+      }
+    },
+    {
+      "case_id": "I2",
+      "status": "PASS",
+      "evidence_level": "real Muse result; metadata-only review of previously completed full decode",
+      "source_summary_sha256": "300de3585c8f2af63628be0adc8dc5e653ea71a9e27189d31d0b69d08e30aaf4",
+      "create_http_status": 202,
+      "one_generation_intent": true,
+      "automatic_replay": false,
+      "task_status": "completed",
+      "media": {
+        "bytes": 34938,
+        "sha256": "0f2af7036b08caf3cdc221becc4da6ba78705b3409fd16d395be93eab0879c87",
+        "format": "WEBP",
+        "width": 2240,
+        "height": 1120,
+        "frames_decoded": 1,
+        "verify_passed": true,
+        "full_decode_passed": true
+      },
+      "reference_validation": {
+        "reference_count": 2,
+        "reference_sha256_in_order": [
+          "cdc5e2886506210698ba96064bc1e9cbf390dcd403776f29e96c33ab1ead5aeb",
+          "a96e8eedf3a9f5f2edb0b6c2fc0eb95d738c06be966c2b7840dfc7c76610e832"
+        ],
+        "reference_hashes_distinct": true,
+        "output_hash_differs_from_both_references": true,
+        "result_is_not_uploaded_preview": true,
+        "red_left_of_blue_observed": true,
+        "red_pixels": 501965,
+        "blue_pixels": 412906
+      }
+    },
+    {
+      "case_id": "V1",
+      "status": "PASS",
+      "evidence_level": "real Muse result; metadata-only review of previously completed full decode",
+      "source_summary_sha256": "f4f28aa0c4117c98410948e64a1440cbcb14157ab5f83c806a4199d7da07871b",
+      "create_http_status": 200,
+      "one_generation_intent": true,
+      "automatic_replay": false,
+      "task_status": "completed",
+      "operation_state": "completed",
+      "requested_duration_seconds": 5,
+      "media": {
+        "bytes": 479523,
+        "sha256": "77e122d7c22c48d3c39d2540054c847db2e125413a2345bf73854871bc3b8003",
+        "container_format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "duration_seconds": 5.0,
+        "video_streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 720,
+            "pix_fmt": "yuv420p",
+            "avg_frame_rate": "24/1"
+          }
+        ],
+        "frames_decoded": 120,
+        "full_decode_passed": true,
+        "decoded_audio_streams": 1,
+        "decoder_versions": {
+          "ffmpeg": "9.0.2",
+          "ffprobe": "9.0.2"
+        }
+      }
+    }
+  ],
+  "summary": {
+    "I1": "PASS: complete 1600x1600 WebP decode, one frame, 36342 bytes and SHA-256 recorded",
+    "I2": "PASS: complete 2240x1120 WebP decode, one frame, 34938 bytes; two distinct ordered reference hashes; output differs from both references; red left of blue observed",
+    "V1": "PASS: ffprobe metadata and full 120-frame / 5-second / 1280x720 video decode, one audio stream decoded, 479523 bytes and SHA-256 recorded"
+  },
+  "provenance_boundary": "These PASS results come from the parent-executed real Muse cases and their existing full-decoder results. This report does not claim a new decode or compare against any unprovided private media.",
+  "new_generation_calls": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "new_decoder_or_test_runs": 0,
+  "privacy": "Only case labels, categorical states, numeric metadata and SHA-256 hashes are retained; no URLs, media filenames/UUIDs, operation/task/session/node/account IDs, credentials or media contents."
+}

@@ -22,13 +22,14 @@ def test_maintenance_selection_does_not_count_as_use():
         cfg.ensure_dirs()
         store = Store(cfg)
         acc = store.add_account({"hatch_sess": "fixture"}, "fixture")
-        acc["last_used"] = 1234
-        acc["use_count"] = 7
+        store.update_account(acc["id"], last_used=1234, use_count=7)
         selected = store.pick_account(record_use=False)
         assert selected["id"] == acc["id"]
+        acc = store.get_account(acc["id"])
         assert acc["last_used"] == 1234
         assert acc["use_count"] == 7
         store.pick_account()
+        acc = store.get_account(acc["id"])
         assert acc["use_count"] == 8
 
 

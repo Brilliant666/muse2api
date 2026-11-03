@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "execution": "agent-reported",
+  "scope": "budget-safe case runner; synthetic loopback peers and temporary files only",
+  "evidence_level": "synthetic loopback; no real Muse",
+  "status": "PASS",
+  "live_muse_tested": false,
+  "real_generation_calls": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "command": ".\\.venv\\Scripts\\python.exe tests/test_live_protocol_case.py",
+  "original_tool_command": ".\\.venv\\Scripts\\python.exe tests/test_live_protocol_case.py; git diff --check",
+  "working_directory": "C:\\Users\\brilliant\\Documents\\ChatGPT\\muse2api-protocol-acceptance",
+  "exit_code": 0,
+  "exit_code_basis": "Unittest reported OK; the original combined shell command exited 0.",
+  "tests_run": 8,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "elapsed_seconds": 2.209,
+  "elapsed_basis": "The final already-executed unittest summary reported Ran 8 tests in 2.209s.",
+  "raw_log_retained": false,
+  "log_note": "This is an agent-reported summary of the observed tool output, not a reconstructed raw log. No tests were rerun to create this report.",
+  "cases": [
+    {
+      "name": "test_caps_and_fail_closed_lock",
+      "status": "PASS"
+    },
+    {
+      "name": "test_chat_stream_success_summary_has_no_content_or_identifiers",
+      "status": "PASS"
+    },
+    {
+      "name": "test_http_failure_retains_budget_and_cannot_retry",
+      "status": "PASS"
+    },
+    {
+      "name": "test_intent_is_charged_once_and_external_claim_is_atomic",
+      "status": "PASS"
+    },
+    {
+      "name": "test_multipart_keeps_two_distinct_references_in_order",
+      "status": "PASS"
+    },
+    {
+      "name": "test_redirect_is_not_followed_and_remote_base_is_rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "test_responses_stream_order_terminal_and_exact_delta_reconstruction",
+      "status": "PASS"
+    },
+    {
+      "name": "test_stream_requires_finish_and_done_and_captures_raw_privately",
+      "status": "PASS"
+    }
+  ],
+  "source_sha256": {
+    "tools/live_protocol_case.py": "9b40b97b5664560f3db869aea341c5b49a5680bde088a5986468ff1a415ee96d",
+    "tests/test_live_protocol_case.py": "0b6ba3f59cd8878a53fdc8d2036b4554696101f8276e88c6fb98fb4498d4b3b8"
+  },
+  "source_hash_scope": "Current working-tree bytes of the two owned source files; no source edits since the final executed test run.",
+  "privacy": {
+    "real_env_read": false,
+    "real_cookie_read": false,
+    "existing_service_called": false,
+    "live_ledger_created": false
+  },
+  "other_checks": [
+    {
+      "command": "git diff --check",
+      "status": "PASS",
+      "exit_code": 0
+    }
+  ]
+}

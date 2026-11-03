@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "evidence_level": "real Muse session bootstrap, Store persistence and fresh-process original-operation recovery",
+  "tested_sha": "b08f11000930674990c2834e1a9da091fd08a668",
+  "account_alias": "test-account-1",
+  "changes": {
+    "hatch_sess": "rotated",
+    "hatch_gw": "newly_set",
+    "hatch_vml": "rotated"
+  },
+  "fingerprints": {
+    "hatch_sess": {
+      "import": "a3ffda80258fd3c9",
+      "after_real_session": "c3d442f77f830930",
+      "before_process_restart": "88cb09a944fe3533",
+      "after_fresh_process_recovery": "88cb09a944fe3533"
+    },
+    "hatch_gw": {
+      "import": null,
+      "after_real_session": "ae00e7963c609f6b",
+      "before_process_restart": "03c239437b8e119e",
+      "after_fresh_process_recovery": "03c239437b8e119e"
+    },
+    "hatch_vml": {
+      "import": "3c7cc2ad2f859623",
+      "after_real_session": "bd7150adc0daecd8",
+      "before_process_restart": "c82e172b0c3d67eb",
+      "after_fresh_process_recovery": "321319b1387a0735"
+    }
+  },
+  "expiry_entries_observed": 3,
+  "credential_revision_before": 1,
+  "credential_revision_after": 1,
+  "revision_note": "Automatic renewal retains the manual-import revision. Stale manual-import callbacks are separately controlled-tested.",
+  "store_write_observed": true,
+  "process_restarted": true,
+  "runtime_count_at_restart_before_recovery": 0,
+  "fresh_process_authenticated_with_persisted_store": true,
+  "original_handoff_reimported_after_rotation": false,
+  "proof": "The old interpreter exited. A fresh runtime authenticated from the persisted Store and recovered the original 3359-character response without a new generation.",
+  "raw_cookie_values_included": false
+}

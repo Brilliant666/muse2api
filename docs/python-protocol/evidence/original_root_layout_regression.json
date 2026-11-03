@@ -1,0 +1,223 @@
+{
+  "scope": "Original root-layout regressions after integration test migration",
+  "backend": "browser compatibility",
+  "network": "Python socket/getaddrinfo guard allows localhost and loopback IP fixtures only; external sockets and DNS blocked",
+  "data_isolation": "One fresh temporary directory and subprocess per script; synthetic service key; no shared account data",
+  "scripts": [
+    {
+      "name": "test_account_proxy.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 1.507,
+      "arguments": []
+    },
+    {
+      "name": "test_account_proxy_routing.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.636,
+      "arguments": []
+    },
+    {
+      "name": "test_admin_base_url.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.668,
+      "arguments": []
+    },
+    {
+      "name": "test_async_images.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.891,
+      "arguments": []
+    },
+    {
+      "name": "test_browser_context_downloads.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.318,
+      "arguments": []
+    },
+    {
+      "name": "test_concurrency.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.873,
+      "arguments": []
+    },
+    {
+      "name": "test_cookie_requirements.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.099,
+      "arguments": []
+    },
+    {
+      "name": "test_extension_upgrade_notice.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.041,
+      "arguments": []
+    },
+    {
+      "name": "test_extension_zip.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.572,
+      "arguments": []
+    },
+    {
+      "name": "test_keepalive_scheduling.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.57,
+      "arguments": []
+    },
+    {
+      "name": "test_media_delete.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.567,
+      "arguments": []
+    },
+    {
+      "name": "test_media_selection.py",
+      "status": "BLOCKED",
+      "exit_code": 1,
+      "seconds": 0.335,
+      "arguments": [],
+      "reason": "Actual Chromium is not installed; this original browser test is not counted as passed."
+    },
+    {
+      "name": "test_muse_video_delivery.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.618,
+      "arguments": []
+    },
+    {
+      "name": "test_quota_account_binding.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.156,
+      "arguments": []
+    },
+    {
+      "name": "test_quota_localization.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.135,
+      "arguments": []
+    },
+    {
+      "name": "test_ref_image_safety.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.797,
+      "arguments": []
+    },
+    {
+      "name": "test_reference_limits.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.926,
+      "arguments": []
+    },
+    {
+      "name": "test_refusal_rotation.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.582,
+      "arguments": []
+    },
+    {
+      "name": "test_session_health.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.746,
+      "arguments": []
+    },
+    {
+      "name": "test_session_only_import.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 1.189,
+      "arguments": []
+    },
+    {
+      "name": "test_socks_proxy.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 1.757,
+      "arguments": []
+    },
+    {
+      "name": "test_video_late_attachment.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.565,
+      "arguments": []
+    },
+    {
+      "name": "test_vm_wait.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.198,
+      "arguments": [
+        "engine.py",
+        "--assert"
+      ]
+    },
+    {
+      "name": "test_wake_confirmation.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "seconds": 0.213,
+      "arguments": []
+    }
+  ],
+  "summary": {
+    "PASS": 23,
+    "BLOCKED": 1
+  },
+  "javascript": {
+    "name": "test_admin_api_error_messages.mjs",
+    "status": "PASS",
+    "exit_code": 0,
+    "passed_behavior_cases": 10
+  },
+  "watched_source_changes": [],
+  "watched_sha256": {
+    "tests/test_account_proxy.py": "be7c7dfff80a50865325eaeb9c3aa65aef3bc09785d2d021b13c3fa2b387c40e",
+    "tests/test_account_proxy_routing.py": "99c17fa8781977eaadb5a44b3437c78dd9789b144834be41314ae47026e59135",
+    "tests/test_admin_base_url.py": "aa87cb86beffc023085258b3e0edbf0d808b0724a2d693980d91892a27b864ea",
+    "tests/test_async_images.py": "701f90d6f7453696fb4295beb9053f44bf41dce7c458e784f4e6a630dc9fd6cb",
+    "tests/test_browser_context_downloads.py": "33e9d2ae4b702c415ad1051f2b590550a80f21f8d33c054bc3634971db01bcc7",
+    "tests/test_concurrency.py": "d14483d7d31475c9f555eaed4832a8986d6ab27be916502c446f5776a20bef27",
+    "tests/test_cookie_requirements.py": "261830a001f4e87c4218a7860e504678437d9be5b3977e3eebf773d8ee9f7080",
+    "tests/test_extension_upgrade_notice.py": "3b8d10073b483d9df4c82c796eebb59ca5e61d00becc25978fd2decc2c8ead68",
+    "tests/test_extension_zip.py": "a7229bd6d2ff0a822c0d459b7d805443512c2740742c6c3dca8d682e467d5769",
+    "tests/test_keepalive_scheduling.py": "b9a9d2e3628d39a07738f46fd9b835e15d41571a21767d37450258e640d739aa",
+    "tests/test_media_delete.py": "eb46cf46708c782fa396abdae1cea0c6ec606ce5d95d477019dc46edfead9668",
+    "tests/test_media_selection.py": "002e43d9f0d266359bc92ed95f76ca0c11955da4cf744cdfc7cfa72942d3142d",
+    "tests/test_muse_video_delivery.py": "95ed7ad89bd6e9395b170da0857cd05e289c7508e05986f7f3eda78aa1b1f852",
+    "tests/test_quota_account_binding.py": "16c4f4726e32859169e00f55753718945444f7b5078a8b873e7ce16cb6c9298e",
+    "tests/test_quota_localization.py": "a98c57af5ca858cd6844cd8a78fd8c3778fe47b45336c71d11c490999f671234",
+    "tests/test_ref_image_safety.py": "509f3929cd9cc181e429bf6a92d3b9f7dd81ce350fcf2bbe20ac1809154e9b37",
+    "tests/test_reference_limits.py": "18f2caf88ccac89f7b0ea637edc2dea3784078cbef9009bbb8817759e2e4d1af",
+    "tests/test_refusal_rotation.py": "7accca5d0a99d87bb99a2e55e806359beb81eebacc5f698a43dc6507081b17e0",
+    "tests/test_session_health.py": "f99697ca5003d6469fe0408f9461cbb9ca5bc5f721d17bede51a229fc3ac1229",
+    "tests/test_session_only_import.py": "2fc32a57bdae2263549adc78652fb8675cce593c084dd5bc68a15026acec8886",
+    "tests/test_socks_proxy.py": "678ed928039fc7f770ab820da7e831ad18de4176c66071af1339324602c8c0ed",
+    "tests/test_video_late_attachment.py": "46ff5e5f805301926b084fc18c1ce43acc36549f6fac47e3ce43c2a13828e64f",
+    "tests/test_vm_wait.py": "f86992679e48df66aeb07ff9a36a473abe82680388e81a4c70c794ae51706378",
+    "tests/test_wake_confirmation.py": "be223fdacd5c025d58438205bb02eecb712b01edd6622be9a3beeaa5d4e3cd71",
+    "tests/test_admin_api_error_messages.mjs": "98ab81caf90f26fe0c156f1e7f04cc3f32babd74dcab5adf03c2ce4247b47b80",
+    "app.py": "0408228c6083a4e01036b88854ffc941f851e99889d73aac6e884fcd27c5d1ba",
+    "admin.html": "c63a3cab4ecaf82a9df82df82411005542b24978f2e8d1a00acd36209a5735b8",
+    "engine.py": "ba688656b404d2635817b9b8beb5c0cf9bc2c36ab42a9fb2dba9d614e6ed11cc",
+    "store.py": "ac37f3cb1fac15c6b519c2950b16ef5abebfc9133a3a4d1c4deb9d0bbe267f39",
+    "config.py": "4d6de2bb7479c4feec91787e5a51828793ba48bfe57338a883330f12dd3fd745"
+  }
+}

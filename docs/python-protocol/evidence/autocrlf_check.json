@@ -1,0 +1,5 @@
+{
+  "scope": "Git checkout-index with core.autocrlf=true; not a full Windows runtime test",
+  "patch_sha256": "2b31dc50b730b0870ab6e7099d7718e8ac43eebf6c61a9ed39eba6d63c7ebcf9",
+  "status": "PASS"
+}

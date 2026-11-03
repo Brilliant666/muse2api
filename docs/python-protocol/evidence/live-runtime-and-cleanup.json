@@ -1,0 +1,49 @@
+{
+  "status": "PASS",
+  "scope": "Observational snapshots, not a throughput benchmark",
+  "tested_sha": "b08f11000930674990c2834e1a9da091fd08a668",
+  "configured_concurrency": 1,
+  "workers": 1,
+  "real_parallel_or_deployment_concurrency_3_tested": false,
+  "protocol_runtime_observations": {
+    "runtime_count_before_restart": 1,
+    "runtime_count_in_fresh_process_before_recovery": 0,
+    "per_account_runtime_reuse_observed": true,
+    "wire_connection_reuse_independently_instrumented": false,
+    "historical_reconnect_total_counter_available": false,
+    "established_process_tcp_connections_after_T2": 10,
+    "tcp_note": "This combines HTTP and WebSocket process connections; not a count of only gateway sockets."
+  },
+  "memory_snapshots": [
+    {
+      "phase": "protocol after T2",
+      "working_set_bytes": 75526144,
+      "private_memory_bytes": 59019264,
+      "source": "actual root Get-Process observation"
+    },
+    {
+      "phase": "restarted protocol after T5 recovery",
+      "working_set_bytes": 74313728,
+      "private_memory_bytes": 57909248,
+      "source": "actual root Get-Process observation"
+    },
+    {
+      "phase": "browser after T6",
+      "working_set_bytes": 61280256,
+      "private_memory_bytes": 50913280,
+      "owned_browser_process_count": 7,
+      "sum_browser_working_sets_bytes": 468635648,
+      "source": "private process snapshot",
+      "note": "Summed working sets can double-count shared pages."
+    }
+  ],
+  "cleanup": {
+    "source_services_stopped": true,
+    "owned_chrome_tree_stopped": true,
+    "service_port_18611_released": true,
+    "cdp_port_19211_released": true,
+    "unrelated_browser_processes_not_terminated": true,
+    "unknown_operations_remaining": 0,
+    "data_media_and_private_receipts_retained_outside_git": true
+  }
+}

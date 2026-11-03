@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "level": "real GitHub clone and fixed Git objects; no snapshot fixture substitute",
+  "source": {
+    "repository": "https://github.com/its-benjamin/muse2api-http.git",
+    "commit": "6309f64b44ce133a2428fadf966a395d503ce84f"
+  },
+  "resolved_commit": "6309f64b44ce133a2428fadf966a395d503ce84f",
+  "prepared_marker": {
+    "format_version": 1,
+    "source": {
+      "repository": "https://github.com/its-benjamin/muse2api-http.git",
+      "commit": "6309f64b44ce133a2428fadf966a395d503ce84f"
+    },
+    "manifest_sha256": "1af7de07d0c759cae29dbca48b814d8813e43ad0e81670eb6149730be4d1234c",
+    "output_files": {
+      "muse2api/chat.py": "6f842758d497460f7e006ff3b996b30fa1cd0874749d0cb4f4c7698ac7a298d0",
+      "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+      "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+      "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+      "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+    }
+  },
+  "manifest_unchanged": true,
+  "initial_failure": "Windows core.autocrlf=true changed archive and patch output bytes; raw media.py mismatch",
+  "fix": "Disable core.autocrlf/eol conversion for archive and isolated git apply; retain explicit manifest normalization",
+  "targeted_real_git_regressions": 2,
+  "installed_wheel_sha256": "32486285e1d9be94ba3beed98857ec292ba5158ba525f69d0aa335aa2fbf92d7"
+}

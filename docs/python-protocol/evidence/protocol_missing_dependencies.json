@@ -1,0 +1,19 @@
+{
+  "scope": "Negative runner check with isolated imports (-S): missing dependencies must report BLOCKED, not PASS",
+  "status": "BLOCKED",
+  "live_muse_tested": false,
+  "live_native_transport_tested": false,
+  "protocol_integrity": {
+    "prepared_marker": false,
+    "patched_file_sha256": {
+      "muse2api/chat.py": "6f842758d497460f7e006ff3b996b30fa1cd0874749d0cb4f4c7698ac7a298d0",
+      "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+      "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+      "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+      "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+    }
+  },
+  "blockers": [
+    "Missing real Python import dependencies: fastapi, starlette, anyio, sniffio, pydantic, python_multipart, requests, urllib3, websocket, websockets, cryptography"
+  ]
+}

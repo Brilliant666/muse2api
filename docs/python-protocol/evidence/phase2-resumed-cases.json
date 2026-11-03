@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "scope": "Resumed Linux real-account cases; single worker, concurrency 1, nine independent account aliases",
+  "new_case_count": 20,
+  "new_generation_intents": {
+    "text": 15,
+    "image": 4,
+    "video": 1,
+    "total": 20
+  },
+  "prior_phase2_baseline_consumed": {
+    "text": 3,
+    "image": 1,
+    "video": 0
+  },
+  "phase2_total_consumed": {
+    "text": 18,
+    "image": 5,
+    "video": 1
+  },
+  "phase1_history": "separate and unchanged",
+  "tool_status_counts": {
+    "PASS": 19,
+    "FAIL": 1
+  },
+  "initial_business_status_counts": {
+    "PASS": 18,
+    "FAIL": 2
+  },
+  "status_policy": "Recovery and later remote final replies supplement original outcomes; they never rewrite the initial FAIL or cached reply.",
+  "latest_commentary_fix": {
+    "sdk_chat_sha256": "ea7356e5987bdacbda75fb38253bcc76395f273a0df2920f894259d9218d21ab",
+    "controlled_test_groups_passed": [
+      79,
+      6,
+      15
+    ],
+    "new_real_generation_after_this_fix": 0,
+    "live_generation_verdict": "NOT_RUN",
+    "controlled_test_groups_note": "79 Python includes the 15 media/commentary cases; 6 are JS. Separate checkpoints overlap and must not be summed."
+  },
+  "cases": [
+    {
+      "case_id": "L2-001",
+      "account_alias": "pool-01",
+      "category": "text",
+      "kind": "chat",
+      "latency_seconds": 10.79,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-002",
+      "account_alias": "pool-02",
+      "category": "text",
+      "kind": "chat_sse",
+      "latency_seconds": 13.892,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-003",
+      "account_alias": "pool-03",
+      "category": "text",
+      "kind": "responses",
+      "latency_seconds": 8.112,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-004",
+      "account_alias": "pool-04",
+      "category": "image",
+      "kind": "image",
+      "latency_seconds": 40.262,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "media_binding": true
+      },
+      "bytes": 53868,
+      "sha256": "5ec0ddc8c552ef0deb3175edee2a7fe96cd8edd9db0f7b284d638a1126642d6c",
+      "decode": {
+        "status": "PASS",
+        "kind": "image",
+        "format": "WEBP",
+        "bytes": 53868,
+        "sha256": "5ec0ddc8c552ef0deb3175edee2a7fe96cd8edd9db0f7b284d638a1126642d6c",
+        "width": 1920,
+        "height": 1280,
+        "frames_decoded": 1,
+        "verify_passed": true,
+        "full_decode_passed": true
+      }
+    },
+    {
+      "case_id": "L2-005",
+      "account_alias": "pool-05",
+      "category": "text",
+      "kind": "responses_sse",
+      "latency_seconds": 12.101,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-006",
+      "account_alias": "pool-06",
+      "category": "text",
+      "kind": "chat",
+      "latency_seconds": 11.256,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-007",
+      "account_alias": "pool-07",
+      "category": "image",
+      "kind": "edit",
+      "latency_seconds": 62.462,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "media_binding": true
+      },
+      "bytes": 4818,
+      "sha256": "a35d4efa8148b5aeb30dc85a97a8b20ab7487e0a236ca43ab95233105d694178",
+      "decode": {
+        "status": "PASS",
+        "kind": "image",
+        "format": "PNG",
+        "bytes": 4818,
+        "sha256": "a35d4efa8148b5aeb30dc85a97a8b20ab7487e0a236ca43ab95233105d694178",
+        "width": 1200,
+        "height": 600,
+        "frames_decoded": 1,
+        "verify_passed": true,
+        "full_decode_passed": true
+      }
+    },
+    {
+      "case_id": "L2-008",
+      "account_alias": "pool-08",
+      "category": "text",
+      "kind": "chat_sse",
+      "latency_seconds": 14.886,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-009",
+      "account_alias": "pool-09",
+      "category": "text",
+      "kind": "responses",
+      "latency_seconds": 11.724,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-010",
+      "account_alias": "pool-01",
+      "category": "text",
+      "kind": "responses_sse",
+      "latency_seconds": 13.968,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "L2-011",
+      "account_alias": "pool-02",
+      "category": "image",
+      "kind": "image",
+      "latency_seconds": 12.863,
+      "tool_status": "FAIL",
+      "initial_business_status": "FAIL",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true
+      },
+      "failure_classification": "PREMATURE_MEDIA_COMPLETION",
+      "supplemental_evidence": {
+        "original_failure_preserved": true,
+        "new_generation_requests": 0,
+        "original_history_read": {
+          "status": "READ_VERIFIED",
+          "same_prompt": true,
+          "same_session": true,
+          "same_vm": true,
+          "events": 4,
+          "user_events": 1,
+          "assistant_events": 2,
+          "media_references": 1,
+          "wake_requests": 1,
+          "state_before": "SUSPENDED",
+          "state_after": "RUNNING",
+          "presentation_display_update_after_initial_failure_seconds": 15.706,
+          "timestamp_scope": "display update time; not a media creation timestamp"
+        },
+        "original_media_recovery": {
+          "status": "RECOVERED",
+          "original_operation_only": true,
+          "no_resubmit": true,
+          "ownership_verified": true,
+          "bytes": 39704,
+          "sha256": "65f235385b4395c5079d9896e2e7faef420cf14dbad90661cc7822faeacd870e",
+          "decode": {
+            "status": "PASS",
+            "kind": "image",
+            "format": "WEBP",
+            "bytes": 39704,
+            "sha256": "65f235385b4395c5079d9896e2e7faef420cf14dbad90661cc7822faeacd870e",
+            "width": 1600,
+            "height": 1600,
+            "frames_decoded": 1,
+            "verify_passed": true,
+            "full_decode_passed": true
+          }
+        }
+      }
+    },
+    {
+      "case_id": "D02-001",
+      "account_alias": "pool-03",
+      "category": "text",
+      "kind": "chat",
+      "latency_seconds": 9.384,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "D03-001",
+      "account_alias": "pool-04",
+      "category": "text",
+      "kind": "chat_sse",
+      "latency_seconds": 12.747,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "D04-001",
+      "account_alias": "pool-05",
+      "category": "image",
+      "kind": "edit",
+      "latency_seconds": 54.463,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "media_binding": true
+      },
+      "bytes": 40042,
+      "sha256": "62cdce47393d0d8b7377632425105d786484b7a6b9769644ee4f5329ad73ebfc",
+      "decode": {
+        "status": "PASS",
+        "kind": "image",
+        "format": "WEBP",
+        "bytes": 40042,
+        "sha256": "62cdce47393d0d8b7377632425105d786484b7a6b9769644ee4f5329ad73ebfc",
+        "width": 1920,
+        "height": 1280,
+        "frames_decoded": 1,
+        "verify_passed": true,
+        "full_decode_passed": true
+      }
+    },
+    {
+      "case_id": "D05-001",
+      "account_alias": "pool-06",
+      "category": "text",
+      "kind": "responses",
+      "latency_seconds": 14.184,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "D06-001",
+      "account_alias": "pool-07",
+      "category": "text",
+      "kind": "responses_sse",
+      "latency_seconds": 9.183,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "D07-001",
+      "account_alias": "pool-08",
+      "category": "video",
+      "kind": "video",
+      "latency_seconds": 48.577,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "media_binding": true
+      },
+      "bytes": 375996,
+      "sha256": "c96f1a75840ef0d37a977b45d46fb4b00672fde81559df7f8c348b037a63ce74",
+      "decode": {
+        "status": "PASS",
+        "kind": "video",
+        "container_format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "bytes": 375996,
+        "sha256": "c96f1a75840ef0d37a977b45d46fb4b00672fde81559df7f8c348b037a63ce74",
+        "frames_decoded": 120,
+        "full_decode_passed": true,
+        "duration_seconds": 5.0,
+        "decoded_audio_streams": 1,
+        "video_streams": [
+          {
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 720,
+            "pix_fmt": "yuv420p",
+            "avg_frame_rate": "24/1",
+            "duration": "5.000000"
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "D08-001",
+      "account_alias": "pool-09",
+      "category": "text",
+      "kind": "chat",
+      "latency_seconds": 13.501,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "D09-001",
+      "account_alias": "pool-01",
+      "category": "text",
+      "kind": "chat_sse",
+      "latency_seconds": 7.902,
+      "tool_status": "PASS",
+      "initial_business_status": "PASS",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      }
+    },
+    {
+      "case_id": "D10-001",
+      "account_alias": "pool-02",
+      "category": "text",
+      "kind": "responses",
+      "latency_seconds": 15.641,
+      "tool_status": "PASS",
+      "initial_business_status": "FAIL",
+      "ownership_verified": {
+        "operation_binding": true,
+        "operation_account_matches_alias": true,
+        "response_matches_own_operation_text": true
+      },
+      "failure_classification": "COMMENTARY_RETURNED_AS_FINAL_TEXT",
+      "supplemental_evidence": {
+        "original_tool_pass_and_cached_reply_preserved": true,
+        "new_generation_requests": 0,
+        "original_history_read": {
+          "status": "READ_VERIFIED",
+          "same_prompt": true,
+          "same_session": true,
+          "same_vm": true,
+          "events": 3,
+          "user_events": 1,
+          "assistant_events": 2,
+          "media_references": 0,
+          "wake_requests": 1,
+          "state_before": "SUSPENDED",
+          "state_after": "RUNNING",
+          "initial_reply_characters": 111,
+          "initial_reply_kind": "commentary",
+          "initial_reply_public_commentary": true,
+          "initial_reply_recipient": "commentary",
+          "later_reply_characters": 14,
+          "later_reply_kind": "message",
+          "later_reply_exact_own_marker": true,
+          "same_root_execution": true,
+          "both_assistant_status_completed": true,
+          "explicit_turn_completed_observed": false,
+          "later_message_started_after_local_account_release_seconds": 1.291,
+          "later_message_display_update_after_client_tool_pass_seconds": 1.749,
+          "timestamp_scope": "upstream metadata/display times compared with client wall time; not a zero-skew clock assertion"
+        },
+        "scoped_session_metadata_read": {
+          "status": "READ_VERIFIED",
+          "successful_attempt": 2,
+          "prior_attempt": "pre-RPC failure on earlier image; zero gateway GETs",
+          "successful_gateway_gets": 1,
+          "http_status": 200,
+          "same_vm": true,
+          "session_summary_status": "completed",
+          "current_execution_active_or_idle_verified": false,
+          "scope": "session/sidebar summary; no root-execution or current-run binding"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "scope": "Separate controlled peers/OS/native synthetic tests; none of these successes counts as a real Muse fault or media generation",
+  "real_generation_calls": 0,
+  "core_source_sha": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+  "final_harness_sha": "a5551b2dbb3d0a7c016764b28fdd86123cd2881d",
+  "suites": [
+    {
+      "suite": "protocol validation",
+      "command": "python tools/test_protocol.py --protocol-source .protocol --report <external-receipt.json>",
+      "tests": 64,
+      "javascript_tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "curl_import_stub": false,
+      "native_socket_io_proved_by_this_suite": false,
+      "real_muse": false,
+      "source_sha": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+      "receipt_sha256": "3067ab439dbaa13853b42ec95ab75457533ad612529d88a2feffa393d111d30f"
+    },
+    {
+      "suite": "final backend combination",
+      "tests": 16,
+      "counts": {
+        "test_phase2_scheduler": 6,
+        "test_phase2_fault_isolation": 6,
+        "test_protocol_transport_cleanup": 3,
+        "test_media_truncation_recovery": 1
+      },
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "source_sha": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+      "source_raw_sha256": {
+        "app.py": "0a39dc38b9c4960ec6b46cc2dfb63dac98172142eb2392db5d4313e15d87fcc6",
+        "protocol_backend.py": "7cd3ae71a4c40f19cef27fadac0122cbd6cc5b8f94ec9f72d4fc0d35ba8bbad9",
+        "store.py": "b136a9848da35aab89f87787d7aac4fbc4fb8d701c48cdd8f4991bb542b06c25"
+      },
+      "tests_raw_sha256": {
+        "tests/test_phase2_scheduler.py": "4dea88f45ac4f15300d3a4248b4ce278065f033f02728ca704e4daef0f5746a6",
+        "tests/test_phase2_fault_isolation.py": "9d2b1ab312b97c8d2db721ce662b89a5f5aef3360fa3b85793c0946d812f03fe",
+        "tests/test_protocol_transport_cleanup.py": "f0e8803d8459efb6c0fd07a13f0597197f8c41fc09434797ac2ceb1228a103b5",
+        "tests/protocol/test_media_truncation_recovery.py": "e8d8842e5ea37f32b301786db54f206a0ca4557c1fa7a789ea1c32e9cc1fd4cf"
+      },
+      "log_sha256": "658312bd5312d3f6de75151d3dc3e1b0d0cfa0afc237efdcc24e7bb2121f568e",
+      "external_socket_and_dns_blocked": true
+    },
+    {
+      "suite": "Store crash consistency",
+      "tests": 7,
+      "legacy_store_tests": 4,
+      "result": "PASS",
+      "before": "Five of six initial cases failed; child os._exit(87) between terminal operation and account-block persistence",
+      "after": "Seven final cases pass; persist terminal operation before releasing quarantine; restart reconciliation retains unrelated unknown quarantine",
+      "red_harness_sha256": null,
+      "red_receipt": "Captured tool output only; initial six-case harness snapshot was not saved and is not retroactively labeled with the final seven-case hash",
+      "test_raw_sha256": "67308af7da47cb76bd493fb00d605708f87a22539c048e0f0da85df7224964c0",
+      "source_equivalent_after_fix": "e878e5ce94fc47e1242b15800e08322a327cb72e",
+      "real_process_exit": true,
+      "power_loss_or_arbitrary_corruption_tested": false
+    },
+    {
+      "suite": "scheduler",
+      "tests": 6,
+      "result": "PASS",
+      "before": "Four original cases fail: preselected busy LRU account leaves other healthy accounts unused",
+      "after": "Four original then six expanded pass; dispatch selects and leases atomically and reports the actual chosen account",
+      "controlled_configured_concurrency": 3,
+      "controlled_observed_overlap": 2,
+      "real_concurrency3_proved": false
+    },
+    {
+      "suite": "handshake connection cleanup",
+      "tests": 3,
+      "result": "PASS",
+      "before": "One of three fails; a created connection survives a later Cookie-persistence OSError",
+      "after": "Generic failure closes that connection before the existing retry; stale credential branch remains no retry",
+      "log_red_sha256": "a707f03810d3f25ca879f74f346de9009f14a87b5ddd3bcfd4d6ccd55b534cf9",
+      "log_green_sha256": "c73a9378c1d7867ee17c42773c044b38c401a2c278c93882dbda6eb869001cdb"
+    },
+    {
+      "suite": "SDK status propagation and fail-closed send boundaries",
+      "tests": 11,
+      "result": "PASS",
+      "source_sha": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+      "test_raw_sha256": "e9f4e0c767d7c3d1d629e7664fa267eddef62a9b515cf4273fda17849e80d89a",
+      "ack_429": {
+        "red_generation_submissions": 1,
+        "red_history_reads": 1,
+        "green_generation_submissions": 1,
+        "green_history_reads": 0
+      },
+      "registration_429": {
+        "red_generation_submissions": 1,
+        "green_generation_submissions": 0
+      },
+      "history_429": "One original history read then stop",
+      "media_429": "Original file-only download route attempts remain bounded at two, no generation replay",
+      "claim": "Preserves explicit status and blocks continuation after explicit 429; red is not evidence of a duplicate generation",
+      "other_error_formats_all_classified": false
+    },
+    {
+      "suite": "fault isolation",
+      "tests": 6,
+      "result": "PASS",
+      "cases": [
+        "synthetic 401",
+        "synthetic 403",
+        "synthetic 429",
+        "synthetic quota exhaustion",
+        "proxy failure",
+        "Cookie revision compare-and-set"
+      ],
+      "healthy_other_account_completes": true,
+      "accepted_failure_unknown_quarantined": true,
+      "unknown_operation_auto_replayed": false,
+      "real_muse_faults": false
+    },
+    {
+      "suite": "native proxy isolation",
+      "windows_tests": 1,
+      "linux_tests": 1,
+      "result": "PASS",
+      "transport": "Real curl_cffi, Backend and Store against local synthetic HTTP peer; A dead loopback proxy fails, B session GET and Cookie persistence succeeds",
+      "linux_network": "--network none; loopback only; no real credentials mounted",
+      "operations_or_generation": 0,
+      "linux_log_sha256": "2ff7e7b37a2d78e4a9f4415adc88ba6a5219ff670c0059f8db0d84108cb3325e",
+      "test_raw_sha256": "21960bb8aa199656547af1da96eb1f51075395242134406fd64e6af90a88a275",
+      "noise_or_real_proxy_service_tested": false,
+      "tested_linux_image_id": "sha256:4e3f7216a59f0b28432261154490350bb5bd35a9cc6e4fd4371e493bf9983cd0",
+      "source_equivalent_core_commit": "e878e5ce94fc47e1242b15800e08322a327cb72e",
+      "tested_source_raw_sha256": {
+        "protocol_backend.py": "478ca023419459513aaa7b6ac0e0945131b4c23805f262ec479126cdd567c28f",
+        "store.py": "b136a9848da35aab89f87787d7aac4fbc4fb8d701c48cdd8f4991bb542b06c25"
+      },
+      "final_39_source_rerun": false,
+      "version_note": "Windows and Linux native tests ran before the explicit SDK status/429 fix. No additional native or real requests were made to relabel them as final39 tests."
+    },
+    {
+      "suite": "truncated media recovery",
+      "tests": 1,
+      "result": "PASS",
+      "evidence": {
+        "status": "PASS",
+        "level": "controlled gateway iterator and model; installed SDK file I/O",
+        "real_generation_calls": 0,
+        "native_socket_io": false,
+        "noise_handshake": false,
+        "installed_media_sha256": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+        "protocol_package_version": "0.2.0",
+        "partial_bytes_written": 36,
+        "full_file_bytes": 73,
+        "full_file_sha256": "3fd6e6be528c182d768563a63b65ac5a70d022149a01eeeaaa30396d75f426e0",
+        "failed_state": "delivery_failed",
+        "partial_media_published": false,
+        "healthy_B_completed": true,
+        "synthetic_submissions_A": 1,
+        "synthetic_submissions_B": 1,
+        "recovery_generation_submissions": 0,
+        "operations_before_recovery": 2,
+        "operations_after_recovery": 2,
+        "same_account_session_message_vm": true,
+        "initial_same_file_get_attempts": 2,
+        "recovery_original_file_gets": 1,
+        "history_or_model_recovery_queries": 0,
+        "temporary_files_after_failure": 0,
+        "closed_iterators": 3
+      }
+    },
+    {
+      "suite": "batch safety harness",
+      "tests": 22,
+      "result": "PASS",
+      "test_raw_sha256": "22599f65cb0fd275043dc8c79318f3ca1bbb7e4d5a9266577d4e9c69402058bf",
+      "log_sha256": "76c34caf66e0dddf2b30e1f8c2291750a8ce10102560e67553224c725384edcd",
+      "guards": [
+        "external private root",
+        "atomic budget precharge",
+        "distinct authenticated identity preflight",
+        "fixed bounded batches",
+        "C3/C3P mutually exclusive",
+        "one generation POST per intent",
+        "exact prompt/operation/account binding",
+        "unverified returned operation cannot recover",
+        "first unknown/severe/unclassified failure stops batch",
+        "no automatic new-account replay"
+      ]
+    },
+    {
+      "suite": "authenticated identity parser",
+      "tests": 8,
+      "result": "PASS",
+      "test_raw_sha256": "56831ca4d7c9c9276e55e6e48935fece721330c5c6678c0af54f28e1b68b9c4a",
+      "real_input": "Three actual authenticated Next Flight HTML captures parsed offline; viewerId equals user identifier and isAuthenticated is true"
+    },
+    {
+      "suite": "server metrics contract",
+      "tests": 6,
+      "result": "PASS",
+      "source_raw_sha256": {
+        "tools/phase2_server.py": "5a755e3e2c2161c84d597781d4a009565c13a19dbe3307b7d64c083067cc48e3",
+        "tests/test_phase2_server_shutdown.py": "d8e00b1bcfb7f2944c7c457f7837a53b9c0a4a7eff95a790c04e939e69f53453"
+      },
+      "log_sha256": {
+        "server-shutdown-linux-red.txt": "d9f97d387ff47182ee3b86a40b3a9095dba114dd2058c11ca01b482a528614e0",
+        "server-shutdown-linux-green.txt": "b6fe453fd7ff91f5f34d3ee4f5156673aaf0aac240ea89817e9082ecd0a4f577",
+        "server-instrumentation-after-shutdown-fix.txt": "82da05ff280eb94927b6e813c92a42c593aa64984150955de40ee9ecd3dea48a"
+      },
+      "real_SIGTERM_red_exit": -15,
+      "real_SIGTERM_green_exit": 0,
+      "green_writer_finished": true,
+      "green_queue_or_drop_or_writer_error": 0,
+      "real_SIGINT_tested": false,
+      "scope": "Real Linux OS subprocess, HTTP and SIGTERM; new empty Store, zero accounts, --network none. SIGKILL cannot guarantee a metrics footer."
+    }
+  ],
+  "fault_matrix": [
+    {
+      "fault": "before-send failure",
+      "controlled": "PASS",
+      "real_muse": "NOT_RUN",
+      "note": "A zero submissions; healthy B one"
+    },
+    {
+      "fault": "401/403/429/quota",
+      "controlled": "PASS",
+      "real_muse": "NOT_RUN",
+      "note": "Bounded synthetic status cases; actual Muse limits not induced"
+    },
+    {
+      "fault": "proxy failure",
+      "controlled": "PASS",
+      "real_muse": "NOT_RUN",
+      "note": "Native local proxy negative + independent healthy peer; no authorized external proxy tested"
+    },
+    {
+      "fault": "Cookie replacement",
+      "controlled": "PASS",
+      "real_muse": "NOT_RUN",
+      "note": "Revision CAS rejects stale callback; actual serial Linux renewal separately observed"
+    },
+    {
+      "fault": "client cancellation / post-send disconnect / process restart",
+      "controlled": "PASS",
+      "real_muse": "NOT_RUN",
+      "note": "Prior offline 64 and targeted Store crash reconciliation; first-phase Windows real recovery stays historical, not new Linux proof"
+    },
+    {
+      "fault": "VM mismatch",
+      "controlled": "PASS",
+      "real_muse": "NOT_RUN",
+      "note": "Existing offline recovery suite refuses mismatch; not induced on real accounts"
+    },
+    {
+      "fault": "media truncation and original-file recovery",
+      "controlled": "PASS",
+      "real_muse": "NOT_RUN",
+      "note": "Controlled gateway iterator plus installed SDK actual temp-file I/O, not native media transmission"
+    }
+  ],
+  "limitations": [
+    "No real multi-account concurrent fault injection",
+    "No exact provider wire acceptance guarantee",
+    "No severe defect was hidden by retry-to-green",
+    "No automatic idle reclamation implemented without leak evidence"
+  ],
+  "test_file_hash_scope": "SHA-256 of actual working-tree bytes at final delivery, bound by final live harness commit after Git EOL normalization; individual earlier red snapshots are not relabeled as final test files.",
+  "final_test_files_sha256": {
+    "tests/test_phase2_batch.py": "22599f65cb0fd275043dc8c79318f3ca1bbb7e4d5a9266577d4e9c69402058bf",
+    "tests/test_phase2_error_status.py": "e9f4e0c767d7c3d1d629e7664fa267eddef62a9b515cf4273fda17849e80d89a",
+    "tests/test_phase2_fault_isolation.py": "9d2b1ab312b97c8d2db721ce662b89a5f5aef3360fa3b85793c0946d812f03fe",
+    "tests/test_phase2_identity.py": "56831ca4d7c9c9276e55e6e48935fece721330c5c6678c0af54f28e1b68b9c4a",
+    "tests/test_phase2_native_proxy.py": "21960bb8aa199656547af1da96eb1f51075395242134406fd64e6af90a88a275",
+    "tests/test_phase2_scheduler.py": "4dea88f45ac4f15300d3a4248b4ce278065f033f02728ca704e4daef0f5746a6",
+    "tests/test_phase2_server.py": "f4af5caf9d0fa0d97ee1a9e811a7bb7972d6393152b493b4a087eea8436feb43",
+    "tests/test_phase2_server_shutdown.py": "d8e00b1bcfb7f2944c7c457f7837a53b9c0a4a7eff95a790c04e939e69f53453",
+    "tests/test_protocol_transport_cleanup.py": "f0e8803d8459efb6c0fd07a13f0597197f8c41fc09434797ac2ceb1228a103b5",
+    "tests/protocol/test_store_crash_consistency.py": "67308af7da47cb76bd493fb00d605708f87a22539c048e0f0da85df7224964c0",
+    "tests/protocol/test_media_truncation_recovery.py": "e8d8842e5ea37f32b301786db54f206a0ca4557c1fa7a789ea1c32e9cc1fd4cf"
+  },
+  "core_source_sha_scope": "Final core where explicitly bound (64+6 and final16); earlier native/Store/red-green suites retain their own snapshot boundaries and were not all rerun at this SHA."
+}
