@@ -31,7 +31,8 @@ REQUIRED_IMPORTS = (
 )
 EXPECTED_PYTHON = {"test_protocol_regressions": 28, "test_adapter_integration": 8,
                    "test_app_contract": 23, "test_composed_protocol": 2,
-                   "test_acceptance_recovery": 3}
+                   "test_acceptance_recovery": 3, "test_media_completion": 7,
+                   "test_commentary_completion": 8}
 EXPECTED_JS = 6
 CHILD = r'''
 import importlib, json, sys, unittest

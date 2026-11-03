@@ -7,7 +7,8 @@ Example (separate Linux test data, no production credentials):
 
 Gateway counters distinguish call entry, local send/flush completion and unknown
 writes. They do not prove upstream acceptance. Any dropped metrics invalidate
-exact event counts. No sampler sends requests or owns an additional Store.
+exact event counts. The default sampler sends no requests or opens another Store.
+An optional exact-marker probe reads one existing session without connecting or generating.
 SIGTERM/SIGINT request graceful shutdown (exit 0) while this wrapper owns their
 handlers; repeated SIGINT retains Uvicorn's force-exit behavior. Other signals
 are untouched. SIGKILL cannot guarantee a metrics completion record.
@@ -28,11 +29,12 @@ import logging
 import os
 from pathlib import Path
 import queue
+import re
 import signal
 import sys
 import threading
 import time
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, quote, urlsplit
 import weakref
 
 
@@ -147,8 +149,102 @@ def linux_process_sample(server_port, *, proc=Path("/proc")):
             "tcp_scope": "FD-owned TCP only; includes HTTP and gateway, not a gateway-only count"}
 
 
+SESSION_MARKER = re.compile(r"PHASE2_(?:L2|C3R|C5R|SOAKR|SOAK9TEXT|SOAK9|C3TEXT|D(?:0[1-9]|[12][0-9]|3[0-6]))_[0-9]{3}")
+
+
+class SessionProbe:
+    """Optional bounded observation, on the Backend's loop and existing connection."""
+    def __init__(self, owner, marker, directory):
+        if not SESSION_MARKER.fullmatch(marker): raise ValueError("Invalid full session marker")
+        self.owner, self.marker, self.directory = owner, marker, Path(directory)
+        self.directory.mkdir(parents=True, mode=0o700, exist_ok=False)
+        self.pattern = re.compile(r"(?<![A-Za-z0-9_])" + re.escape(marker) + r"(?![A-Za-z0-9_])")
+        self.case = marker[7:].replace("_", "-")
+        self.op = self.binding = self.task = None
+        self.active_reads, self.after, self.last, self.closed = 0, False, float("-inf"), False
+
+    def tick(self, now=None):
+        if self.closed or (self.task is not None and not self.task.done()): return
+        now = time.monotonic() if now is None else now
+        if now - self.last < 5: return
+        engine = self.owner.application.engine
+        if self.binding is None:
+            matches = [op for op in engine._active.values() if self.pattern.search(str(op.get("prompt", "")))]
+            if len(matches) != 1: return
+            op = matches[0]
+            binding = {"operation_id": op.get("id"), **{k: op.get(k) for k in ("account_id", "session_id", "vm_id")}}
+            if not all(isinstance(v, str) and v for v in binding.values()): return
+            self.op, self.binding = op, binding
+        phase = "active" if self.binding["operation_id"] in engine._active else "after"
+        if (phase == "active" and self.active_reads >= 12) or (phase == "after" and self.after): return
+        rt = engine._runtimes.get(self.binding["account_id"])
+        if rt is None or rt.conn is None or rt.conn.is_closed: return
+        self.last = now
+        if (rt.session is None or rt.session.vm_id != self.binding["vm_id"] or
+                any(self.op.get("id" if k == "operation_id" else k) != v for k, v in self.binding.items())):
+            self.owner.emit("session_probe_error", case_id=self.case, phase=phase,
+                            error_type="BindingMismatch", local_phase=self.op.get("phase"), delivery=self.op.get("delivery"), **self.binding)
+            return
+        if phase == "active": self.active_reads += 1
+        else: self.after = True
+        self.task = asyncio.create_task(self.read(rt.conn, phase, self.active_reads), name="phase2-session-probe")
+
+    async def read(self, connection, phase, number):
+        started = time.time_ns()
+        response = None
+        local_before = {key: self.op.get(key) for key in ("state", "phase", "delivery")}
+        path = "/api/session/list/" + quote(self.binding["session_id"], safe="")
+        self.owner.routes[path] = "sessions.get"
+        try:
+            async with asyncio.timeout(10):
+                response = await connection.request("GET", path, timeout=10, max_response_bytes=256*1024)
+                data = response.json()
+            local_after = {key: self.op.get(key) for key in ("state", "phase", "delivery")}
+            record = {"binding": self.binding, "phase": phase, "started_at_ns": started,
+                      "finished_at_ns": time.time_ns(), "local_state": local_after["state"],
+                      "local_at_dispatch": local_before, "local_at_return": local_after,
+                      "response_code": response.status, "response": data}
+            name = "after-01.json" if phase == "after" else f"active-{number:02d}.json"
+            fd = os.open(self.directory / name, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as stream: json.dump(record, stream, ensure_ascii=True)
+            response.raise_for_status()
+            result = data.get("result") if isinstance(data, dict) else None
+            if (not isinstance(result, dict) or not isinstance(result.get("session_id"), str)
+                    or not isinstance(result.get("status"), str) or not result["status"]
+                    or any(type(result.get(k)) is not bool for k in ("can_send_messages", "can_send_actions"))):
+                self.owner.emit("session_probe_unverified", case_id=self.case, phase=phase,
+                                code=response.status, reason="ResultSchema", local_phase=local_after["phase"], delivery=local_after["delivery"], **self.binding)
+                return
+            if result["session_id"] != self.binding["session_id"]: raise ValueError("SessionMismatch")
+            self.owner.emit("session_probe", case_id=self.case, phase=phase, code=response.status,
+                remote_status=result["status"], local_state=local_after["state"],
+                local_phase=local_after["phase"], delivery=local_after["delivery"],
+                can_send={k: v for k, v in result.items() if k.startswith("can_send_") and isinstance(v, bool)},
+                remote_completed_is_not_cpu_idle=True, **self.binding)
+        except asyncio.CancelledError: raise
+        except Exception as error:
+            status = getattr(error, "upstream_status", None)
+            if type(status) is not int: status = getattr(error, "status", None)
+            typed = {"upstream_status": status, "status": status} if type(status) is int and 400 <= status <= 599 else {}
+            evidence = {"binding": self.binding, "phase": phase, "error_type": type(error).__name__,
+                        "response_code": getattr(response, "status", None), "local_at_dispatch": local_before,
+                        "local_at_return": {k: self.op.get(k) for k in ("state", "phase", "delivery")}, **typed}
+            error_name = "after-01-error.json" if phase == "after" else f"active-{number:02d}-error.json"
+            try:
+                fd = os.open(self.directory / error_name, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+                with os.fdopen(fd, "w", encoding="utf-8") as stream: json.dump(evidence, stream, ensure_ascii=True)
+            except Exception: pass  # The diagnostic error still reaches bounded metrics.
+            self.owner.emit("session_probe_error", case_id=self.case, phase=phase,
+                            error_type=type(error).__name__, local_phase=self.op.get("phase"), delivery=self.op.get("delivery"), **self.binding, **typed)
+
+    async def close(self):
+        self.closed = True
+        if self.task is not None and not self.task.done(): self.task.cancel()
+        if self.task is not None: await asyncio.gather(self.task, return_exceptions=True)
+
+
 class Instrumentation:
-    def __init__(self, application, sink, routes):
+    def __init__(self, application, sink, routes, *, session_probe_marker=None, probe_directory=None):
         self.application, self.sink = application, sink
         self.routes = routes  # path -> protocol route name; no dynamic discovery requests
         self.patches = []
@@ -156,6 +252,26 @@ class Instrumentation:
         self.connection_vm = weakref.WeakKeyDictionary()
         self.calls = itertools.count(1)
         self.hook_errors = 0
+        self.session_probe = SessionProbe(self, session_probe_marker, probe_directory) if session_probe_marker else None
+        if self.session_probe is not None:
+            engine = self.application.engine
+            original_stop = engine.stop
+            def stop(*args, **kwargs):
+                self.close_session_probe()  # Before Backend stops its owning loop.
+                return original_stop(*args, **kwargs)
+            self.patches.append((engine, "stop", original_stop))
+            engine.stop = stop
+
+    def close_session_probe(self):
+        probe = self.session_probe
+        if probe is None or (probe.closed and (probe.task is None or probe.task.done())): return
+        loop = getattr(self.application.engine, "_loop", None)
+        if loop is None or not loop.is_running():
+            probe.closed = True
+            return
+        try: asyncio.run_coroutine_threadsafe(probe.close(), loop).result(timeout=12)
+        except Exception as error:
+            self.emit("session_probe_error", phase="shutdown", error_type=type(error).__name__)
 
     def emit(self, event, **fields):
         try:
@@ -375,6 +491,7 @@ class Instrumentation:
     def runtime_sample(self, scheduled_at):
         """Called only on Backend's owning loop; never opens a connection."""
         engine = self.application.engine
+        if self.session_probe is not None: self.session_probe.tick()
         rows, connected, receivers, streams = [], 0, 0, 0
         for runtime in list(engine._runtimes.values()):
             connection = runtime.conn
@@ -447,6 +564,7 @@ class Sampler:
     def close(self):
         self.stop_event.set()
         self.thread.join(timeout=2)
+        self.instrumentation.close_session_probe()
 
 
 def main(argv=None):
@@ -457,9 +575,13 @@ def main(argv=None):
     parser.add_argument("--workers", type=int, choices=(1,), default=1)
     parser.add_argument("--sample-seconds", type=int, choices=(1, 5), default=5)
     parser.add_argument("--metric-capacity", type=int, default=4096)
+    parser.add_argument("--session-probe-marker", default=None)
     args = parser.parse_args(argv)
     if not args.metrics.is_absolute() or args.metrics.suffix != ".jsonl":
         parser.error("--metrics must be an absolute private .jsonl path; existing files are refused")
+    if args.session_probe_marker and (not SESSION_MARKER.fullmatch(args.session_probe_marker) or
+            any((parent / ".git").exists() for parent in (args.metrics.parent.resolve(), *args.metrics.parent.resolve().parents))):
+        parser.error("Session probe requires a safe full marker and external private metrics directory")
     if args.metric_capacity < 16 or not 0 < args.port < 65536:
         parser.error("metric capacity must be >=16 and port must be valid")
     if os.environ.get("MUSE_BACKEND") != "protocol" or not os.environ.get("MUSE2API_HOME"):
@@ -478,7 +600,9 @@ def main(argv=None):
         from muse2api.protocol import ProtocolConfig
         import uvicorn
         protocol = ProtocolConfig.load()
-        instrumentation = Instrumentation(application, sink, {r.path: name for name, r in protocol.routes.items()})
+        instrumentation = Instrumentation(application, sink, {r.path: name for name, r in protocol.routes.items()},
+            session_probe_marker=args.session_probe_marker,
+            probe_directory=args.metrics.parent / (args.metrics.stem + "-session-probe"))
         instrumentation.install(HatchConnection, MuseHTTP, store_module)
         source = Path(application.__file__)
         versions = {}
@@ -490,6 +614,7 @@ def main(argv=None):
         sink.emit("server_configuration", pid=os.getpid(), workers=1, versions=versions,
             concurrency=application.CFG.max_concurrency, backend=application.CFG.backend,
             sample_seconds=args.sample_seconds, metrics_capacity=args.metric_capacity,
+            session_probe_marker=args.session_probe_marker, session_probe_scope="optional bound session GET only; not a scheduler input",
             python=sys.version.split()[0], platform=sys.platform, application_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
             gateway_sha256=hashlib.sha256(Path(inspect.getfile(HatchConnection)).read_bytes()).hexdigest(),
             submission_count_scope="gateway call entry vs local send/flush; not upstream acceptance",
