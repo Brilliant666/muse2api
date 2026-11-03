@@ -404,6 +404,120 @@ class EmailLoginBrowserTests(unittest.TestCase):
         self.assertEqual(self.env.clicks,["email"])
         self.assertEqual(self.env.inserted,[EMAIL,CODE])
 
+    def test_readonly_timeout_then_cookie_and_identity_still_authenticates(self):
+        for boundary in ("snapshot","cookies","identity"):
+            with self.subTest(boundary=boundary):
+                self.driver.close()
+                self.env = Environment(Path(self.scratch.name))
+                self.driver = self.env.driver()
+                self.begin()
+                page_js, browser_send = Page.js, Browser.send
+                failed = []
+                def maybe_timeout(point):
+                    if point == boundary and not failed and self.env.auto_submissions:
+                        failed.append(point)
+                        self.env.clock.now += 3
+                        raise TimeoutError("synthetic read-only timeout")
+                def observed_js(page, expr, timeout=None):
+                    if "muse-email:snapshot" in expr: maybe_timeout("snapshot")
+                    if "muse-email:identity" in expr: maybe_timeout("identity")
+                    return page_js(page,expr,timeout)
+                def observed_send(browser, method, params=None, timeout=None):
+                    if method == "Storage.getCookies": maybe_timeout("cookies")
+                    return browser_send(browser,method,params,timeout)
+                with patch.object(Page,"js",observed_js), patch.object(Browser,"send",observed_send):
+                    result = self.driver.verify(CODE)
+                self.assertEqual(result["status"],"AUTHENTICATED")
+                self.assertEqual(failed,[boundary])
+                self.assertEqual(self.env.auto_submissions,1)
+                self.assertEqual(self.env.clicks,["email"])
+                self.assertEqual(self.env.inserted,[EMAIL,CODE])
+
+    def test_repeated_readonly_timeout_exhausts_original_deadline_without_resubmission(self):
+        self.begin()
+        page_js = Page.js
+        started = self.env.clock.now
+        def unreadable(page,expr,timeout=None):
+            if "muse-email:snapshot" in expr and self.env.auto_submissions:
+                self.env.clock.now += 3
+                raise TimeoutError("synthetic recurring read timeout")
+            return page_js(page,expr,timeout)
+        with patch.object(Page,"js",unreadable):
+            self.assertEqual(self.driver.verify(CODE)["status"],"UNKNOWN")
+        self.assertGreaterEqual(self.env.clock.now-started,45)
+        self.assertLessEqual(self.env.clock.now-started,48.25)
+        self.assertEqual(self.env.auto_submissions,1)
+        self.assertEqual(self.env.clicks,["email"])
+        self.assertEqual(self.env.inserted,[EMAIL,CODE])
+        self.assertEqual(sum(m=="Page.navigate" for m,_ in self.env.page_calls),1)
+
+    def test_readonly_timeout_respects_stop_and_closes_owned_context(self):
+        self.begin()
+        page_js = Page.js
+        started = self.env.clock.now
+        driver = self.driver
+        def stopped_read(page,expr,timeout=None):
+            if "muse-email:snapshot" in expr and self.env.auto_submissions:
+                self.env.clock.now += 3
+                driver.request_stop()
+                raise TimeoutError("synthetic cancelled read timeout")
+            return page_js(page,expr,timeout)
+        with patch.object(Page,"js",stopped_read):
+            self.assertEqual(self.driver.verify(CODE)["status"],"UNKNOWN")
+        self.assertLessEqual(self.env.clock.now-started,3.25)
+        self.assertEqual(self.env.auto_submissions,1)
+        self.assertEqual(self.env.clicks,["email"])
+        self.assertEqual(self.env.browser.disposed,["owned-context-1"])
+
+    def test_single_identity_get_timeout_is_never_reissued(self):
+        self.begin()
+        self.env.html = "<html>identity not ready</html>"
+        page_send = Page.send
+        reloads = []
+        def get_timeout(page,method,params=None,timeout=None):
+            if method=="Page.navigate" and self.env.auto_submissions:
+                reloads.append(method)
+                self.env.clock.now += 3
+                self.env.html = identity()
+                raise TimeoutError("synthetic GET observation timeout")
+            return page_send(page,method,params,timeout)
+        with patch.object(Page,"send",get_timeout):
+            self.assertEqual(self.driver.verify(CODE)["status"],"AUTHENTICATED")
+        self.assertEqual(reloads,["Page.navigate"])
+        self.assertEqual(self.env.auto_submissions,1)
+        self.assertEqual(self.env.clicks,["email"])
+
+    def test_send_timeout_remains_unknown_without_observation_or_retry(self):
+        self.begin()
+        page_send = Page.send
+        def send_timeout(page,method,params=None,timeout=None):
+            result = page_send(page,method,params,timeout)
+            if method=="Input.insertText" and self.env.prepared=="code":
+                self.env.clock.now += 3
+                raise TimeoutError("synthetic send response lost")
+            return result
+        with patch.object(Page,"send",send_timeout):
+            self.assertEqual(self.driver.verify(CODE)["status"],"UNKNOWN")
+        self.assertEqual(self.env.auto_submissions,1)
+        self.assertEqual(self.env.inserted,[EMAIL,CODE])
+        self.assertEqual(self.env.clicks,["email"])
+        self.assertEqual(self.env.identity_reads,0)
+
+    def test_non_timeout_observation_error_is_not_silently_retried(self):
+        self.begin()
+        page_js = Page.js
+        errors = []
+        def bad_read(page,expr,timeout=None):
+            if "muse-email:snapshot" in expr and self.env.auto_submissions:
+                errors.append("ValueError")
+                raise ValueError("synthetic unexpected observation failure")
+            return page_js(page,expr,timeout)
+        with patch.object(Page,"js",bad_read):
+            self.assertEqual(self.driver.verify(CODE)["status"],"UNKNOWN")
+        self.assertEqual(errors,["ValueError"])
+        self.assertEqual(self.env.auto_submissions,1)
+        self.assertEqual(self.env.clicks,["email"])
+
     def test_constructor_and_availability_do_not_launch_or_attach(self):
         self.assertTrue(browser_available(self.env.cfg))
         self.assertTrue(self.driver.available())

@@ -366,33 +366,38 @@ class EmailLoginBrowser:
                 deadline = self._clock() + 45
                 while self._clock() < deadline:
                     self._check_stop()
-                    state = self._snapshot()
-                    if state.get("invalid_code") and state.get("otp_ready") and not state.get("sending"):
-                        self._phase = "WAITING_FOR_CODE"
-                        return {"status": "INVALID_CODE", "message": "验证码无效或已过期，请检查本次验证码。"}
-                    if not state.get("otp_ready") and not state.get("sending"):
-                        cookies, expires = self._cookies()
-                        if cookies.get("hatch_sess"):
-                            self._check_stop()
-                            html = self._page.js("/* muse-email:identity */ document.documentElement.outerHTML", timeout=3)
-                            try:
-                                principal = authenticated_viewer_id(html)
-                            except IdentityUnverified as exc:
-                                if exc.reason != "missing":
-                                    raise _Blocked() from None
-                                if not self._identity_reloaded:
-                                    # A SPA transition may retain unauthenticated Flight props.
-                                    # One official GET refresh obtains server-side identity.
-                                    self._identity_reloaded = True
-                                    self._check_stop()
-                                    self._page.send("Page.navigate", {"url": _SITE}, timeout=3)
-                            else:
+                    try:
+                        state = self._snapshot()
+                        if state.get("invalid_code") and state.get("otp_ready") and not state.get("sending"):
+                            self._phase = "WAITING_FOR_CODE"
+                            return {"status": "INVALID_CODE", "message": "验证码无效或已过期，请检查本次验证码。"}
+                        if not state.get("otp_ready") and not state.get("sending"):
+                            cookies, expires = self._cookies()
+                            if cookies.get("hatch_sess"):
                                 self._check_stop()
-                                self._phase = "AUTHENTICATED"
-                                return {"status": "AUTHENTICATED", "cookies": cookies,
-                                        "expires": expires, "principal_id": principal,
-                                        "challenge_email_matched": self._challenge_matched}
-                    self._sleep(0.25)
+                                html = self._page.js("/* muse-email:identity */ document.documentElement.outerHTML", timeout=3)
+                                try:
+                                    principal = authenticated_viewer_id(html)
+                                except IdentityUnverified as exc:
+                                    if exc.reason != "missing":
+                                        raise _Blocked() from None
+                                    if not self._identity_reloaded:
+                                        # A SPA transition may retain unauthenticated Flight props.
+                                        # One official GET refresh obtains server-side identity.
+                                        self._identity_reloaded = True
+                                        self._check_stop()
+                                        self._page.send("Page.navigate", {"url": _SITE}, timeout=3)
+                                else:
+                                    self._check_stop()
+                                    self._phase = "AUTHENTICATED"
+                                    return {"status": "AUTHENTICATED", "cookies": cookies,
+                                            "expires": expires, "principal_id": principal,
+                                            "challenge_email_matched": self._challenge_matched}
+                    except TimeoutError:
+                        # Only read-only post-input observations are retryable.
+                        # The deadline and the one-shot GET flag remain unchanged.
+                        self._check_stop()
+                    self._sleep(min(0.25, max(0, deadline - self._clock())))
                 return self._terminal("UNKNOWN")
             except _Blocked:
                 return self._terminal("BLOCKED")
