@@ -315,8 +315,9 @@ class State:
     def finish(self, name, elapsed, peak, distribution):
         data = self.load(); spec = data['batches'][name]['spec']
         rows = [v for v in data['cases'].values() if v['round'] == name]
+        observed_accounts_required = 1 if name.startswith('D') else spec['accounts']
         complete = (len(rows) == sum(spec[k] for k in LIMITS) and all(v['status'] == 'PASS' for v in rows)
-                    and len({v.get('account_alias') for v in rows} - {None}) >= spec['accounts'])
+                    and len({v.get('account_alias') for v in rows} - {None}) >= observed_accounts_required)
         buckets = Counter(min(11, int(v['dispatch_elapsed_seconds'] // 600)) for v in rows if 'dispatch_elapsed_seconds' in v)
         span = max((v.get('dispatch_elapsed_seconds', 0) for v in rows), default=0) - min((v.get('dispatch_elapsed_seconds', 0) for v in rows), default=0)
         if name in SOAK:

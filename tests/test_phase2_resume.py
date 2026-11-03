@@ -176,6 +176,28 @@ class ResumeSafetyTests(unittest.TestCase):
             with self.assertRaises(resume.BatchError): self.reserve(name + '-002', resume.KINDS[kind])
         self.assertEqual(self.state.summary()['diagnostic_cases_consumed'], 3)
 
+    def test_single_diagnostic_passes_with_one_selected_account_but_needs_two_pool_identities(self):
+        args = self.args('D02'); args.diagnostic_kind = 'chat'
+        self.preflight(1); client = NeverSend()
+        with patch.object(resume.sys, 'platform', 'linux'):
+            with self.assertRaisesRegex(resume.BatchError, 'identity threshold'):
+                resume.run_batch(self.state, client, args)
+        self.assertEqual(client.calls, [])
+        self.assertFalse(self.state.path.exists())
+        spec = resume.spec_for('D02', diagnostic_kind='chat')
+        self.assertEqual(spec['accounts'], 2)
+        path, _ = self.preflight(2)
+        self.assertEqual(len(resume.identities(path, spec)), 2)
+        self.state.begin('D02', '2' * 64, spec)
+        self.reserve('D02-001'); self.state.mark_send('D02-001')
+        self.state.update('D02-001', status='PASS', account_alias='A00')
+        result = self.state.finish('D02', 1, 1, {1: 1})
+        self.assertEqual(result['status'], 'PASS')
+        self.assertEqual(result['accounts'], {'A00': 1})
+        self.assertEqual(self.state.load()['batches']['D02']['spec']['accounts'], 2)
+        self.assertEqual(result['consumed']['text'], 4)
+        self.assertEqual(self.original.read_bytes(), self.original_bytes)
+
     def test_fsync_failure_prevents_send_and_complete_intent_remains_charged(self):
         self.state.begin('L2', '2' * 64)
         client = NeverSend(); runner = resume.Runner(self.state, client, {}, self.args())
