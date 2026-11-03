@@ -2,18 +2,13 @@
   "schema_version": 1,
   "date": "2026-11-03",
   "timezone": "Asia/Shanghai",
-  "tested_code_sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
+  "tested_code_sha": "b08f11000930674990c2834e1a9da091fd08a668",
   "scope": "Real Muse acceptance case ledger; controlled peer evidence is recorded separately",
-  "status": "BLOCKED",
-  "account_source": null,
-  "enabled_test_accounts": 0,
+  "status": "PASS",
+  "account_source": "private-handoff-1; later explicit human authorization allowed the selected existing account for this round",
+  "enabled_test_accounts": 1,
   "account_evidence": "acceptance-metadata.json",
-  "blockers": [
-    {
-      "id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "description": "No independent dedicated test account is currently available. Coordination confirmed the earlier session-checked cookie came from the production pool, so it was not handed off or used for acceptance. The designated configuration lacked MUSE_COOKIE and the isolated account pool was empty at the readiness check."
-    }
-  ],
+  "blockers": [],
   "budget": {
     "limits": {
       "text": 6,
@@ -21,16 +16,16 @@
       "video": 1
     },
     "consumed": {
-      "text": 0,
-      "image": 0,
-      "video": 0
-    },
-    "remaining": {
       "text": 6,
       "image": 2,
       "video": 1
     },
-    "send_intents": 0,
+    "remaining": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "send_intents": 9,
     "rule": "Persist the send intent and conservatively charge its budget before POST. Failures, timeouts and unknown outcomes count. An intent whose non-delivery cannot be proved must not be automatically retried; recover the original operation or leave it pending."
   },
   "cases": [
@@ -41,21 +36,28 @@
       "backend": "protocol",
       "budget_category": "text",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:26:35.098024+00:00",
+      "sent_at": "2026-11-03T06:26:35.101826+00:00",
+      "request_sha256": "cf2750a61ec9a778eda6fbacdedf54e6eb70f341a813514fcc2534efd032666d",
+      "request_id": "api-request-T1",
+      "operation_id": "operation-T1",
       "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "send_note": "Not sent; no generation intent was persisted and no real account was used."
+      "session_id": "session-T1",
+      "node_id": "node-T1",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json"
+      ],
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "c853e782bacca8c9",
+        "session": "9832af10fcb1b214",
+        "node": "f784361cf5937516",
+        "vm": "f1103dc5d12eb307"
+      }
     },
     {
       "case_id": "T2",
@@ -64,21 +66,28 @@
       "backend": "protocol",
       "budget_category": "text",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:27:52.951980+00:00",
+      "sent_at": "2026-11-03T06:27:52.954981+00:00",
+      "request_sha256": "9980355dd03fd80a7d7d75f12dcc2aae8924dd5485e8293aecf87220984a9b49",
+      "request_id": "api-request-T2",
+      "operation_id": "operation-T2",
       "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "send_note": "Not sent; no generation intent was persisted and no real account was used."
+      "session_id": "session-T2",
+      "node_id": "node-T2",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json"
+      ],
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "4675eb0dd94b0660",
+        "session": "4cab238d3cb5033b",
+        "node": "ffe2076735f37aba",
+        "vm": "f1103dc5d12eb307"
+      }
     },
     {
       "case_id": "T3",
@@ -87,21 +96,28 @@
       "backend": "protocol",
       "budget_category": "text",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:29:03.471286+00:00",
+      "sent_at": "2026-11-03T06:29:03.474285+00:00",
+      "request_sha256": "f1b0f0388d42f478dbe6a61d36a7ebbd2fc56e301053c25b25cb50f6297ebfb4",
+      "request_id": "api-request-T3",
+      "operation_id": "operation-T3",
       "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "send_note": "Not sent; no generation intent was persisted and no real account was used."
+      "session_id": "session-T3",
+      "node_id": "node-T3",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json"
+      ],
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "9f309f9ec219c628",
+        "session": "558188fbecd2ad8b",
+        "node": "a6834db1ed3b7bcc",
+        "vm": "f1103dc5d12eb307"
+      }
     },
     {
       "case_id": "T4",
@@ -110,21 +126,28 @@
       "backend": "protocol",
       "budget_category": "text",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:29:26.012083+00:00",
+      "sent_at": "2026-11-03T06:29:26.015084+00:00",
+      "request_sha256": "3340a479119401a55ed925d657ffe7e525989d32bc822177cff50cfa04ef1921",
+      "request_id": "api-request-T4",
+      "operation_id": "operation-T4",
       "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "send_note": "Not sent; no generation intent was persisted and no real account was used."
+      "session_id": "session-T4",
+      "node_id": "node-T4",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json"
+      ],
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "8f53d6dea920d847",
+        "session": "a0db790ff3dab59e",
+        "node": "33ac51e0b28ffe16",
+        "vm": "f1103dc5d12eb307"
+      }
     },
     {
       "case_id": "T5",
@@ -133,21 +156,29 @@
       "backend": "protocol",
       "budget_category": "text",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:38:24.775234+00:00",
+      "sent_at": "2026-11-03T06:38:30.763241+00:00",
+      "request_sha256": "46323d552ca381893cf46573bc2630eb8771e59850045488c4b2bede7232c118",
+      "request_id": "api-request-T5",
+      "operation_id": "operation-T5",
       "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "send_note": "Not sent. Controlled recovery evidence does not substitute for this real-account case."
+      "session_id": "session-T5",
+      "node_id": "node-T5",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json",
+        "live-disconnect-recovery.json"
+      ],
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "9ca9cfd9eba6f498",
+        "session": "cdad3599a73993cc",
+        "node": "d5c24dc0f3392e79",
+        "vm": "f1103dc5d12eb307"
+      }
     },
     {
       "case_id": "T6",
@@ -156,21 +187,23 @@
       "backend": "browser",
       "budget_category": "text",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:48:55.025671+00:00",
+      "sent_at": "2026-11-03T06:48:55.029671+00:00",
+      "request_sha256": "cf2750a61ec9a778eda6fbacdedf54e6eb70f341a813514fcc2534efd032666d",
+      "request_id": "api-request-T6",
       "operation_id": null,
       "task_id": null,
       "session_id": null,
       "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "send_note": "Not sent. No test account was used; browser availability alone cannot establish fallback communication."
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json"
+      ],
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_note": "Browser backend has no persisted protocol-operation/session receipt."
     },
     {
       "case_id": "I1",
@@ -179,22 +212,44 @@
       "backend": "protocol",
       "budget_category": "image",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
-      "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "media": null,
-      "send_note": "Not sent; no real generated image exists for decoding or recovery."
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:30:37.047259+00:00",
+      "sent_at": "2026-11-03T06:30:37.050403+00:00",
+      "request_sha256": "618e66e4a2a0c11d8c273f0c44e2cf472e1e801b57652a4d53d4c6dd48336e9f",
+      "request_id": "api-request-I1",
+      "operation_id": "operation-I1",
+      "task_id": "task-I1",
+      "session_id": "session-I1",
+      "node_id": "node-I1",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json",
+        "live-media-validation.json"
+      ],
+      "media": {
+        "status": "PASS",
+        "bytes": 36342,
+        "sha256": "b5b1a55c5c534e69d92a12823cbec4d8aac38a03e4af7103bfeb10fde12cf97b",
+        "kind": "image",
+        "format": "WEBP",
+        "width": 1600,
+        "height": 1600,
+        "frames_decoded": 1,
+        "modes": [
+          "RGB"
+        ],
+        "verify_passed": true,
+        "full_decode_passed": true
+      },
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "5df1f59a7d4d03cf",
+        "session": "a2b9c303f5bd05eb",
+        "node": "fbd567b300d5e499",
+        "vm": "f1103dc5d12eb307"
+      }
     },
     {
       "case_id": "I2",
@@ -203,22 +258,44 @@
       "backend": "protocol",
       "budget_category": "image",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
-      "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "media": null,
-      "send_note": "Not sent; no reference upload or real generation was performed."
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:32:21.359721+00:00",
+      "sent_at": "2026-11-03T06:32:21.363720+00:00",
+      "request_sha256": "577151f77b5bc4ae4b8e7dd4f38043e14052f8b562f16c9b0a93b8c88ef224df",
+      "request_id": "api-request-I2",
+      "operation_id": "operation-I2",
+      "task_id": "task-I2",
+      "session_id": "session-I2",
+      "node_id": "node-I2",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json",
+        "live-media-validation.json"
+      ],
+      "media": {
+        "status": "PASS",
+        "bytes": 34938,
+        "sha256": "0f2af7036b08caf3cdc221becc4da6ba78705b3409fd16d395be93eab0879c87",
+        "kind": "image",
+        "format": "WEBP",
+        "width": 2240,
+        "height": 1120,
+        "frames_decoded": 1,
+        "modes": [
+          "RGB"
+        ],
+        "verify_passed": true,
+        "full_decode_passed": true
+      },
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "e9387e596da2de62",
+        "session": "326dae3f2b008655",
+        "node": "d933183b031cc80d",
+        "vm": "f1103dc5d12eb307"
+      }
     },
     {
       "case_id": "V1",
@@ -227,72 +304,166 @@
       "backend": "protocol",
       "budget_category": "video",
       "budget_units": 1,
-      "budget_consumed": 0,
+      "budget_consumed": 1,
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "sent_intent_at": null,
-      "sent_at": null,
-      "request_sha256": null,
-      "request_id": null,
-      "operation_id": null,
-      "task_id": null,
-      "session_id": null,
-      "node_id": null,
-      "account_id": null,
-      "evidence_paths": [],
-      "media": null,
-      "send_note": "Not sent; no real generated video exists for full-file decoding."
+      "status": "PASS",
+      "sent_intent_at": "2026-11-03T06:35:29.806930+00:00",
+      "sent_at": "2026-11-03T06:35:29.810556+00:00",
+      "request_sha256": "266a2b1bdab731148350c64324665c5989f4e47d5c86c576a1f85a3c087a3c60",
+      "request_id": "api-request-V1",
+      "operation_id": "operation-V1",
+      "task_id": "task-V1",
+      "session_id": "session-V1",
+      "node_id": "node-V1",
+      "account_id": "test-account-1",
+      "evidence_paths": [
+        "live-functional-validation.json",
+        "live-media-validation.json"
+      ],
+      "media": {
+        "status": "PASS",
+        "bytes": 479523,
+        "sha256": "77e122d7c22c48d3c39d2540054c847db2e125413a2345bf73854871bc3b8003",
+        "kind": "video",
+        "container_format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "duration_seconds": 5.0,
+        "video_streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "width": 1280,
+            "height": 720,
+            "pix_fmt": "yuv420p",
+            "avg_frame_rate": "24/1",
+            "duration": "5.000000"
+          }
+        ],
+        "frames_decoded": 120,
+        "full_decode_passed": true,
+        "decoded_audio_streams": 1,
+        "decoder_versions": {
+          "ffprobe": "ffprobe version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+          "ffmpeg": "ffmpeg version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+        }
+      },
+      "send_note": "One client generation POST. Original responses and exact IDs remain private.",
+      "identity_fingerprints": {
+        "operation": "04edd448d416f935",
+        "session": "5c818d092cc6506c",
+        "node": "1c538d8fd8b87d9e",
+        "vm": "f1103dc5d12eb307"
+      }
     }
   ],
   "lifecycle": [
     {
       "case_id": "L_COOKIE_ROTATION",
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "observation": "NOT_OBSERVED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "account_id": null,
-      "credential_revision_before": null,
-      "credential_revision_after": null,
-      "cookie_fingerprint_before": null,
-      "cookie_fingerprint_after": null,
-      "note": "No real upstream Cookie rotation or restart authentication was observed. Native synthetic Set-Cookie evidence is separate."
+      "status": "PASS",
+      "observation": "OBSERVED",
+      "account_id": "test-account-1",
+      "credential_revision_before": 1,
+      "credential_revision_after": 1,
+      "cookie_fingerprint_before": "a3ffda80258fd3c9",
+      "cookie_fingerprint_after": "88cb09a944fe3533",
+      "note": "hatch_sess and hatch_vml rotated; hatch_gw newly issued. Store write and fresh-process original recovery authenticated without reimport.",
+      "evidence_paths": [
+        "live-cookie-lifecycle.json"
+      ]
     },
     {
       "case_id": "L_VM_WAKE",
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
+      "status": "NOT_OBSERVED",
       "observation": "NOT_OBSERVED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "account_id": null,
-      "note": "No real VM sleep/inactive state followed by wake was observed. Local process restart and synthetic wake are not this case."
+      "account_id": "test-account-1",
+      "note": "No real asleep/inactive to RUNNING transition observed. Local restart and wake acknowledgement are not proof."
     },
     {
       "case_id": "L_REAL_MULTI_ACCOUNT_PROXY",
       "evidence_level": "real_muse",
-      "status": "BLOCKED",
-      "observation": "NOT_OBSERVED",
-      "blocker_id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "account_ids": [],
-      "note": "No dedicated real account or test proxy source was supplied, including no second real account. Controlled isolation tests do not establish real multi-account/proxy compatibility."
+      "status": "NOT_RUN",
+      "observation": "NOT_RUN",
+      "account_ids": [
+        "test-account-1"
+      ],
+      "note": "Only one authorized reused account and no designated test proxy; real multi-account/proxy coverage not performed."
     }
   ],
   "media_full_decode": {
     "image": {
-      "status": "BLOCKED",
-      "reason": "No real generated image",
-      "files": []
+      "status": "PASS",
+      "case_id": "I1",
+      "files": [
+        {
+          "status": "PASS",
+          "bytes": 36342,
+          "sha256": "b5b1a55c5c534e69d92a12823cbec4d8aac38a03e4af7103bfeb10fde12cf97b",
+          "kind": "image",
+          "format": "WEBP",
+          "width": 1600,
+          "height": 1600,
+          "frames_decoded": 1,
+          "modes": [
+            "RGB"
+          ],
+          "verify_passed": true,
+          "full_decode_passed": true
+        }
+      ]
     },
     "edited_image": {
-      "status": "BLOCKED",
-      "reason": "No real generated edited image",
-      "files": []
+      "status": "PASS",
+      "case_id": "I2",
+      "files": [
+        {
+          "status": "PASS",
+          "bytes": 34938,
+          "sha256": "0f2af7036b08caf3cdc221becc4da6ba78705b3409fd16d395be93eab0879c87",
+          "kind": "image",
+          "format": "WEBP",
+          "width": 2240,
+          "height": 1120,
+          "frames_decoded": 1,
+          "modes": [
+            "RGB"
+          ],
+          "verify_passed": true,
+          "full_decode_passed": true
+        }
+      ]
     },
     "video": {
-      "status": "BLOCKED",
-      "reason": "No real generated video",
-      "files": []
+      "status": "PASS",
+      "case_id": "V1",
+      "files": [
+        {
+          "status": "PASS",
+          "bytes": 479523,
+          "sha256": "77e122d7c22c48d3c39d2540054c847db2e125413a2345bf73854871bc3b8003",
+          "kind": "video",
+          "container_format": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration_seconds": 5.0,
+          "video_streams": [
+            {
+              "index": 0,
+              "codec_name": "h264",
+              "width": 1280,
+              "height": 720,
+              "pix_fmt": "yuv420p",
+              "avg_frame_rate": "24/1",
+              "duration": "5.000000"
+            }
+          ],
+          "frames_decoded": 120,
+          "full_decode_passed": true,
+          "decoded_audio_streams": 1,
+          "decoder_versions": {
+            "ffprobe": "ffprobe version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+            "ffmpeg": "ffmpeg version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+          }
+        }
+      ]
     }
   },
   "controlled_evidence_only": [
@@ -319,5 +490,7 @@
   ],
   "resume_instructions": "../RESUME.md",
   "python_suite_and_image_source_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
-  "configuration_change_after_suite": "Previous Compose init fix validated at b9228cc; subsequent 8b2dc1c adds client-side live acceptance tooling only, with 13 targeted synthetic tests and local decoder fixtures. No new real Muse case was sent."
+  "configuration_change_after_suite": "All nine real cases used application content matching b08f110. Existing control suites retain their original SHA binding. No executable changes after the real round.",
+  "budget_exhausted": true,
+  "real_identifiers_note": "Public IDs are aliases plus stable identity fingerprints; exact values remain private."
 }

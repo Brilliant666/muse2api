@@ -1,10 +1,10 @@
-# 提交前验证记录
+# 验证记录
 
-本页下文保留初始提交 `52d5acd74ec54757fe228a4f3daed6099046739a` 之前的历史证据，不代表本轮验收状态。2026-11-03 的后续实测见 [acceptance-report.md](acceptance-report.md) 和 [acceptance-results.json](acceptance-results.json)。
+最新实号测试 SHA：`b08f11000930674990c2834e1a9da091fd08a668`。本机 Windows 源码环境 **九案 PASS**，预算恰好 6/6 文本、2/2 图片、1/1 视频；真实断连 unknown/重启原操作恢复、Cookie 轮换/Store/重启认证和 Chrome 文本回退通过。图片/编辑完整解码，视频完整 120 帧和音轨解码。当前可进入限定环境的单账号试运行，真实 VM 唤醒和目标部署条件未覆盖，不能替换现网。
 
-本轮最终配置测试 SHA：`b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08`。64 项 Python（原 61 + 跨进程恢复 3）、6 项 JS、原有 25 个 Python 脚本及 10 项管理页行为均通过；Windows 和 Linux Docker 内的原生 I/O 各 6 项通过。两种 Docker 镜像实际构建/启动通过，Chromium 孤儿进程回收缺陷已修复。真实 Muse 预算消耗为 0；所有实号接口、媒体完整解码与真实生命周期仍阻塞。
+完整结论和元数据见 [acceptance-report.md](acceptance-report.md)、[acceptance-results.json](acceptance-results.json)、[实号证据](evidence/live-functional-validation.json)。实号之后只更新报告，没有改业务代码或伪称新版本重跑。
 
-Python 完整回归与镜像源版本是 `beed898fb088209051ca2bbaa4112f8bc92d0eed`；此后仅改 Compose 的 `init: true`，在最终 SHA 定向验证了实际 init、持久化记录、Chromium 清理。没有把历史测试改写为新版本全量实号通过。
+此前 64 Python、6 JS、原有 25 Python 脚本/10 JS、native I/O、Docker 构建、init 清理和新增 13 项工具合成测试保留各自实际版本与结果；未重复测试仅为凑计数。下面是初始 `52d5acd` 之前的历史记录，不能当作最新状态。
 
 ---
 

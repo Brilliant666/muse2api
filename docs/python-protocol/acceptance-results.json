@@ -5,14 +5,14 @@
   "repository": "Brilliant666/muse2api",
   "branch": "codex/python-protocol-integration",
   "pull_request": "https://github.com/Brilliant666/muse2api/pull/1",
-  "status": "BLOCKED",
-  "achieved_grade": 1,
+  "status": "PASS",
+  "achieved_grade": 2,
   "grade1_build_offline": "PASS",
-  "grade2_single_account_trial": "BLOCKED",
+  "grade2_single_account_trial": "PASS",
   "grade3_production_replacement": "BLOCKED",
   "start_sha": "52d5acd74ec54757fe228a4f3daed6099046739a",
-  "final_test_sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
-  "final_test_tree": "9a223e82fdad60efe2cd25d9b83471a239719241",
+  "final_test_sha": "b08f11000930674990c2834e1a9da091fd08a668",
+  "final_test_tree": "e80f1466d49ac12e6b368d65988b9db6d1ef7c8d",
   "python_suite_and_image_source_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
   "after_suite_change": {
     "files": [
@@ -29,16 +29,16 @@
       "video": 1
     },
     "consumed": {
-      "text": 0,
-      "image": 0,
-      "video": 0
-    },
-    "remaining": {
       "text": 6,
       "image": 2,
       "video": 1
     },
-    "send_intents": 0,
+    "remaining": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "send_intents": 9,
     "rule": "Persist the send intent and conservatively charge its budget before POST. Failures, timeouts and unknown outcomes count. An intent whose non-delivery cannot be proved must not be automatically retried; recover the original operation or leave it pending."
   },
   "checks": [
@@ -133,90 +133,120 @@
     },
     {
       "id": "live_chat_responses",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence_level": "real Muse",
-      "detail": "T1-T4 not sent; no dedicated test account",
+      "detail": "T1-T4 ordinary/SSE Chat and Responses passed; stop/DONE or ordered response.completed and exact delta/final output checked",
       "evidence": [
-        "evidence/acceptance-cases.json"
+        "evidence/live-functional-validation.json"
       ]
     },
     {
       "id": "live_disconnect_restart",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence_level": "real Muse",
-      "detail": "T5 not sent; controlled recovery does not prove real Muse recovery",
+      "detail": "T5 real running-turn disconnect -> unknown/quarantine -> new interpreter -> original 3359 characters/60 items; same identities and operation set, resubmitted:false",
       "evidence": [
-        "evidence/acceptance-cases.json"
+        "evidence/live-disconnect-recovery.json"
       ]
     },
     {
       "id": "live_browser_fallback",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence_level": "real Muse",
-      "detail": "T6 not sent; no valid Muse session",
+      "detail": "Actual isolated Chrome browser backend returned successful assistant text and preserved account/tasks/media",
       "evidence": [
-        "evidence/acceptance-cases.json"
+        "evidence/live-functional-validation.json",
+        "evidence/live-runtime-and-cleanup.json"
       ]
     },
     {
       "id": "live_images_edits_video_decode",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence_level": "real Muse",
-      "detail": "I1/I2/V1 not sent; no real media exists for full decode",
+      "detail": "I1/I2 complete WebP decode; V1 5-second H.264 video full 120-frame and audio decode; sizes/hashes recorded",
       "evidence": [
-        "evidence/acceptance-cases.json"
+        "evidence/live-media-validation.json"
       ]
     },
     {
       "id": "real_cookie_rotation",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence_level": "real Muse",
-      "detail": "No test account; NOT_OBSERVED; synthetic cookie persistence passed separately",
+      "detail": "hatch_sess and hatch_vml rotated; hatch_gw newly issued. Store persistence and fresh-process original recovery authenticated without reimport",
       "evidence": [
-        "evidence/acceptance-cases.json"
+        "evidence/live-cookie-lifecycle.json"
       ]
     },
     {
       "id": "real_vm_wakeup",
-      "status": "BLOCKED",
+      "status": "NOT_OBSERVED",
       "evidence_level": "real Muse",
-      "detail": "No sleeping real VM observed; NOT_OBSERVED; synthetic wake passed separately",
+      "detail": "No asleep/inactive -> RUNNING event observed; local restart and wake acknowledgement do not prove this",
       "evidence": [
         "evidence/acceptance-cases.json"
       ]
     },
     {
       "id": "live_multi_account_proxy",
-      "status": "BLOCKED",
+      "status": "NOT_RUN",
       "evidence_level": "real Muse",
-      "detail": "No second test account or designated proxy; controlled isolation tests passed",
+      "detail": "Only one authorized reused account, no designated proxy/second account; controlled isolation coverage remains separate",
       "evidence": [
         "evidence/acceptance-cases.json"
       ]
     },
     {
       "id": "active_account_resource_metrics",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence_level": "real Muse",
-      "detail": "No active account; idle source/container memory only, no performance improvement claim",
+      "detail": "Runtime/process TCP and RSS snapshots recorded; no independent wire reconnect count or performance/parallel-load claim",
       "evidence": [
-        "evidence/acceptance-cases.json"
+        "evidence/live-runtime-and-cleanup.json"
       ]
     },
     {
       "id": "windows_docker_published_port",
       "status": "BLOCKED",
       "evidence_level": "actual Windows -> Docker published port",
-      "detail": "127.0.0.1:18612 refused connection although container loopback passed; Windows Desktop endpoint/forwarding is unhealthy",
+      "detail": "Previous environment check refused Windows access to the Docker-published port while container loopback passed. Not re-tested in the real Windows-source round.",
       "evidence": [
         "evidence/acceptance-docker-runtime.json"
+      ],
+      "retested_in_real_round": false
+    },
+    {
+      "id": "linux_container_real_muse",
+      "status": "NOT_RUN",
+      "evidence_level": "target platform",
+      "detail": "Docker images build/start and Linux native loopback I/O passed. Actual Muse generation ran in Windows source service, not Linux container. Budget exhausted.",
+      "evidence": [
+        "evidence/live-functional-validation.json"
+      ]
+    },
+    {
+      "id": "live_concurrency_3",
+      "status": "NOT_RUN",
+      "evidence_level": "real parallel load",
+      "detail": "This round used one account, concurrency1/worker1. Production concurrency3 remains an unchanged deployment parameter; not real-load-tested.",
+      "evidence": [
+        "evidence/live-runtime-and-cleanup.json"
+      ]
+    },
+    {
+      "id": "real_delivery_failure_recovery",
+      "status": "NOT_OBSERVED",
+      "evidence_level": "real Muse",
+      "detail": "All real media delivery succeeded. delivery_failed original-file recovery remains controlled/native/cross-process coverage, not an injected real failure.",
+      "evidence": [
+        "evidence/acceptance-native.json",
+        "evidence/acceptance-recovery.json"
       ]
     }
   ],
   "production_changed": false,
   "merged": false,
   "runtime_cleanup": {
-    "source_service_stopped": false,
+    "source_service_stopped": true,
     "containers_stopped": [
       "muse2api-acceptance-20261103-protocol",
       "muse2api-acceptance-20261103-browser",
@@ -224,12 +254,25 @@
     ],
     "images_and_isolated_synthetic_volume_retained": true,
     "shared_docker_restarted": false,
-    "source_service_state": "User-requested isolated management page remains running on 127.0.0.1:18611 for manual dedicated account import; no production service changed"
+    "source_service_state": "All acceptance source services and owned Chrome processes stopped; ports18611/19211 released",
+    "real_media_and_private_receipts_retained_outside_git": true
   },
-  "minimum_user_input": "One independent dedicated valid Muse test account imported in the isolated UI, or an explicitly designated private local test credential configuration; do not use the production pool account by assumption",
+  "minimum_user_input": "None needed to finish this budgeted round. Production replacement still needs a real idle-VM wake observation and target-runtime/multi-account/proxy/concurrency evidence where required; any new generation needs a separately agreed budget.",
   "previous_application_configuration_test_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
-  "final_test_scope": "Live acceptance tooling: 8 budget/SSE cases, 5 disconnect cases, complete local decoder positive/negative fixtures. No real Muse generation; application, protocol and deployment configuration unchanged.",
-  "latest_preparation": {
+  "final_test_scope": "All nine real Muse cases, real Cookie rotation/Store persistence/fresh-process authentication, and actual Chrome fallback",
+  "status_scope": "Nine budgeted real functional cases on native Windows source environment; not production replacement",
+  "grade2_scope": "Native Windows source service, one human-authorized reused account with isolated local data/profile",
+  "live_generation_case_count": 9,
+  "live_generation_counts": {
+    "text": 6,
+    "image": 2,
+    "video": 1
+  },
+  "live_results": "evidence/live-functional-validation.json",
+  "production_service_configuration_changed": false,
+  "production_credential_reuse": "Explicit human authorization verified; private one-account handoff; no production service configuration or deployment changed",
+  "after_live_tests_changes": "Documentation and sanitized evidence only; no executable or dependency changes after real validation",
+  "pre_generation_tooling_validation": {
     "sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
     "case_tool_tests": 8,
     "disconnect_tool_tests": 5,
@@ -240,12 +283,13 @@
       "image": 0,
       "video": 0
     },
-    "account_readiness": "BLOCKED: prior externally checked cookie belonged to production pool, not a dedicated test account; no credential handoff was made",
+    "account_readiness": "RESOLVED by later explicit human reuse authorization and private handoff; actual import and session validation passed",
     "evidence": [
       "evidence/live-case-tooling.json",
       "evidence/live-disconnect-tooling.json",
       "evidence/live-media-decoder-tooling.json",
       "evidence/live-account-readiness.json"
-    ]
+    ],
+    "scope": "Historical tooling-only phase before this real round; zero generation calls at that phase"
   }
 }
