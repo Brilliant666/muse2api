@@ -8,6 +8,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import re
 import sys
 import tempfile
 import threading
@@ -36,6 +37,33 @@ class RecoveryClient:
             raise AssertionError('Only the original operation recovery is permitted')
         return self.Reply(json.dumps({'ok': True, 'operation_id': self.operation,
             'resubmitted': False, 'result': {'text': 'PHASE2_L2_001'}}).encode())
+
+
+class MarkerTextClient:
+    """Return this operation's own completed text, optionally only commentary."""
+    def __init__(self, operations_file, text_factory):
+        self.operations_file, self.text_factory = operations_file, text_factory
+        self.posts, self.operations = 0, {}
+    def open(self, path, body=None, headers=None):
+        if body is None: raise AssertionError('Synthetic operation binding uses its file only')
+        self.posts += 1
+        request = json.loads(body)
+        prompt = request.get('input') or request['messages'][0]['content']
+        marker = re.search(r'Acceptance marker (PHASE2_[A-Z0-9_]+)\.', prompt).group(1)
+        text = self.text_factory(marker)
+        operation_id = 'own-operation-' + marker
+        self.operations[operation_id] = {'id': operation_id, 'account_id': 'account-0',
+            'kind': 'chat', 'state': 'completed', 'delivery': 'completed', 'prompt': prompt,
+            'session_id': 'own-session-' + marker, 'vm_id': 'own-vm',
+            'message_id': 'own-message-' + marker, 'result': {'text': text}}
+        self.operations_file.write_text(json.dumps(self.operations))
+        if path == '/v1/responses':
+            value = {'id': 'own-response', 'status': 'completed', 'output': [
+                {'type': 'message', 'role': 'assistant', 'content': [{'type': 'output_text', 'text': text}]}]}
+        elif path == '/v1/chat/completions':
+            value = {'choices': [{'message': {'role': 'assistant', 'content': text}, 'finish_reason': 'stop'}]}
+        else: raise AssertionError('No other generation or recovery is permitted')
+        return RecoveryClient.Reply(json.dumps(value).encode())
 
 
 class ResumeSafetyTests(unittest.TestCase):
@@ -222,6 +250,45 @@ class ResumeSafetyTests(unittest.TestCase):
         with self.assertRaises(resume.BatchError): self.reserve()
         with self.assertRaises(resume.BatchError): self.state.begin('L2', '2' * 64)
         self.assertTrue(runner.stop.is_set())
+
+    def test_marker_commentary_is_rejected_after_binding_and_stops_next_send(self):
+        self.state.begin('D10', '2' * 64, resume.spec_for('D10', diagnostic_kind='responses'))
+        self.state.begin('D11', '2' * 64, resume.spec_for('D11', diagnostic_kind='chat'))
+        args = self.args('D10')
+        client = MarkerTextClient(args.operations_file,
+            lambda marker: 'Checking memory before replying. ' + marker + ' will be the final answer.')
+        runner = resume.Runner(self.state, client, {'account-0': 'A00'}, args)
+        runner.execute({'case_id': 'D10-001', 'kind': 'responses', 'category': 'text'}, [], 0)
+        row = self.state.load()['cases']['D10-001']
+        self.assertEqual(row['status'], 'FAIL')
+        self.assertEqual(row['failure_class'], 'UPSTREAM_OR_VALIDATION')
+        self.assertTrue(row['operation_binding_verified'])
+        self.assertEqual((row['operation_id'], row['account_id'], row['session_id'], row['vm_id']),
+            ('own-operation-PHASE2_D10_001', 'account-0', 'own-session-PHASE2_D10_001', 'own-vm'))
+        self.assertTrue(runner.stop.is_set())
+        # A read-only original-operation binding has no text expectation. It
+        # remains valid for recovery/D01's long reply, preserving the failed case.
+        operation = runner.bind('D10-001', 'PHASE2_D10_001', require_completed=True)
+        self.assertIn('Checking memory', operation['result']['text'])
+        runner.execute({'case_id': 'D11-001', 'kind': 'chat', 'category': 'text'}, [], 0)
+        self.assertEqual(client.posts, 1)
+        self.assertEqual(row['generation_post_count'], 1)
+        self.assertEqual(self.state.summary()['consumed']['text'], 4)
+        self.assertNotIn('D11-001', self.state.load()['cases'])
+        self.assertEqual(self.original.read_bytes(), self.original_bytes)
+
+    def test_exact_marker_text_allows_surrounding_whitespace(self):
+        self.state.begin('D10', '2' * 64, resume.spec_for('D10', diagnostic_kind='responses'))
+        args = self.args('D10')
+        client = MarkerTextClient(args.operations_file, lambda marker: ' \t' + marker + '\r\n ')
+        runner = resume.Runner(self.state, client, {'account-0': 'A00'}, args)
+        runner.execute({'case_id': 'D10-001', 'kind': 'responses', 'category': 'text'}, [], 0)
+        row = self.state.load()['cases']['D10-001']
+        self.assertEqual(row['status'], 'PASS')
+        self.assertTrue(row['operation_binding_verified'])
+        self.assertFalse(runner.stop.is_set())
+        self.assertEqual(client.posts, 1)
+        self.assertEqual(self.state.summary()['consumed']['text'], 4)
 
     def test_identity_ten_hmac_linux_and_media_gates_precede_network(self):
         path, data = self.preflight(9)

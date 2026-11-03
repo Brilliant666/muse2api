@@ -1,5 +1,5 @@
 diff --git a/muse2api/chat.py b/muse2api/chat.py
-index 686ddbb..d445ca8 100644
+index 686ddbb..1a5a3e8 100644
 --- a/muse2api/chat.py
 +++ b/muse2api/chat.py
 @@ -26,7 +26,12 @@
@@ -24,11 +24,19 @@ index 686ddbb..d445ca8 100644
  
  # Markers indicating upstream refused or failed to invoke media tools,
  # allowing early return without waiting out the full media grace period.
-@@ -306,6 +312,58 @@
+@@ -306,6 +312,73 @@
      message_id: str
      events: list[dict] = field(default_factory=list)
      media: list[MediaRef] = field(default_factory=list)
 +    session_id: str = ""
++
++
++def _is_commentary(payload: dict) -> bool:
++    """Recognize observed protocol commentary flags, never body wording."""
++    metadata = payload.get("metadata") if isinstance(payload.get("metadata"), dict) else {}
++    return (metadata.get("public_commentary") is True
++            or metadata.get("message_kind") == "commentary"
++            or metadata.get("recipient") == "commentary")
 +
 +
 +def _lifecycle(payload: dict, *, assistant: bool = False) -> tuple[bool, bool]:
@@ -49,26 +57,32 @@ index 686ddbb..d445ca8 100644
 +
 +
 +def _turn_lifecycle(events: list[dict]) -> tuple[bool, bool, bool]:
-+    """Track the latest assistant and independent tool lifecycles in order."""
++    """Track active tools and whether an assistant answer is still pending."""
 +    active: dict[str, bool] = {}
 +    assistant_active = assistant_done = turn_done = False
++    awaiting_reply = False
 +    for event in events:
 +        name = str(event.get("event_name") or event.get("event") or "")
 +        payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
 +        if name in {"turn.completed", "turn.failed", "turn.cancelled", "turn.canceled"}:
 +            active.clear()
 +            assistant_active, turn_done = False, True
++            awaiting_reply = False
 +            continue
 +        if name == "message.assistant":
 +            if event.get("reply_to_message_id") or payload.get("reply_to_message_id"):
 +                continue
 +            assistant_active, assistant_done = _lifecycle(payload, assistant=True)
++            awaiting_reply = _is_commentary(payload)
++            if awaiting_reply:
++                # Commentary can finish while the same root execution continues.
++                assistant_done = False
 +            # Even an empty replacement assistant supersedes the old reply.
 +            turn_done = False
 +            continue
 +        if name in {"message.done", "delta.message_done"}:
 +            # A message boundary is weaker than an active assistant/tool.
-+            if not assistant_active:
++            if not assistant_active and not awaiting_reply:
 +                assistant_done = True
 +            continue
 +        busy, done = _lifecycle(payload)
@@ -79,11 +93,12 @@ index 686ddbb..d445ca8 100644
 +        active[str(identity)] = busy
 +        if busy:
 +            turn_done = False
-+    return assistant_active or any(active.values()), assistant_done, turn_done
++    # Pending means no final answer observed, not proven upstream CPU activity.
++    return assistant_active or awaiting_reply or any(active.values()), assistant_done, turn_done
  
  
  class ChatService:
-@@ -378,9 +436,10 @@
+@@ -378,9 +451,10 @@
          timeout: float | None = None,
          items: list[dict] | None = None,
          refusal_markers: tuple[str, ...] | None = None,
@@ -95,7 +110,7 @@ index 686ddbb..d445ca8 100644
          return await self._run_thread(
              prompt,
              state,
-@@ -404,50 +463,98 @@
+@@ -404,50 +478,98 @@
          items: list[dict] | None = None,
          refusal_markers: tuple[str, ...] = (),
      ) -> ChatResult:
@@ -238,7 +253,7 @@ index 686ddbb..d445ca8 100644
  
      async def _poll_thread_reply(
          self,
-@@ -463,7 +570,8 @@
+@@ -463,7 +585,8 @@
      ) -> tuple[str, str, list[dict], list[MediaRef]]:
          deadline = time.monotonic() + timeout
          last_text: str | None = None
@@ -248,7 +263,7 @@ index 686ddbb..d445ca8 100644
          best = ""
          best_id = ""
          started = time.monotonic()
-@@ -475,13 +583,30 @@
+@@ -475,13 +598,30 @@
          text_stable_at: float | None = None
          next_approval_check = 0.0
  
@@ -281,7 +296,7 @@ index 686ddbb..d445ca8 100644
              if handled:
                  log.info("answered %d permission prompt(s) for %s", handled, session_id)
              return handled > 0
-@@ -490,33 +615,44 @@
+@@ -490,33 +630,44 @@
              polls += 1
              if self.approval_policy != "off" and time.monotonic() >= next_approval_check:
                  next_approval_check = time.monotonic() + 4.0
@@ -334,7 +349,7 @@ index 686ddbb..d445ca8 100644
                  continue
  
              user_index = -1
-@@ -525,7 +661,7 @@
+@@ -525,7 +676,7 @@
                      if event.get("message_id") == message_id:
                          user_index = index
                          break
@@ -343,7 +358,7 @@ index 686ddbb..d445ca8 100644
                  needle = prompt.strip()
                  for index, event in enumerate(events):
                      name = str(event.get("event_name") or event.get("event") or "")
-@@ -535,11 +671,17 @@
+@@ -535,11 +686,17 @@
                      if text and (text == needle or needle[:80] in text):
                          user_index = index
              if user_index < 0:
@@ -362,16 +377,21 @@ index 686ddbb..d445ca8 100644
              current_text = ""
              current_id = ""
              for event in after:
-@@ -550,8 +692,6 @@
+@@ -549,9 +706,11 @@
+                 payload = event.get("payload") if isinstance(event.get("payload"), dict) else {}
                  if event.get("reply_to_message_id") or payload.get("reply_to_message_id"):
                      continue
++                if _is_commentary(payload):
++                    # Preserve captured events/media, but never expose progress
++                    # as final answer text, SSE deltas, or the result message ID.
++                    continue
                  text = event_text(event)
 -                if not text:
 -                    continue
                  current_text = text
                  raw_id = event.get("message_id") or payload.get("message_id")
                  current_id = raw_id if isinstance(raw_id, str) else current_id
-@@ -559,14 +699,18 @@
+@@ -559,14 +718,18 @@
              if want_media:
                  media = extract_media(after)
  
@@ -395,7 +415,7 @@ index 686ddbb..d445ca8 100644
                  if last_text == current_text:
                      if text_stable_at is None:
                          text_stable_at = time.monotonic()
-@@ -577,10 +721,12 @@
+@@ -577,10 +740,12 @@
                  last_text = None
                  text_stable_at = None
  
@@ -411,7 +431,7 @@ index 686ddbb..d445ca8 100644
                  return best, best_id, captured, media
  
              if want_media:
-@@ -593,7 +739,7 @@
+@@ -593,7 +758,7 @@
                          text_stable_at is not None
                          and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS
                      )
@@ -420,7 +440,7 @@ index 686ddbb..d445ca8 100644
                          if await approval_hold():
                              text_stable_at = None
                              media_stable_at = None
-@@ -604,20 +750,15 @@
+@@ -604,20 +769,15 @@
                      media_stable_at = time.monotonic()
                  else:
                      media_stable_at = None
@@ -449,7 +469,7 @@ index 686ddbb..d445ca8 100644
                  if await approval_hold():
                      text_stable_at = None
                      last_text = None
-@@ -629,13 +770,32 @@
+@@ -629,13 +789,32 @@
                  text_stable_at = None
  
              poll_interval = 0.35 if (current_text and text_stable_at is None) else 0.6
@@ -485,7 +505,7 @@ index 686ddbb..d445ca8 100644
          self,
          prompt: str,
          *,
-@@ -646,7 +806,8 @@
+@@ -646,7 +825,8 @@
      ) -> ChatResult:
          async with self._connection() as (_account, _session, conn):
              client_id = str(uuid.uuid4())
@@ -495,7 +515,7 @@ index 686ddbb..d445ca8 100644
  
              try:
                  await self._register_node(conn, client_id)
-@@ -668,7 +829,9 @@
+@@ -668,7 +848,9 @@
                      except asyncio.CancelledError:
                          raise
                      except Exception as exc:  # noqa: BLE001
@@ -506,7 +526,7 @@ index 686ddbb..d445ca8 100644
  
                  pump_task = asyncio.create_task(pump())
                  await asyncio.sleep(0.4)  # let the subscribe attach
-@@ -687,6 +850,7 @@
+@@ -687,6 +869,7 @@
                  )
  
                  parts: list[str] = []
@@ -514,7 +534,7 @@ index 686ddbb..d445ca8 100644
                  deadline = time.monotonic() + timeout
                  while True:
                      remaining = deadline - time.monotonic()
-@@ -696,6 +860,9 @@
+@@ -696,6 +879,9 @@
                          event = await asyncio.wait_for(queue.get(), min(5.0, remaining))
                      except TimeoutError:
                          continue
@@ -524,7 +544,7 @@ index 686ddbb..d445ca8 100644
                      if not isinstance(event, dict):
                          continue
                      ts = event.get("ts_ms")
-@@ -719,6 +886,7 @@
+@@ -719,6 +905,7 @@
                                               parts.append(content["text"])
                                               if on_delta:
                                                   on_delta(content["text"])
@@ -532,7 +552,7 @@ index 686ddbb..d445ca8 100644
                          break
                      elif name == "message.assistant":
                          if not parts:
-@@ -727,16 +895,24 @@
+@@ -727,16 +914,24 @@
                                  parts.append(text)
                                  if on_delta:
                                      on_delta(text)

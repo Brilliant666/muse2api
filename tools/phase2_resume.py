@@ -385,6 +385,14 @@ class Runner(legacy.Runner):
         super().__init__(*args)
         self.metrics_lock = threading.Lock(); self.active = 0; self.previous = time.monotonic(); self.distribution = Counter()
 
+    def bind(self, case, marker, text=None, *, require_completed=False):
+        operation = super().bind(case, marker, text, require_completed=require_completed)
+        # Grade the explicit marker-only acceptance prompt after retaining the
+        # verified original operation/account. Read-only binds have no text arg.
+        if text is not None and operation.get('kind') == 'chat' and text.strip() != marker:
+            raise SafetyError('UPSTREAM_OR_VALIDATION', 'Returned text does not equal this test expected marker')
+        return operation
+
     def _occupancy(self, delta):
         with self.metrics_lock:
             current = time.monotonic(); self.distribution[self.active] += current - self.previous
