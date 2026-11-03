@@ -2,7 +2,7 @@
   "schema_version": 1,
   "date": "2026-11-03",
   "timezone": "Asia/Shanghai",
-  "tested_code_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
+  "tested_code_sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
   "scope": "Real Muse acceptance case ledger; controlled peer evidence is recorded separately",
   "status": "BLOCKED",
   "account_source": null,
@@ -11,7 +11,7 @@
   "blockers": [
     {
       "id": "TEST_ACCOUNT_NOT_PROVIDED",
-      "description": "No dedicated test account or explicitly designated private credential configuration was provided. The isolated source service reported enabled_accounts=0. No unrelated or production account data was read."
+      "description": "No independent dedicated test account is currently available. Coordination confirmed the earlier session-checked cookie came from the production pool, so it was not handed off or used for acceptance. The designated configuration lacked MUSE_COOKIE and the isolated account pool was empty at the readiness check."
     }
   ],
   "budget": {
@@ -319,5 +319,5 @@
   ],
   "resume_instructions": "../RESUME.md",
   "python_suite_and_image_source_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
-  "configuration_change_after_suite": "Only docker-compose.yml init:true; targeted real Chromium cleanup passed at final tested SHA"
+  "configuration_change_after_suite": "Previous Compose init fix validated at b9228cc; subsequent 8b2dc1c adds client-side live acceptance tooling only, with 13 targeted synthetic tests and local decoder fixtures. No new real Muse case was sent."
 }

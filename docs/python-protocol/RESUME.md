@@ -2,6 +2,8 @@
 
 本轮实号账本是 [evidence/acceptance-cases.json](evidence/acceptance-cases.json)。最终配置测试提交为 `b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08`，Python 完整回归和镜像源提交为 `beed898fb088209051ca2bbaa4112f8bc92d0eed`；之后只增加 Compose init 并定向验证回收，版本边界见 [验收报告](acceptance-report.md)。当前没有用户指定的专用测试账号或私密配置，隔离源码服务记录 `enabled_accounts=0`；T1–T6、I1、I2、V1 均未发送。预算已消耗为文本 0/6、图片 0/2、视频 0/1。
 
+后续验收工具提交为 `8b2dc1c55aea2bc3c67ddf5c92984648142cfd52`。新增预算/SSE 用例 8 项、断连用例 5 项均在合成对端通过，完整媒体解码工具通过自产正负例；没有重跑旧的 64 项来重复记数，也没有新增实号通过项。当前管理页按用户要求保留运行在 <http://127.0.0.1:18611/admin>。此前外部会话验证所用 Cookie 经协调确认为现网账号，未交接或用于本轮；仍需独立测试账号。
+
 ## 先补齐测试账号
 
 由用户明确指定本地私密配置文件路径，或在隔离测试管理页导入一个专用 Muse 账号。Cookie 至少需要有效的 `hatch_sess`，导入后先测试账号。不要搜索现网或其他项目的账号文件，不要在聊天、日志、报告或 Git 中记录 Cookie、服务 Key 或签名下载地址。
@@ -18,6 +20,23 @@
 4. 需要续跑时先读账本与磁盘操作记录，不重复执行已有发送意图的案例。`delivery_failed` 只恢复原文件，不重新生成。
 
 不要重复跑 `protocol_smoke.py --generate` 来补测单项。该组合每次提交文本和图片，并创建新的图片幂等键；`--generate --video` 还会提交视频。逐案调用原接口；查询、恢复和原文件下载单独执行。
+
+### 已准备的逐案入口
+
+`tools/live_protocol_case.py` 的私密账本必须放在仓库外，默认是本机独立测试临时根的 `live-cases/`。`status` 不发请求；`send` 只运行一个指定案例，先原子预扣预算，任何已有意图都拒绝再次发送。原始响应和关联 ID 只保存在私密目录，stdout 仅有脱敏摘要。
+
+```powershell
+.venv/Scripts/python.exe tools/live_protocol_case.py status
+# 先确认专用账号健康，再逐项执行；下面不是批量执行清单。
+.venv/Scripts/python.exe tools/live_protocol_case.py send --case T1 --env-file .env
+.venv/Scripts/python.exe tools/live_protocol_case.py query --case I1 --env-file .env --wait 600
+```
+
+I2 还需按顺序提供两次 `--reference <PNG文件>`；两个小图必须可区分。同步格式等未分配实号预算的组合继续只用受控验证。该工具只读取服务 `MUSE2API_KEY`，不会自动将 `MUSE_COOKIE` 导入账号池；Cookie 需要先通过管理接口导入，不能把“写入变量”当作已导入。
+
+T5 先用 `reserve --case T5 --request-file <私密JSON>` 保存流式、较长纯文本任务意图，再用 `tools/live_protocol_disconnect.py` 消费这一个意图。它收到真实内容且确认原操作仍执行、磁盘 session/node/VM 一致时才断开；若已完成则 NOT_OBSERVED，不重发。停止、确认退出、启动和恢复原操作仍由操作者分步完成；辅助工具不重启服务。
+
+`tools/decode_acceptance_media.py` 用 Pillow verify + 逐帧 load 检查图片，用 ffprobe 和 ffmpeg 全文件解码检查视频。便携工具位于本机测试临时根 `media-tools/`，不进入 Git。使用 `--ffprobe`、`--ffmpeg` 指定其完整路径；报告只含格式、尺寸、时长、字节数、SHA 和解码状态，不含媒体内容或原始解码器 stderr。自产测试文件解码通过不等于真实 Muse 媒体通过。
 
 ## 案例与保留预算
 

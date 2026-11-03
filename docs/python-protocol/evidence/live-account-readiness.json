@@ -1,0 +1,24 @@
+{
+  "status": "BLOCKED",
+  "scope": "credential readiness only; no generation POST",
+  "verified_at": "2026-11-03T06:20:30.940884+00:00",
+  "application_source_sha": "129488a39417e616b709dff2becfc5c178d0357b",
+  "client_tooling_sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
+  "management_url": "http://127.0.0.1:18611/admin",
+  "enabled_test_accounts_observed": 0,
+  "MUSE_COOKIE_present_at_direct_config_check": false,
+  "configuration_loader": "project .venv + project config.py, no preexisting MUSE2API_HOME override",
+  "coordinated_prior_session_check": {
+    "origin": "production account pool, not dedicated test account",
+    "reported_result": "HTTP 200 / assigned",
+    "counts_as_this_acceptance_pass": false,
+    "credential_handoff_made": false
+  },
+  "real_generation_consumed": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "production_read_or_changed_by_this_acceptance": false,
+  "next_required": "Explicit independent dedicated test credential source or isolated UI import"
+}

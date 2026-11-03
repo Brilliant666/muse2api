@@ -11,8 +11,8 @@
   "grade2_single_account_trial": "BLOCKED",
   "grade3_production_replacement": "BLOCKED",
   "start_sha": "52d5acd74ec54757fe228a4f3daed6099046739a",
-  "final_test_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
-  "final_test_tree": "d2b6925109de9095d6bfd389c8abaa6eb9728360",
+  "final_test_sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
+  "final_test_tree": "9a223e82fdad60efe2cd25d9b83471a239719241",
   "python_suite_and_image_source_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
   "after_suite_change": {
     "files": [
@@ -216,14 +216,36 @@
   "production_changed": false,
   "merged": false,
   "runtime_cleanup": {
-    "source_service_stopped": true,
+    "source_service_stopped": false,
     "containers_stopped": [
       "muse2api-acceptance-20261103-protocol",
       "muse2api-acceptance-20261103-browser",
       "muse2api-acceptance-20261103-browser-init"
     ],
     "images_and_isolated_synthetic_volume_retained": true,
-    "shared_docker_restarted": false
+    "shared_docker_restarted": false,
+    "source_service_state": "User-requested isolated management page remains running on 127.0.0.1:18611 for manual dedicated account import; no production service changed"
   },
-  "minimum_user_input": "Explicit private local configuration path or isolated UI import for one dedicated valid Muse test account; do not paste Cookies/PAT into chat"
+  "minimum_user_input": "One independent dedicated valid Muse test account imported in the isolated UI, or an explicitly designated private local test credential configuration; do not use the production pool account by assumption",
+  "previous_application_configuration_test_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
+  "final_test_scope": "Live acceptance tooling: 8 budget/SSE cases, 5 disconnect cases, complete local decoder positive/negative fixtures. No real Muse generation; application, protocol and deployment configuration unchanged.",
+  "latest_preparation": {
+    "sha": "8b2dc1c55aea2bc3c67ddf5c92984648142cfd52",
+    "case_tool_tests": 8,
+    "disconnect_tool_tests": 5,
+    "decoder_positive_files": 3,
+    "decoder_expected_rejections": 2,
+    "real_generation_calls": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "account_readiness": "BLOCKED: prior externally checked cookie belonged to production pool, not a dedicated test account; no credential handoff was made",
+    "evidence": [
+      "evidence/live-case-tooling.json",
+      "evidence/live-disconnect-tooling.json",
+      "evidence/live-media-decoder-tooling.json",
+      "evidence/live-account-readiness.json"
+    ]
+  }
 }

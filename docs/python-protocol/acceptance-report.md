@@ -74,3 +74,19 @@ python -m venv .venv
 真实验收最少还需要用户明确指定一个专用有效 Muse 测试账号的本地私密配置路径，或在隔离管理页导入。不要在聊天粘贴 Cookie 或 PAT。随后按 [RESUME.md](RESUME.md) 逐案先落盘意图、预扣预算、只发送一次；失败和超时也计数，unknown 只查原操作，delivery_failed 只取回原媒体。恢复 Windows Docker 的正常对外端口访问、准备完整图像解码器及 ffprobe/ffmpeg 后，才能补齐对应环境与媒体项。当前机器未在 PATH 中发现 ffmpeg/ffprobe。
 
 真实 Cookie 轮换和 VM 休眠若未发生，应保持 NOT_OBSERVED；实际多账号/代理若属于目标部署要求，仍需相应账号和代理证据。所有这些未执行项均不算通过。本轮不合并 PR，不迁移或切换现网。
+
+## 后续实号工具准备与账号核对
+
+用户随后授权启动隔离管理页并在导入后继续实号验收。源码管理服务已重新启动在 <http://127.0.0.1:18611/admin>，沿用独立数据根、并发 1、单 worker；当前保留运行供用户手动导入。因此前文“服务已停止”描述的是上一轮离线/容器验收结束时的状态。
+
+直接读取用户指定的 worktree `.env`，并使用项目 `.venv` 与 `config.py` 复核时，未找到非空 `MUSE_COOKIE`，账号接口返回总账号 0、启用 0。随后经用户授权的协调确认，此前外部 HTTP 200 / assigned 验证使用的是现网账号池凭据，并非独立测试账号；没有将它交接或用于本轮，也没有再次提取现网凭据。这项外部会话结果不计为本轮通过。T1–T6、I1、I2、V1 仍全部 BLOCKED，预算保持 **0/6 文本、0/2 图片、0/1 视频**。
+
+在不依赖账号的范围内，提交 `8b2dc1c55aea2bc3c67ddf5c92984648142cfd52` 新增了逐案预算入口、T5 单次断连捕获和完整媒体解码器：
+
+- `tools/live_protocol_case.py`：意图先落盘并保守预扣预算，重复意图拒绝发送，HTTP 失败/超时仍计数，不跟随重定向重发。8 项合成 loopback 测试通过。
+- `tools/live_protocol_disconnect.py`：仅消费预扣的 T5，一次 POST，确认有内容、操作仍执行及原磁盘关联后才断开，已完成记 NOT_OBSERVED。5 项合成 HTTP/SSE 测试通过；重启与恢复仍由操作者分步执行。
+- `tools/decode_acceptance_media.py`：完整 PNG、两帧 GIF 与 H.264 视频自产样例通过；截断 PNG 在图片解码阶段拒绝，probe 可读的截断 MP4 在 ffmpeg 全解码阶段拒绝，另验证单视频入口。负例的实际 FAIL 是预期拒绝，不能写成媒体解码通过。
+
+Pillow 13.0.0 安装在独立测试 venv；便携 ffmpeg/ffprobe 9.0.2 来自 FFmpeg 下载页列出的 Windows 构建来源，位于仓库外的测试 `media-tools/`。它们现在已可用，前文“PATH 未发现 ffmpeg/ffprobe”是准备前记录。来源、二进制摘要、原测试命令、退出码和源文件摘要分别在 `evidence/live-case-tooling.json`、`live-disconnect-tooling.json`、`live-media-decoder-tooling.json` 与 `live-harness-binding.json`；证据明确记录由子代理实际执行，没有为收集报告重跑已经通过的测试，也没有伪造原始日志。
+
+这次只有验收工具与相应合成测试新增，应用、协议补丁和 Docker 配置未变。历史完整回归/镜像版本保持原记录，最后验收工具版本单独绑定；未把旧的真实验证或合成样例冒记为新版本实号通过。接下来最少需要一个独立测试账号的有效 Cookie 经管理页导入，或用户明确指定其私密配置路径。

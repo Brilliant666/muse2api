@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "report_created_at": "2026-11-03T06:16:16.228600+00:00",
+  "executed_by": "/root/live_disconnect_case",
+  "status": "PASS",
+  "scope": "T5 acceptance tooling only; synthetic loopback HTTP/SSE peer and synthetic disk records",
+  "actual_execution": true,
+  "command": ".\\.venv\\Scripts\\python.exe tests/test_live_protocol_disconnect.py",
+  "working_directory": "C:\\Users\\brilliant\\Documents\\ChatGPT\\muse2api-protocol-acceptance",
+  "exit_code": 0,
+  "tests_run": 5,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "unittest_elapsed_seconds": 2.826,
+  "tool_wall_time_seconds": 3.1378101,
+  "original_run_started_at": null,
+  "raw_log_path": null,
+  "log_note": "Counts and elapsed time are taken from the actual prior unittest tool result (Ran 5 tests in 2.826s; OK). No raw log was retained or reconstructed. Tests were not rerun to create this report.",
+  "cases": [
+    {
+      "name": "test_changed_payload_is_rejected_before_network_or_second_budget_charge",
+      "status": "PASS"
+    },
+    {
+      "name": "test_completed_before_running_observation_is_not_observed_not_replayed",
+      "status": "PASS"
+    },
+    {
+      "name": "test_http_failure_still_consumes_one_and_never_replays",
+      "status": "PASS"
+    },
+    {
+      "name": "test_missing_intent_never_posts",
+      "status": "PASS"
+    },
+    {
+      "name": "test_reserved_single_submit_disconnects_running_turn_and_preserves_unknown",
+      "status": "PASS"
+    }
+  ],
+  "source_sha256": {
+    "tools/live_protocol_disconnect.py": "ec1fc8b7dc5c2677d370582d4c01e199e9f65da0df394891ebfc62e3c86a77a0",
+    "tests/test_live_protocol_disconnect.py": "98faa7a9554cc4f6b0296c4b983e7bdafd20e6b16a3347989dde576638da2d17"
+  },
+  "live_muse_tested": false,
+  "real_generation_calls": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "real_credentials_read": false,
+  "existing_live_service_requested": false,
+  "not_proven": [
+    "Real Muse acceptance, authentication or generation",
+    "Actual service restart and original-operation recovery",
+    "Direct account lease / capacity-lock observation"
+  ]
+}

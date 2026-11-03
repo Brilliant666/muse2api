@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "recorded_at": "2026-11-03T14:16:26.977732+08:00",
+  "status": "PASS",
+  "scope": "Offline decoder-tooling validation using only self-created fixtures; not real Muse media acceptance",
+  "real_muse_input_used": false,
+  "real_generation_calls": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "script": {
+    "path": "tools/decode_acceptance_media.py",
+    "sha256": "0c044616bd286540dc7243b88de66bb50d698e735a3de24e537ae82533e59a75"
+  },
+  "versions": {
+    "pillow": "13.0.0",
+    "ffmpeg": "9.0.2",
+    "ffprobe": "9.0.2"
+  },
+  "tool_acquisition": {
+    "source_url": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
+    "resolved_url": "https://www.gyan.dev/ffmpeg/builds/packages/ffmpeg-9.0.2-essentials_build.zip",
+    "official_download_index": "https://ffmpeg.org/download.html",
+    "archive_bytes": 114768076,
+    "archive_sha256": "60f467265b1e312373dbcd92200c2618a74850f98d3d078e94296bb3fa2047ba",
+    "binaries": {
+      "ffmpeg.exe": "3256173f3f8bffd7df12227c68adf68025edb1832273a9530688a7bb1ed8edec",
+      "ffprobe.exe": "f0d36ecbbdd3bcfac3efa078c96c7271c2e68b3810595552ac3b7f17e9a65c52"
+    }
+  },
+  "positive_directory": {
+    "expectation": "all three local PNG/GIF/MP4 fixtures fully decode",
+    "expected_status": "PASS",
+    "actual_status": "PASS",
+    "validation_status": "PASS",
+    "report": {
+      "status": "PASS",
+      "scope": "full local media decoding only; input provenance not asserted",
+      "files_checked": 3,
+      "directory_files_ignored": 0,
+      "results": [
+        {
+          "file_name": "animated.gif",
+          "status": "PASS",
+          "bytes": 149,
+          "sha256": "8bbc04113976f8188b8ce9603ba816bbd1af249cf304a6d14ab7ad1ad1d569e9",
+          "kind": "image",
+          "format": "GIF",
+          "width": 16,
+          "height": 12,
+          "frames_decoded": 2,
+          "modes": [
+            "P",
+            "RGB"
+          ],
+          "verify_passed": true,
+          "full_decode_passed": true,
+          "elapsed_seconds": 0.016
+        },
+        {
+          "file_name": "short.mp4",
+          "status": "PASS",
+          "bytes": 2255,
+          "sha256": "2204b73b1052e6d9c75c17801c92d7273f999d39424c5384e385eeb3cb5c88a3",
+          "kind": "video",
+          "container_format": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration_seconds": 1.0,
+          "video_streams": [
+            {
+              "index": 0,
+              "codec_name": "h264",
+              "width": 32,
+              "height": 24,
+              "pix_fmt": "yuv420p",
+              "avg_frame_rate": "5/1",
+              "duration": "1.000000"
+            }
+          ],
+          "frames_decoded": 5,
+          "full_decode_passed": true,
+          "decoded_audio_streams": 0,
+          "decoder_versions": {
+            "ffprobe": "ffprobe version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+            "ffmpeg": "ffmpeg version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+          },
+          "elapsed_seconds": 0.641
+        },
+        {
+          "file_name": "still.png",
+          "status": "PASS",
+          "bytes": 109,
+          "sha256": "c4eab82f15ff926ec102eeaf8c1168269987a12f2c2abae35edd484f4713beef",
+          "kind": "image",
+          "format": "PNG",
+          "width": 32,
+          "height": 24,
+          "frames_decoded": 1,
+          "modes": [
+            "RGB"
+          ],
+          "verify_passed": true,
+          "full_decode_passed": true,
+          "elapsed_seconds": 0.015
+        }
+      ],
+      "pillow_version": "13.0.0"
+    }
+  },
+  "negative_directory": {
+    "expectation": "both truncated fixtures must be rejected; the decoder returns FAIL/exit 1 by design",
+    "expected_status": "FAIL",
+    "actual_status": "FAIL",
+    "validation_status": "PASS",
+    "report": {
+      "status": "FAIL",
+      "scope": "full local media decoding only; input provenance not asserted",
+      "files_checked": 2,
+      "directory_files_ignored": 0,
+      "results": [
+        {
+          "file_name": "truncated.mp4",
+          "status": "FAIL",
+          "bytes": 2215,
+          "sha256": "c8d216ed606967e3732782f93e0bb2ad0d4ff78ac4dcd1085c3383ad171ce750",
+          "kind": "video",
+          "error": "ffmpeg_full_decode rejected the input",
+          "stage": "ffmpeg_full_decode",
+          "exit_code": 3199971767,
+          "diagnostic_sha256": "74ef410cc4b609908d5b367018d85be841d0bde62ce52a81a40cb953ede3ff17",
+          "elapsed_seconds": 0.516
+        },
+        {
+          "file_name": "truncated.png",
+          "status": "FAIL",
+          "bytes": 28,
+          "sha256": "3baff57f7c6fcc1e739af72a3cbbd06049cd6d43d2169ec321e10148d8a7972b",
+          "kind": "image",
+          "error": "Pillow could not verify and fully decode the image",
+          "stage": "image_decode",
+          "exit_code": null,
+          "diagnostic_sha256": "1cf1dc58b9372f2ef2db9a4790bb94e5b992286e26a4ae985b7f2512ec0d8793",
+          "elapsed_seconds": 0.031
+        }
+      ],
+      "pillow_version": "13.0.0"
+    }
+  },
+  "single_video_entry": {
+    "expectation": "one explicit video-file input fully decodes",
+    "expected_status": "PASS",
+    "actual_status": "PASS",
+    "validation_status": "PASS",
+    "report": {
+      "status": "PASS",
+      "scope": "full local media decoding only; input provenance not asserted",
+      "files_checked": 1,
+      "directory_files_ignored": 0,
+      "results": [
+        {
+          "file_name": "short.mp4",
+          "status": "PASS",
+          "bytes": 2255,
+          "sha256": "2204b73b1052e6d9c75c17801c92d7273f999d39424c5384e385eeb3cb5c88a3",
+          "kind": "video",
+          "container_format": "mov,mp4,m4a,3gp,3g2,mj2",
+          "duration_seconds": 1.0,
+          "video_streams": [
+            {
+              "index": 0,
+              "codec_name": "h264",
+              "width": 32,
+              "height": 24,
+              "pix_fmt": "yuv420p",
+              "avg_frame_rate": "5/1",
+              "duration": "1.000000"
+            }
+          ],
+          "frames_decoded": 5,
+          "full_decode_passed": true,
+          "decoded_audio_streams": 0,
+          "decoder_versions": {
+            "ffprobe": "ffprobe version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers",
+            "ffmpeg": "ffmpeg version 9.0.2-essentials_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+          },
+          "elapsed_seconds": 0.296
+        }
+      ],
+      "pillow_version": "13.0.0"
+    }
+  },
+  "summary": {
+    "positive_files_passed": 3,
+    "expected_negative_rejections": 2,
+    "single_video_entry_passed": 1,
+    "new_tests_run_for_this_report": 0
+  },
+  "privacy": "Reports include only fixture basenames, metadata and hashes. No credentials, signed URLs, private absolute paths or media bytes are included.",
+  "note": "This report packages previously executed checks without rerunning them. Decoder FAIL on the two corrupted fixtures is the expected successful negative-test outcome."
+}
