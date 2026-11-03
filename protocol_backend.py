@@ -185,6 +185,8 @@ def _default_transport(settings, cookies, on_cookies):
                         await conn.close()
                     raise
                 except Exception:
+                    if conn is not None:
+                        await conn.close()
                     if attempt:
                         raise
                     session = await self.bootstrap(force=True)

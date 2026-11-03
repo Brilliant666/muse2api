@@ -306,21 +306,54 @@ class Store:
             _write(self.protocol_operations_file, self.protocol_operations)
             return copy.deepcopy(item)
 
+    def _sync_protocol_quarantine(self, account_id=None):
+        """Reconcile account hints from operation truth while holding _LOCK."""
+        pending = {}
+        for operation in self.protocol_operations.values():
+            if operation.get("state") in {"unknown", "recovering"}:
+                pending.setdefault(operation["account_id"], []).append(operation["id"])
+        changed = False
+        for account in self.accounts:
+            if account_id is not None and account["id"] != account_id:
+                continue
+            previous = account.get("protocol_blocked")
+            candidates = pending.get(account["id"], [])
+            if candidates:
+                blocker = previous if previous in candidates else candidates[0]
+                if previous != blocker:
+                    account["protocol_blocked"] = blocker
+                    changed = True
+            elif previous:
+                operation = self.protocol_operations.get(previous)
+                # A missing/corrupt operation cannot prove that it is safe to release.
+                if (operation is not None and operation.get("account_id") == account["id"]
+                        and operation.get("state") in {"completed", "failed", "delivery_failed"}):
+                    account.pop("protocol_blocked", None)
+                    changed = True
+        if changed:
+            _write(self.cfg.accounts_file, self.accounts)
+
     def update_protocol_operation(self, request_id, **changes):
         with _LOCK:
-            item = self.protocol_operations.get(request_id)
-            if item is None:
+            previous = self.protocol_operations.get(request_id)
+            if previous is None:
                 return None
+            item = copy.deepcopy(previous)
             item.update(copy.deepcopy(changes), updated_at=int(time.time()))
-            account = next((a for a in self.accounts if a["id"] == item["account_id"]), None)
-            if account is not None:
-                if item.get("state") == "unknown":
-                    account["protocol_blocked"] = request_id
-                elif item.get("state") in {"completed", "failed", "delivery_failed"}:
-                    if account.get("protocol_blocked") == request_id:
-                        account.pop("protocol_blocked", None)
-                _write(self.cfg.accounts_file, self.accounts)
-            _write(self.protocol_operations_file, self.protocol_operations)
+            if item.get("state") in {"completed", "failed", "delivery_failed"}:
+                # Persist the known outcome before releasing its account. A crash
+                # between files leaves a conservative stale block, repaired at startup.
+                operations = dict(self.protocol_operations)
+                operations[request_id] = item
+                _write(self.protocol_operations_file, operations)
+                self.protocol_operations = operations
+                self._sync_protocol_quarantine(item["account_id"])
+            else:
+                # Unknown outcomes must fail closed even if the next operation
+                # write fails. Keep the account blocked before persisting uncertainty.
+                self.protocol_operations[request_id] = item
+                self._sync_protocol_quarantine(item["account_id"])
+                _write(self.protocol_operations_file, self.protocol_operations)
             return copy.deepcopy(item)
 
     def get_protocol_operation(self, request_id):
@@ -347,6 +380,9 @@ class Store:
                     self.update_protocol_operation(item["id"], state="unknown", delivery="unknown",
                                                    error="服务重启，原任务结果未确认；请查询恢复，勿重复生成")
                     changed.append(item["id"])
+            # Also repair interrupted two-file updates from older versions: an
+            # existing unknown needs a block; a durably terminal outcome may release it.
+            self._sync_protocol_quarantine()
             return changed
 
     def stats(self) -> dict:

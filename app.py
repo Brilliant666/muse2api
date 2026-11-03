@@ -464,7 +464,8 @@ def _renew_and_persist(acc_id: str, wake_vm: bool = True, force: bool = False) -
 
 
 def safe_chat_stream(cookies: dict, prompt: str, expires: dict | None,
-                     timeout: int, account_id: str | None, cancel_event=None):
+                     timeout: int, account_id: str | None, cancel_event=None,
+                     on_account=None):
     """Stream through a bounded, cancellation-aware bridge owned by one worker."""
     import queue
     q = queue.Queue(maxsize=100)
@@ -513,6 +514,8 @@ def safe_chat_stream(cookies: dict, prompt: str, expires: dict | None,
                 else:
                     selected = ACCOUNT_POOL.acquire(account_id=cur_id, timeout=remaining) if cur_id else ACCOUNT_POOL.acquire(timeout=remaining)
                     cur_id = leased_id = selected["id"]
+                if on_account is not None:
+                    on_account(selected)
                 try:
                     _bind_account_proxy(selected)
                     refreshed = _renew_and_persist(cur_id, wake_vm=True, force=bool(attempt)) or selected
@@ -1607,7 +1610,7 @@ async def chat_completions(req: ChatRequest, _=Depends(auth)):
     请求带 `tools` 时，会注入【工具调用协议】并把模型输出的 JSON 解析回
     `tool_calls`（muse.ai 没有原生 function calling，这层属于协议适配）。
 
-    对话与生图/生视频共用同一个浏览器实例，靠 `GEN_LOCK` 串行。
+    对话与媒体请求共用账号租约；同一账号互斥，总并发由 `GEN_LOCK` 限制。
     """
     prompt = build_chat_prompt(req.messages) or (req.prompt or "").strip()
     if not prompt:
@@ -1623,15 +1626,20 @@ async def chat_completions(req: ChatRequest, _=Depends(auth)):
 
     model = resolve_model(req.model, default="muse-spark")
     timeout = int(req.timeout or CFG.chat_timeout)
-    acc = store.pick_account(rotate=True, preferred_id=getattr(engine, "current_acc_id", None))
+    # Admission check only: choose the actual account atomically with its lease
+    # in the worker, so a busy LRU account cannot strand otherwise idle capacity.
+    acc = store.pick_account(record_use=False)
     if not acc:
         raise HTTPException(400, "没有可用账号，请先在管理页面导入 cookie")
 
     cid = "chatcmpl-" + uuid.uuid4().hex[:24]
     created = int(time.time())
-    acc_id = acc["id"]
-    cookies = acc["cookies"]
-    expires = acc.get("cookies_exp")
+    acc_id = None
+    cookies, expires = {}, None
+
+    def selected_account(account):
+        nonlocal acc_id
+        acc_id = account["id"]
 
     def tool_call_deltas(calls: list[dict]) -> list[list[dict]]:
         """按 OpenAI 习惯分两片发：先 id/name，再 arguments 全文。"""
@@ -1650,7 +1658,7 @@ async def chat_completions(req: ChatRequest, _=Depends(auth)):
                 # 握手建立瞬间立即发送 role: assistant 首包，让下游客户端秒级捕获光标
                 yield _sse(_chat_chunk(cid, created, model, {"role": "assistant"}))
 
-                stream_gen = safe_chat_stream(cookies, prompt, expires, timeout, account_id=acc_id, cancel_event=cancel_event)
+                stream_gen = safe_chat_stream(cookies, prompt, expires, timeout, account_id=None, cancel_event=cancel_event, on_account=selected_account)
                 if not tool_note:
                     for chunk in stream_gen:
                         for piece in _pace_text(chunk):
@@ -1696,12 +1704,14 @@ async def chat_completions(req: ChatRequest, _=Depends(auth)):
                                 "choices": [],
                                 "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}})
                 yield "data: [DONE]\n\n"
-                store.mark(acc_id, True, "")
+                if acc_id:
+                    store.mark(acc_id, True, "")
             except MuseAuthError as exc:
-                store.mark(acc_id, False, str(exc))
+                if acc_id:
+                    store.mark(acc_id, False, str(exc))
                 yield _sse({"error": {"message": str(exc), "type": "auth_error", "code": 401}})
             except MuseGenerationError as exc:
-                if not _mark_protocol_failure(acc_id, exc):
+                if acc_id and not _mark_protocol_failure(acc_id, exc):
                     store.mark(acc_id, True, f"助手超时: {str(exc)[:60]}")
                 try:
                     engine.reset_thread()
@@ -1716,7 +1726,7 @@ async def chat_completions(req: ChatRequest, _=Depends(auth)):
         return ManagedStreamingResponse(sync_stream(), cancel_event=cancel_event, media_type="text/event-stream", headers=_SSE_HEADERS)
 
     def run() -> str:
-        return "".join(safe_chat_stream(cookies, prompt, expires, timeout, account_id=acc_id))
+        return "".join(safe_chat_stream(cookies, prompt, expires, timeout, account_id=None, on_account=selected_account))
 
     try:
         text = await asyncio.to_thread(run)
@@ -1791,14 +1801,16 @@ async def responses_api(req: ResponsesRequest, _=Depends(auth)):
 
     model = resolve_model(req.model, default="muse-spark")
     timeout = int(req.timeout or CFG.chat_timeout)
-    acc = store.pick_account(rotate=True, preferred_id=getattr(engine, "current_acc_id", None))
+    # Admission check only: choose the actual account atomically with its lease
+    # in the worker, so a busy LRU account cannot strand otherwise idle capacity.
+    acc = store.pick_account(record_use=False)
     if not acc:
         raise HTTPException(400, "没有可用账号，请先在管理页面导入 cookie")
 
     rid = "resp_" + uuid.uuid4().hex[:24]
     mid = "msg_" + uuid.uuid4().hex[:24]
     created = int(time.time())
-    acc_id, cookies, expires = acc["id"], acc["cookies"], acc.get("cookies_exp")
+    acc_id, cookies, expires = None, {}, None
 
     def envelope(status: str, text: str = "") -> dict:
         done = status == "completed"
