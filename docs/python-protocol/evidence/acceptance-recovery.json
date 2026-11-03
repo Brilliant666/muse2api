@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-03",
+  "status": "PASS",
+  "evidence_level": "synthetic gateway boundary with real OS processes",
+  "tested_head": "52d5acd74ec54757fe228a4f3daed6099046739a",
+  "tested_tree_note": "New acceptance harness in working tree; business backend and Store unchanged from tested_head.",
+  "python": "3.12.16",
+  "protocol_source_commit": "6309f64b44ce133a2428fadf966a395d503ce84f",
+  "command": "MUSE_PROTOCOL_SOURCE=<verified-prepared-source> .venv/Scripts/python.exe tests/protocol/test_acceptance_recovery.py",
+  "tests_run": 3,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "elapsed_seconds": 5.077,
+  "source_sha256": {
+    "protocol_backend.py": "efe48b0c0df499ccd053e8d6f68a7740420281991cfd00680cf7edc08642158f",
+    "store.py": "9b4c55dc7cb34137c9d6f065085d76de9757e264fe1520f996d05ec8ac544a64",
+    "tests/protocol/test_acceptance_recovery.py": "a346ec780c78e8f08d525befe0c1cff79c3e079c5ff33908fd2acfd8612af278"
+  },
+  "cases": [
+    {
+      "id": "controlled-process-restart",
+      "status": "PASS",
+      "checks": [
+        "Actual backend Python interpreter killed after exactly one gateway generation ack",
+        "Fresh interpreter uses Store.recover_interrupted_protocol_operations",
+        "Original account_id/session_id/node_id/vm_id preserved",
+        "History-only recovery completes original text; total generation submissions=1",
+        "Unknown account quarantined before recovery and released after completion"
+      ]
+    },
+    {
+      "id": "controlled-vm-mismatch",
+      "status": "PASS",
+      "checks": [
+        "Actual interpreter killed after one ack",
+        "New interpreter receives a different VM identity",
+        "workspace_changed; operation stays unknown and account stays quarantined",
+        "No recovery history query and no new generation submission"
+      ]
+    },
+    {
+      "id": "controlled-delivery-restart",
+      "status": "PASS",
+      "checks": [
+        "One actual ChatService synthetic-peer generation; controlled media download interruption",
+        "Fresh interpreter recovers stored original media path with zero history or generation replays",
+        "Exactly one generation submission and two download attempts",
+        "Final media bytes and SHA-256 equal the deterministic original PNG; no .pending file remains"
+      ]
+    }
+  ],
+  "live_generation_counts": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "not_proven": [
+    "Real Muse authentication, generation or history behavior",
+    "Native curl or network I/O",
+    "Real Cookie rotation or VM sleep/wake",
+    "Browser fallback",
+    "Performance or production readiness"
+  ],
+  "harness_note": "Initial run had one false-negative assertion because Windows venv launcher PID differs from worker PID; harness now records/terminates the actual interpreter and uses worker IDs for evidence. Final rerun: 3/3 PASS. No application defect was reproduced."
+}

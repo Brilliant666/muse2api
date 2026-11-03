@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "containers": [
+    {
+      "name": "/muse2api-acceptance-20261103-protocol",
+      "running": false,
+      "exit_code": 0
+    },
+    {
+      "name": "/muse2api-acceptance-20261103-browser",
+      "running": false,
+      "exit_code": 0
+    },
+    {
+      "name": "/muse2api-acceptance-20261103-browser-init",
+      "running": false,
+      "exit_code": 143
+    }
+  ],
+  "shared_docker_restarted": false,
+  "init_application_shutdown_complete": true
+}

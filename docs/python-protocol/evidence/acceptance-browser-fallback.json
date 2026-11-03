@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "scope": "browser image startup and synthetic record persistence; no live account",
+  "backend": {
+    "backend": "browser",
+    "browser_controls": true,
+    "quota_supported": true
+  },
+  "task_preserved": true,
+  "media_bytes_preserved": true,
+  "fixture": {
+    "kind": "synthetic persistence fixture; not generated media",
+    "task_id": "task_58eafabe476144f4a14b",
+    "filename": "acceptance-synthetic-fixture.png",
+    "bytes": 68,
+    "sha256": "f42dae6748ea9588c7f18284afeeca93b69985974cd9ade0f652cfb9a1e2ba27",
+    "accounts": 0,
+    "generation_calls": 0
+  },
+  "chromium": "/usr/bin/chromium",
+  "chromium_version": "Chromium 156.0.8078.73 built on Debian GNU/Linux 12 (bookworm)",
+  "real_text_fallback": "BLOCKED: dedicated test account not supplied",
+  "account_credentials_migration": "NOT_RUN: empty account pool",
+  "service_key_preserved": true,
+  "protocol_container_stopped_first": true,
+  "same_isolated_volume": "muse2api-acceptance-20261103-data",
+  "image_id": "sha256:129a69891043e1a6f51d072baf080cfbd2dcd0a890bab138545514370fca46a6"
+}

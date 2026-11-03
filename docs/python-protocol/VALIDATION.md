@@ -1,5 +1,13 @@
 # 提交前验证记录
 
+本页下文保留初始提交 `52d5acd74ec54757fe228a4f3daed6099046739a` 之前的历史证据，不代表本轮验收状态。2026-11-03 的后续实测见 [acceptance-report.md](acceptance-report.md) 和 [acceptance-results.json](acceptance-results.json)。
+
+本轮最终配置测试 SHA：`b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08`。64 项 Python（原 61 + 跨进程恢复 3）、6 项 JS、原有 25 个 Python 脚本及 10 项管理页行为均通过；Windows 和 Linux Docker 内的原生 I/O 各 6 项通过。两种 Docker 镜像实际构建/启动通过，Chromium 孤儿进程回收缺陷已修复。真实 Muse 预算消耗为 0；所有实号接口、媒体完整解码与真实生命周期仍阻塞。
+
+Python 完整回归与镜像源版本是 `beed898fb088209051ca2bbaa4112f8bc92d0eed`；此后仅改 Compose 的 `init: true`，在最终 SHA 定向验证了实际 init、持久化记录、Chromium 清理。没有把历史测试改写为新版本全量实号通过。
+
+---
+
 日期：2026-11-03。范围是把已实现的 Python 集成迁入原仓库根布局、供后续 Codex 实号验收。**本记录不代表 native curl、Docker 实际构建或真实 Muse 已通过。**
 
 ## 来源与变更范围

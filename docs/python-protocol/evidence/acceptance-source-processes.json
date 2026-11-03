@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "scope": "Actual source-service process inspection; no active test account",
+  "observed_at": "2026-11-03T13:31:46.2101124+08:00",
+  "listener": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 18611,
+      "OwningProcess": 288608
+    }
+  ],
+  "processes": [
+    {
+      "ProcessId": 264336,
+      "ParentProcessId": 346812,
+      "Name": "python.exe",
+      "ExecutablePath": "C:\\Users\\brilliant\\Documents\\ChatGPT\\muse2api-protocol-acceptance\\.venv\\Scripts\\python.exe"
+    },
+    {
+      "ProcessId": 291776,
+      "ParentProcessId": 264336,
+      "Name": "conhost.exe",
+      "ExecutablePath": "C:\\Windows\\system32\\conhost.exe"
+    },
+    {
+      "ProcessId": 288608,
+      "ParentProcessId": 264336,
+      "Name": "python.exe",
+      "ExecutablePath": "C:\\Users\\brilliant\\AppData\\Local\\Temp\\muse2api-acceptance-20261103\\python\\cpython-3.12.16-windows-x86_64-none\\python.exe"
+    }
+  ],
+  "browser_descendants": 0,
+  "memory": [
+    {
+      "Id": 291776,
+      "WorkingSet64": 15171584,
+      "PrivateMemorySize64": 7057408
+    },
+    {
+      "Id": 264336,
+      "WorkingSet64": 4222976,
+      "PrivateMemorySize64": 839680
+    },
+    {
+      "Id": 288608,
+      "WorkingSet64": 58339328,
+      "PrivateMemorySize64": 48300032
+    }
+  ],
+  "workers": 1,
+  "active_account_connections_tested": false,
+  "docker_image_processes_tested": false
+}

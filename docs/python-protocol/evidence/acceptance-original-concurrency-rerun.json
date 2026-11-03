@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "timestamp_utc": "2026-11-03T05:28:29.067831+00:00",
+  "scope": "original regressions; synthetic peers and isolated headless browser; no Muse account",
+  "python": "3.12.16 (main, Oct 26 2026, 14:10:56) [MSC v.1944 64 bit (AMD64)]",
+  "chromium": "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+  "live_muse_tested": false,
+  "generation_calls_to_muse": 0,
+  "python_scripts": 1,
+  "results": [
+    {
+      "status": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "seconds": 0.968,
+      "stdout": "PASS: test_concurrency_lock\nPASS: test_account_pool_manager\nPASS: test_parallel_generation_simulation\nALL CONCURRENCY TESTS PASSED!\n",
+      "stderr": "",
+      "script": "tests/test_concurrency.py"
+    }
+  ]
+}

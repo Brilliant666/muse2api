@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "backend": "browser",
+  "accounts": 0,
+  "pid1": "docker-init",
+  "server_pids": [
+    7
+  ],
+  "task_preserved": true,
+  "media_preserved": true,
+  "scope": "Docker init runtime and synthetic persistence only",
+  "compose_init": true,
+  "actual_container_init": true,
+  "tested_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
+  "image_id": "sha256:129a69891043e1a6f51d072baf080cfbd2dcd0a890bab138545514370fca46a6",
+  "image_source_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed"
+}

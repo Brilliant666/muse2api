@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "level": "actual loopback uvicorn service; no Muse account",
+  "cases": [
+    {
+      "route": "/admin",
+      "authenticated": false,
+      "status_code": 200,
+      "status": "PASS"
+    },
+    {
+      "route": "/admin/backend",
+      "authenticated": false,
+      "status_code": 401,
+      "status": "PASS"
+    },
+    {
+      "route": "/admin/accounts",
+      "authenticated": false,
+      "status_code": 401,
+      "status": "PASS"
+    },
+    {
+      "route": "/v1/models",
+      "authenticated": false,
+      "status_code": 401,
+      "status": "PASS"
+    },
+    {
+      "route": "/admin/accounts",
+      "authenticated": true,
+      "status_code": 200,
+      "status": "PASS",
+      "accounts": 0
+    },
+    {
+      "route": "/v1/models",
+      "authenticated": true,
+      "status_code": 200,
+      "status": "PASS",
+      "model_aliases": [
+        "muse-spark",
+        "muse-image",
+        "muse-video"
+      ]
+    }
+  ],
+  "real_generation_calls": {
+    "text": 0,
+    "image": 0,
+    "video": 0
+  },
+  "configuration": {
+    "bind": "127.0.0.1:18611",
+    "concurrency": 1,
+    "workers": 1,
+    "backend": "protocol",
+    "isolated_data": true
+  },
+  "started_with_no_test_stubs": true
+}

@@ -1,0 +1,87 @@
+{
+  "status": "PASS",
+  "http_checks": [
+    {
+      "route": "/admin",
+      "authenticated": false,
+      "status_code": 200,
+      "status": "PASS"
+    },
+    {
+      "route": "/admin/backend",
+      "authenticated": false,
+      "status_code": 401,
+      "status": "PASS"
+    },
+    {
+      "route": "/admin/accounts",
+      "authenticated": false,
+      "status_code": 401,
+      "status": "PASS"
+    },
+    {
+      "route": "/v1/models",
+      "authenticated": false,
+      "status_code": 401,
+      "status": "PASS"
+    },
+    {
+      "route": "/admin/accounts",
+      "authenticated": true,
+      "status_code": 200,
+      "status": "PASS"
+    },
+    {
+      "route": "/v1/models",
+      "authenticated": true,
+      "status_code": 200,
+      "status": "PASS"
+    }
+  ],
+  "processes": [
+    {
+      "pid": 1,
+      "name": "python"
+    },
+    {
+      "pid": 26,
+      "name": "python"
+    }
+  ],
+  "pid1_command": [
+    "python",
+    "-m",
+    "uvicorn",
+    "app:app",
+    "--host",
+    "0.0.0.0",
+    "--port",
+    "18610",
+    "--workers",
+    "1",
+    ""
+  ],
+  "browser_processes": [],
+  "browser_binaries": {
+    "chromium": null,
+    "google-chrome": null
+  },
+  "concurrency": 1,
+  "versions": {
+    "curl_cffi": "0.17.0",
+    "cryptography": "50.0.2",
+    "muse2api-http": "0.2.0",
+    "fastapi": "0.162.0",
+    "uvicorn": "0.54.0"
+  },
+  "protocol_json_exists": true,
+  "idle_memory": [
+    "VmHWM:\t   61092 kB",
+    "VmRSS:\t   60628 kB"
+  ],
+  "image_id": "sha256:4d3cb26b0173fa37ed4f59148fe051e83c29e42a1e37dc8c1d3729531cd48649",
+  "image_source_revision": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
+  "container_name": "muse2api-acceptance-20261103-protocol",
+  "volume": "muse2api-acceptance-20261103-data",
+  "windows_published_port_status": "BLOCKED: Windows Docker Desktop forwarding refused connection; container loopback passed"
+}

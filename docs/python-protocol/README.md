@@ -2,6 +2,8 @@
 
 本分支保留原 muse2api 的 API、账号池、Store、管理页与媒体目录，通过同进程 Python 协议模块连接 Muse。浏览器后端仍可选择。本分支是供 Codex 接手真实验收的集成版本；已完成的离线检查和未执行的项目见 [VALIDATION.md](VALIDATION.md)。
 
+2026-11-03 接手验收已完成真实固定 Git 准备、干净安装、Windows/Linux 原生 curl I/O、两种 Docker 镜像构建/启动及受控恢复。没有提供专用测试账号，真实 Muse 案例均未发送。当前结论、实际测试 SHA 和环境限制见 [验收报告](acceptance-report.md)，续跑见 [RESUME.md](RESUME.md)。
+
 ## 从仓库开始
 
 应用继续位于仓库根目录，无需下载先前的交付 ZIP。Python 协议依赖来源于：
@@ -38,6 +40,8 @@ docker compose --env-file .env up --build -d
 ```
 
 构建会读取固定协议提交并安装修改后的包；构建环境需要能访问 GitHub 和依赖源。默认协议镜像不安装 Chromium。Compose 要求明确设置 `MUSE2API_KEY`，默认只绑定本机，运行单个 worker。
+
+Compose 使用 `init: true` 转发停止信号并回收 Chromium 的孤儿子进程。直接使用 `docker run` 时也要加 `--init`；本轮实际浏览器测试确认未启用时残留 8 个僵尸进程，启用后为 0。
 
 默认数据位于仓库 `data/`，容器内为 `/app/data`。源码运行时，`MUSE2API_HOME` 指定的是包含 `data/` 的根目录，并非直接指定 `data/` 自身。账号、任务、操作记录和协议运行时数据均不应提交 Git。
 
@@ -91,7 +95,7 @@ Store 是 Cookie 的唯一持久化来源。凭据版本比较避免旧连接回
 
 ## 已知限制
 
-- 真实 Muse、native curl 传输、实际 Docker 构建及性能数据需后续验收，见验证记录。
+- 真实 Muse、完整生成媒体解码及活跃账号性能数据仍待验收。原生 curl 的本机合成对端 I/O、实际 Docker 构建/容器内部 HTTP 已通过，不能据此判定真实账号可用；本机 Windows Docker Desktop 的发布端口转发仍阻塞，见验收报告。
 - 普通文本缺少明确 activity 状态时仍使用安静窗口推断，需用真实 history 验证结束判断。
 - 实时额度查询未实现，管理页明确显示不支持并保留已有缓存。
 - 原单仓库的一键覆盖更新已禁用，应用和协议补丁需配套更新。

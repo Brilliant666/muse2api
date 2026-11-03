@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-03",
+  "timezone": "Asia/Shanghai",
+  "repository": "Brilliant666/muse2api",
+  "branch": "codex/python-protocol-integration",
+  "pull_request": "https://github.com/Brilliant666/muse2api/pull/1",
+  "status": "BLOCKED",
+  "achieved_grade": 1,
+  "grade1_build_offline": "PASS",
+  "grade2_single_account_trial": "BLOCKED",
+  "grade3_production_replacement": "BLOCKED",
+  "start_sha": "52d5acd74ec54757fe228a4f3daed6099046739a",
+  "final_test_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
+  "final_test_tree": "d2b6925109de9095d6bfd389c8abaa6eb9728360",
+  "python_suite_and_image_source_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
+  "after_suite_change": {
+    "files": [
+      "docker-compose.yml"
+    ],
+    "scope": "init:true only; application, protocol patch and Python test blobs unchanged",
+    "targeted_test": "actual Chromium orphan count 8 -> 0"
+  },
+  "evidence_delivery_note": "Following report commit changes documentation/evidence only; final_test_sha is the final executable/configuration test version, not a self-referential report commit",
+  "budget": {
+    "limits": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "consumed": {
+      "text": 0,
+      "image": 0,
+      "video": 0
+    },
+    "remaining": {
+      "text": 6,
+      "image": 2,
+      "video": 1
+    },
+    "send_intents": 0,
+    "rule": "Persist the send intent and conservatively charge its budget before POST. Failures, timeouts and unknown outcomes count. An intent whose non-delivery cannot be proved must not be automatically retried; recover the original operation or leave it pending."
+  },
+  "checks": [
+    {
+      "id": "fixed_git_preparation",
+      "status": "PASS",
+      "evidence_level": "real Git",
+      "detail": "Pinned clone, verified archive/patch digests, two EOL regression cases",
+      "evidence": [
+        "evidence/acceptance-preparation.json",
+        "evidence/acceptance-original.json"
+      ]
+    },
+    {
+      "id": "clean_install",
+      "status": "PASS",
+      "evidence_level": "real native dependencies",
+      "detail": "Python 3.12.16 clean venv pip install; patched muse2api-http 0.2.0, curl_cffi 0.17.0, cryptography 50.0.2",
+      "evidence": [
+        "evidence/acceptance-dependencies.json"
+      ]
+    },
+    {
+      "id": "offline_protocol",
+      "status": "PASS",
+      "evidence_level": "synthetic peers + real application/framework",
+      "detail": "64 Python cases (61 baseline + 3 OS-process recovery), 6 JavaScript cases; no failures/skips",
+      "evidence": [
+        "evidence/acceptance-offline.json"
+      ]
+    },
+    {
+      "id": "original_regressions",
+      "status": "PASS",
+      "evidence_level": "synthetic peers + actual isolated Edge",
+      "detail": "25 Python scripts including 2 new preparer tests; original admin JS 10 behaviors; targeted concurrency rerun retained",
+      "evidence": [
+        "evidence/acceptance-original.json",
+        "evidence/acceptance-original-concurrency-rerun.json"
+      ]
+    },
+    {
+      "id": "native_transport",
+      "status": "PASS",
+      "evidence_level": "real curl HTTP/WebSocket to loopback peers",
+      "detail": "6 cases on Windows and 6 in Linux Docker; identity-cipher boundary means no real Noise/TLS authentication claim",
+      "evidence": [
+        "evidence/acceptance-native.json",
+        "evidence/acceptance-native-docker.json"
+      ]
+    },
+    {
+      "id": "docker_build_start",
+      "status": "PASS",
+      "evidence_level": "actual Docker Engine",
+      "detail": "Protocol and browser images built; source and container HTTP metadata/auth/models passed; no browser binary/process in default protocol image",
+      "evidence": [
+        "evidence/acceptance-docker-builds.json",
+        "evidence/acceptance-docker-runtime.json",
+        "evidence/acceptance-docker-metadata.json"
+      ]
+    },
+    {
+      "id": "controlled_restart_recovery",
+      "status": "PASS",
+      "evidence_level": "actual OS processes + synthetic gateway",
+      "detail": "Kill after one acknowledged submission; recover original account/session/node/VM; mismatched VM rejected; delivery_failed re-download only",
+      "evidence": [
+        "evidence/acceptance-recovery.json",
+        "evidence/acceptance-offline.json"
+      ]
+    },
+    {
+      "id": "browser_image_and_persistence",
+      "status": "PASS",
+      "evidence_level": "actual Chromium + synthetic persisted task/media",
+      "detail": "Browser image boots, same service key/volume, synthetic completed task and identical media bytes retained; actual DOM selection test passed",
+      "evidence": [
+        "evidence/acceptance-browser-fallback.json",
+        "evidence/acceptance-browser-chromium.json"
+      ]
+    },
+    {
+      "id": "chromium_orphan_reaping",
+      "status": "PASS",
+      "evidence_level": "actual Docker init and Chromium processes",
+      "detail": "Before fix 8 zombies reparented to PID 1; Compose init:true / --init targeted rerun leaves 0 Chromium or zombie processes",
+      "evidence": [
+        "evidence/acceptance-init-runtime.json",
+        "evidence/acceptance-init-cleanup.json"
+      ]
+    },
+    {
+      "id": "live_chat_responses",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "T1-T4 not sent; no dedicated test account",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "live_disconnect_restart",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "T5 not sent; controlled recovery does not prove real Muse recovery",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "live_browser_fallback",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "T6 not sent; no valid Muse session",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "live_images_edits_video_decode",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "I1/I2/V1 not sent; no real media exists for full decode",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "real_cookie_rotation",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "No test account; NOT_OBSERVED; synthetic cookie persistence passed separately",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "real_vm_wakeup",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "No sleeping real VM observed; NOT_OBSERVED; synthetic wake passed separately",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "live_multi_account_proxy",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "No second test account or designated proxy; controlled isolation tests passed",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "active_account_resource_metrics",
+      "status": "BLOCKED",
+      "evidence_level": "real Muse",
+      "detail": "No active account; idle source/container memory only, no performance improvement claim",
+      "evidence": [
+        "evidence/acceptance-cases.json"
+      ]
+    },
+    {
+      "id": "windows_docker_published_port",
+      "status": "BLOCKED",
+      "evidence_level": "actual Windows -> Docker published port",
+      "detail": "127.0.0.1:18612 refused connection although container loopback passed; Windows Desktop endpoint/forwarding is unhealthy",
+      "evidence": [
+        "evidence/acceptance-docker-runtime.json"
+      ]
+    }
+  ],
+  "production_changed": false,
+  "merged": false,
+  "runtime_cleanup": {
+    "source_service_stopped": true,
+    "containers_stopped": [
+      "muse2api-acceptance-20261103-protocol",
+      "muse2api-acceptance-20261103-browser",
+      "muse2api-acceptance-20261103-browser-init"
+    ],
+    "images_and_isolated_synthetic_volume_retained": true,
+    "shared_docker_restarted": false
+  },
+  "minimum_user_input": "Explicit private local configuration path or isolated UI import for one dedicated valid Muse test account; do not paste Cookies/PAT into chat"
+}

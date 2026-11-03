@@ -1,0 +1,105 @@
+{
+  "protocol": {
+    "command": [
+      "wsl.exe",
+      "-d",
+      "docker-desktop",
+      "-u",
+      "root",
+      "--",
+      "/tmp/docker-desktop-root/mnt/host/c/Users/brilliant/AppData/Local/Temp/muse2api-acceptance-20261103/docker-linux/docker",
+      "--host",
+      "unix:///proc/1480/root/var/run/docker.sock",
+      "build",
+      "--label",
+      "org.opencontainers.image.revision=beed898fb088209051ca2bbaa4112f8bc92d0eed",
+      "--tag",
+      "muse2api-acceptance:20261103-protocol",
+      "/tmp/docker-desktop-root/mnt/host/c/Users/brilliant/Documents/ChatGPT/muse2api-protocol-acceptance"
+    ],
+    "started_at": 1793684041.103991,
+    "tested_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
+    "status": "PASS",
+    "transport": "temporary official Linux CLI -> existing WSL daemon Unix socket; shared services not restarted",
+    "returncode": 0,
+    "finished_at": 1793684085.1030707,
+    "log_sha256": "216c4c8a589d61f2d3bafcbb42c862c8edd81a6f954dd5d25fa8298db8a1bf76",
+    "log_success_tail": [
+      "Removing intermediate container 72763b2c05f4",
+      " ---> 3c989bb8625e",
+      "Step 19/20 : CMD [\"python\", \"-m\", \"uvicorn\", \"app:app\", \"--host\", \"0.0.0.0\", \"--port\", \"18610\", \"--workers\", \"1\"]",
+      " ---> Running in 021ab01588e9",
+      "Removing intermediate container 021ab01588e9",
+      " ---> 615ac832620d",
+      "Step 20/20 : LABEL org.opencontainers.image.revision=beed898fb088209051ca2bbaa4112f8bc92d0eed",
+      " ---> Running in 7c6a1bb6d489",
+      "Removing intermediate container 7c6a1bb6d489",
+      " ---> 4d3cb26b0173",
+      "Successfully built 4d3cb26b0173",
+      "Successfully tagged muse2api-acceptance:20261103-protocol"
+    ]
+  },
+  "browser": {
+    "command": [
+      "wsl.exe",
+      "-d",
+      "docker-desktop",
+      "-u",
+      "root",
+      "--",
+      "/tmp/docker-desktop-root/mnt/host/c/Users/brilliant/AppData/Local/Temp/muse2api-acceptance-20261103/docker-linux/docker",
+      "--host",
+      "unix:///proc/1480/root/var/run/docker.sock",
+      "build",
+      "--build-arg",
+      "INCLUDE_BROWSER=1",
+      "--label",
+      "org.opencontainers.image.revision=beed898fb088209051ca2bbaa4112f8bc92d0eed",
+      "--tag",
+      "muse2api-acceptance:20261103-browser",
+      "/tmp/docker-desktop-root/mnt/host/c/Users/brilliant/Documents/ChatGPT/muse2api-protocol-acceptance"
+    ],
+    "started_at": 1793684308.8098905,
+    "tested_sha": "beed898fb088209051ca2bbaa4112f8bc92d0eed",
+    "status": "PASS",
+    "returncode": 0,
+    "finished_at": 1793684386.0873237,
+    "log_sha256": "7556e28c65484f392fdba649044d50b53dfbd9695984c27c5f74daac68d193bd",
+    "log_success_tail": [
+      "Removing intermediate container 8e7ce0dc2cf1",
+      " ---> dd924deb38d8",
+      "Step 19/20 : CMD [\"python\", \"-m\", \"uvicorn\", \"app:app\", \"--host\", \"0.0.0.0\", \"--port\", \"18610\", \"--workers\", \"1\"]",
+      " ---> Running in c9dc11289c89",
+      "Removing intermediate container c9dc11289c89",
+      " ---> 0b51f01741d3",
+      "Step 20/20 : LABEL org.opencontainers.image.revision=beed898fb088209051ca2bbaa4112f8bc92d0eed",
+      " ---> Running in 0c98bbfb4592",
+      "Removing intermediate container 0c98bbfb4592",
+      " ---> 129a69891043",
+      "Successfully built 129a69891043",
+      "Successfully tagged muse2api-acceptance:20261103-browser"
+    ]
+  },
+  "initial_windows_cli_attempt": {
+    "command": [
+      "docker",
+      "build",
+      "--tag",
+      "muse2api-acceptance:20261103-protocol",
+      "."
+    ],
+    "started_at": 1793683501.6082213,
+    "status": "BLOCKED",
+    "reason": "Docker engine did not respond; build timed out",
+    "timeout_seconds": 60,
+    "finished_at": 1793683561.6465802
+  },
+  "daemon": {
+    "version": "24.0.5",
+    "api": "1.43",
+    "access": "official temporary Linux CLI via existing WSL daemon socket",
+    "restarted_shared_services": false,
+    "cli_source": "https://download.docker.com/linux/static/stable/x86_64/docker-24.0.5.tgz",
+    "cli_archive_sha256": "0a5f3157ce25532c5c1261a97acf3b25065cfe25940ef491fa01d5bea18ddc86"
+  }
+}

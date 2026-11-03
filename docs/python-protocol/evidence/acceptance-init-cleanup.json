@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "tested_sha": "b9228ccf3fce45a25b72b0d17bb5e77b4e1ede08",
+  "scope": "same real Chromium DOM fixture with Docker init reaping enabled",
+  "command": [
+    "wsl.exe",
+    "-d",
+    "docker-desktop",
+    "-u",
+    "root",
+    "--",
+    "/tmp/docker-desktop-root/mnt/host/c/Users/brilliant/AppData/Local/Temp/muse2api-acceptance-20261103/docker-linux/docker",
+    "--host",
+    "unix:///proc/1480/root/var/run/docker.sock",
+    "exec",
+    "--env",
+    "PYTHONPATH=/app",
+    "muse2api-acceptance-20261103-browser-init",
+    "python",
+    "/tmp/test_media_selection.py",
+    "/app/engine.py"
+  ],
+  "returncode": 0,
+  "stdout": "{\"extract_b64\": \"c2VsZWN0ZWQ=\", \"fallback_video_rejected\": true, \"global_download_clicked\": false, \"invalid_reference_rejected\": true, \"multi_reference_uploaded\": 2, \"outside_remove_ignored\": 1, \"result_sources\": [\"data:image/png;base64,b3V0cHV0\"], \"stale_selected\": \"new-image\", \"tid_video_cover_rejected\": true, \"upload_only_accepted\": false, \"video_selected\": \"clip.mp4\"}\nPASS: input preview excluded; exact selected bytes; all old sources ignored; video retained; crossmodal fallback rejected; tid-video cover rejected; scoped download; multi-reference upload; upload failure closed\n",
+  "stderr": "",
+  "elapsed_seconds": 7.656,
+  "remaining_chromium_processes": [],
+  "zombie_count": 0,
+  "pre_fix_zombie_count": 8,
+  "live_generation_calls": 0
+}
