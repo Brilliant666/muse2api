@@ -10,6 +10,7 @@ import asyncio
 import base64
 import concurrent.futures
 import copy
+import functools
 import hashlib
 import mimetypes
 import os
@@ -18,6 +19,7 @@ import struct
 import threading
 import time
 import uuid
+import weakref
 from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass, is_dataclass
 from email.utils import parsedate_to_datetime
@@ -32,12 +34,14 @@ from engine import MuseAuthError, MuseEngine, MuseGenerationError
 class BackendOperationError(MuseGenerationError):
     def __init__(self, message, *, code="protocol_error", phase="prepare",
                  delivery="not_sent", retryable=False, request_id=None,
-                 session_id=None, message_id=None, account_id=None):
+                 session_id=None, message_id=None, account_id=None, upstream_status=None):
         super().__init__(message)
         self.code, self.phase, self.delivery = code, phase, delivery
         self.retryable = bool(retryable and delivery == "not_sent")
         self.request_id, self.session_id = request_id, session_id
         self.message_id, self.account_id = message_id, account_id
+        self.upstream_status = (upstream_status if type(upstream_status) is int
+                                and 400 <= upstream_status <= 599 else None)
 
     @property
     def task_status(self):
@@ -46,8 +50,70 @@ class BackendOperationError(MuseGenerationError):
         return "unknown" if self.delivery in {"unknown", "accepted"} else "failed"
 
     def public(self):
-        return {key: getattr(self, key) for key in
-                ("code", "phase", "delivery", "retryable", "request_id", "session_id", "message_id", "account_id")}
+        result = {key: getattr(self, key) for key in
+                  ("code", "phase", "delivery", "retryable", "request_id", "session_id", "message_id", "account_id")}
+        if self.upstream_status is not None:
+            result["upstream_status"] = self.upstream_status
+        return result
+
+
+def _observed_upstream_status(exc):
+    """Preserve typed HTTP status through SDK exception causes; never parse bodies."""
+    seen = set()
+    for _ in range(8):
+        if exc is None or id(exc) in seen:
+            break
+        seen.add(id(exc))
+        for name in ("upstream_status", "status"):
+            value = getattr(exc, name, None)
+            if type(value) is int and 400 <= value <= 599:
+                return value
+        exc = exc.__cause__
+    return None
+
+
+def _guard_rate_limited_connection(conn):
+    """Do not let optional SDK catches hide an explicit 429 in this operation.
+
+    Only this adapter-owned instance is wrapped. Task-local memory prevents an
+    optional registration catch from continuing to submit; it does not poison
+    the connection for a later, explicitly initiated recovery task.
+    """
+    if getattr(conn, "_muse2api_rate_limit_guard", False):
+        return conn
+    limited_tasks = weakref.WeakKeyDictionary()
+
+    def rejection(args, kwargs):
+        path = args[1] if len(args) > 1 else kwargs.get("path", "")
+        params = args[2] if len(args) > 2 else kwargs.get("params")
+        session_id = params.get("session_id") if isinstance(params, dict) else None
+        return BackendOperationError("上游明确限流 (HTTP 429)；停止本操作，勿重复生成",
+            code="upstream_rate_limited", phase="history" if "history" in str(path) else "submit",
+            delivery="unknown", retryable=False, upstream_status=429,
+            session_id=session_id if isinstance(session_id, str) else None)
+
+    def wrap(original):
+        @functools.wraps(original)
+        async def guarded(*args, **kwargs):
+            task = asyncio.current_task()
+            if task is not None and task in limited_tasks:
+                raise rejection(args, kwargs)
+            try:
+                return await original(*args, **kwargs)
+            except Exception as exc:
+                if _observed_upstream_status(exc) != 429:
+                    raise
+                if task is not None:
+                    limited_tasks[task] = True
+                raise rejection(args, kwargs) from exc
+        return guarded
+
+    for name in ("request", "ack"):
+        original = getattr(conn, name, None)
+        if callable(original):
+            setattr(conn, name, wrap(original))
+    conn._muse2api_rate_limit_guard = True
+    return conn
 
 
 # Retained alias for small external validation harnesses.
@@ -179,7 +245,7 @@ def _default_transport(settings, cookies, on_cookies):
                         user_agent=self.settings.user_agent, proxy=self.proxy,
                         ws_fallback=self.settings.ws_fallback)
                     self._merge_cookies()
-                    return session, conn
+                    return session, _guard_rate_limited_connection(conn)
                 except BackendOperationError:
                     if conn is not None:
                         await conn.close()
@@ -371,17 +437,22 @@ class ProtocolBackend:
             known_delivery = getattr(exc, "delivery", None)
             delivery = known_delivery or (op or {}).get("delivery", "not_sent")
             code = getattr(exc, "code", "protocol_error")
+            upstream_status = _observed_upstream_status(exc)
             if isinstance(exc, (TimeoutError, concurrent.futures.TimeoutError)):
                 code = "operation_timeout"
             if isinstance(exc, (asyncio.CancelledError, concurrent.futures.CancelledError)):
                 code = "operation_cancelled"
             if type(exc).__name__ == "MuseAuthError":
                 code = "session_unauthorized" if "HTTP 401" in str(exc) else "upstream_access_denied"
+            if upstream_status in {401, 403, 429}:
+                code = {401: "session_unauthorized", 403: "upstream_access_denied",
+                        429: "upstream_rate_limited"}[upstream_status]
             err = BackendOperationError(
                 "协议操作未完成 (" + code + ")；" + ("请查询原任务结果，勿重复提交" if delivery != "not_sent" else "尚未确认提交"),
                 code=code, phase=getattr(exc, "phase", (op or {}).get("phase", "prepare")),
                 delivery=delivery, retryable=getattr(exc, "retryable", False),
-                session_id=getattr(exc, "session_id", None), message_id=getattr(exc, "message_id", None))
+                session_id=getattr(exc, "session_id", None), message_id=getattr(exc, "message_id", None),
+                upstream_status=upstream_status)
         if op:
             err.request_id, err.account_id = op["id"], op["account_id"]
             err.session_id = err.session_id or op.get("session_id")
@@ -394,7 +465,8 @@ class ProtocolBackend:
             err.code, err.delivery = "media_delivery_failed", "completed"
         self.store.update_protocol_operation(op["id"], state=err.task_status, error=str(err),
             code=err.code, phase=err.phase, delivery=err.delivery,
-            session_id=err.session_id, message_id=err.message_id)
+            session_id=err.session_id, message_id=err.message_id,
+            upstream_status=err.upstream_status)
         return err
 
     def _call(self, coro, timeout, op=None):
@@ -617,8 +689,11 @@ class ProtocolBackend:
         except BaseException as exc:
             if isinstance(exc, (KeyboardInterrupt, SystemExit)):
                 raise
-            raise BackendOperationError("生成已完成，但媒体交付失败；可重试下载，勿重复生成",
-                code="media_delivery_failed", phase="download", delivery="completed") from None
+            upstream_status = _observed_upstream_status(exc)
+            detail = f"；上游状态 HTTP {upstream_status}" if upstream_status is not None else ""
+            raise BackendOperationError("生成已完成，但媒体交付失败；可重试下载，勿重复生成" + detail,
+                code="media_delivery_failed", phase="download", delivery="completed",
+                upstream_status=upstream_status) from None
         finally:
             temporary.unlink(missing_ok=True)
 
