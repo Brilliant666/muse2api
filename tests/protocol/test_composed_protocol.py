@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -110,7 +111,15 @@ class ComposedProtocolTests(unittest.TestCase):
         original_connect = socket.socket.connect
         def offline_connect(sock, address):
             if sock.family in {socket.AF_INET, socket.AF_INET6}:
-                raise AssertionError("external network is forbidden in composed tests")
+                # Windows asyncio implements socketpair with a loopback TCP
+                # connection. Permit that local plumbing while retaining the
+                # external-network guard on the composed tests.
+                try:
+                    local = ipaddress.ip_address(address[0]).is_loopback
+                except ValueError:
+                    local = False
+                if not local:
+                    raise AssertionError("external network is forbidden in composed tests")
             return original_connect(sock, address)
         self.network = mock.patch.object(socket.socket, "connect", offline_connect)
         self.network.start()

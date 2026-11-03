@@ -26,11 +26,12 @@ sys.path.insert(0, str(TESTS))
 from _paths import validate_protocol_source
 
 REQUIRED_IMPORTS = (
-    "fastapi", "starlette", "anyio", "sniffio", "pydantic", "python_multipart",
+    "fastapi", "starlette", "anyio", "pydantic", "python_multipart",
     "requests", "urllib3", "websocket", "websockets", "cryptography",
 )
 EXPECTED_PYTHON = {"test_protocol_regressions": 28, "test_adapter_integration": 8,
-                   "test_app_contract": 23, "test_composed_protocol": 2}
+                   "test_app_contract": 23, "test_composed_protocol": 2,
+                   "test_acceptance_recovery": 3}
 EXPECTED_JS = 6
 CHILD = r'''
 import importlib, json, sys, unittest

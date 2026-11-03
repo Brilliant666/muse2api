@@ -112,6 +112,9 @@ def run_git(arguments, *, cwd=None, isolated_apply=False):
     environment = git_environment()
     if isolated_apply:
         environment["GIT_CEILING_DIRECTORIES"] = str(Path(cwd).resolve().parent)
+        # Applying outside a repository still reads global Git EOL settings.
+        # The verified output must not depend on the caller's checkout policy.
+        arguments = ["-c", "core.autocrlf=false", "-c", "core.eol=lf", *arguments]
     result = subprocess.run(["git", *arguments], cwd=cwd, env=environment,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     if result.returncode:
@@ -129,7 +132,12 @@ def archive_fixed(checkout, commit, destination):
                        cwd=checkout).decode("ascii").strip()
     if resolved != commit:
         raise PreparationError("source commit did not resolve to the fixed baseline")
-    archive = run_git(["archive", "--format=tar", commit], cwd=checkout)
+    # git archive applies working-tree EOL conversion too. In particular,
+    # Windows' core.autocrlf=true changes LF-only blobs before the raw digest
+    # check. Keep committed LF and CRLF bytes intact; only the manifest's
+    # explicit normalize_lf step may change them after verification.
+    archive = run_git(["-c", "core.autocrlf=false", "-c", "core.eol=lf",
+                       "archive", "--format=tar", commit], cwd=checkout)
     if len(archive) > MAX_ARCHIVE_BYTES:
         raise PreparationError("Git archive exceeds the preparation size limit")
     if destination.is_symlink():

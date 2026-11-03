@@ -119,6 +119,7 @@ def test_parallel_generation_simulation():
 
     try:
         with patch("store._write", lambda *a, **k: None), \
+             patch.object(app, "GEN_LOCK", app.ConcurrencyLock(limit=2)), \
              patch.object(app.store, "mark", lambda *a, **k: None), \
              patch.object(app.engine, "start", return_value=None), \
              patch.object(app.engine, "generate", side_effect=fake_generate), \
