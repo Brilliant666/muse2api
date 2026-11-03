@@ -20,11 +20,11 @@
   "patches": [
     {
       "path": "integration.patch",
-      "sha256": "2b31dc50b730b0870ab6e7099d7718e8ac43eebf6c61a9ed39eba6d63c7ebcf9"
+      "sha256": "3b018f15a0f61411cddb70eab35da211e5aa427367a8363b4f5cd0856f8dca5b"
     }
   ],
   "output_files": {
-    "muse2api/chat.py": "6f842758d497460f7e006ff3b996b30fa1cd0874749d0cb4f4c7698ac7a298d0",
+    "muse2api/chat.py": "3abb7f1d636e5022781d64c0ff637e8bc628b188b85ebd3a80b84649568a383c",
     "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
     "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
     "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",

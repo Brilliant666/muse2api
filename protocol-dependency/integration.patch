@@ -1,8 +1,8 @@
 diff --git a/muse2api/chat.py b/muse2api/chat.py
-index 686ddbb..203be5f 100644
+index 686ddbb..d445ca8 100644
 --- a/muse2api/chat.py
 +++ b/muse2api/chat.py
-@@ -26,7 +26,12 @@ from typing import Any
+@@ -26,7 +26,12 @@
  from .approvals import POLICIES as APPROVAL_POLICIES
  from .approvals import handle_pending
  from .config import Settings
@@ -16,7 +16,7 @@ index 686ddbb..203be5f 100644
  from .media import MediaRef, extract_media
  from .pool import AccountPool
  from .protocol import ProtocolConfig
-@@ -44,6 +49,7 @@ DEFAULT_SESSION_KEY = "default"
+@@ -44,6 +49,7 @@
  # The upstream history can pause between assistant deltas; require a quiet
  # window before declaring a reply complete, otherwise long turns truncate.
  TEXT_SETTLE_SECONDS = 2.0
@@ -24,7 +24,7 @@ index 686ddbb..203be5f 100644
  
  # Markers indicating upstream refused or failed to invoke media tools,
  # allowing early return without waiting out the full media grace period.
-@@ -306,6 +312,58 @@ class ChatResult:
+@@ -306,6 +312,58 @@
      message_id: str
      events: list[dict] = field(default_factory=list)
      media: list[MediaRef] = field(default_factory=list)
@@ -83,7 +83,7 @@ index 686ddbb..203be5f 100644
  
  
  class ChatService:
-@@ -378,9 +436,10 @@ class ChatService:
+@@ -378,9 +436,10 @@
          timeout: float | None = None,
          items: list[dict] | None = None,
          refusal_markers: tuple[str, ...] | None = None,
@@ -95,7 +95,7 @@ index 686ddbb..203be5f 100644
          return await self._run_thread(
              prompt,
              state,
-@@ -404,50 +463,98 @@ class ChatService:
+@@ -404,50 +463,98 @@
          items: list[dict] | None = None,
          refusal_markers: tuple[str, ...] = (),
      ) -> ChatResult:
@@ -238,7 +238,7 @@ index 686ddbb..203be5f 100644
  
      async def _poll_thread_reply(
          self,
-@@ -463,7 +570,8 @@ class ChatService:
+@@ -463,7 +570,8 @@
      ) -> tuple[str, str, list[dict], list[MediaRef]]:
          deadline = time.monotonic() + timeout
          last_text: str | None = None
@@ -248,7 +248,7 @@ index 686ddbb..203be5f 100644
          best = ""
          best_id = ""
          started = time.monotonic()
-@@ -475,13 +583,30 @@ class ChatService:
+@@ -475,13 +583,30 @@
          text_stable_at: float | None = None
          next_approval_check = 0.0
  
@@ -281,7 +281,7 @@ index 686ddbb..203be5f 100644
              if handled:
                  log.info("answered %d permission prompt(s) for %s", handled, session_id)
              return handled > 0
-@@ -490,33 +615,44 @@ class ChatService:
+@@ -490,33 +615,44 @@
              polls += 1
              if self.approval_policy != "off" and time.monotonic() >= next_approval_check:
                  next_approval_check = time.monotonic() + 4.0
@@ -334,7 +334,7 @@ index 686ddbb..203be5f 100644
                  continue
  
              user_index = -1
-@@ -525,7 +661,7 @@ class ChatService:
+@@ -525,7 +661,7 @@
                      if event.get("message_id") == message_id:
                          user_index = index
                          break
@@ -343,7 +343,7 @@ index 686ddbb..203be5f 100644
                  needle = prompt.strip()
                  for index, event in enumerate(events):
                      name = str(event.get("event_name") or event.get("event") or "")
-@@ -535,11 +671,17 @@ class ChatService:
+@@ -535,11 +671,17 @@
                      if text and (text == needle or needle[:80] in text):
                          user_index = index
              if user_index < 0:
@@ -362,7 +362,7 @@ index 686ddbb..203be5f 100644
              current_text = ""
              current_id = ""
              for event in after:
-@@ -550,8 +692,6 @@ class ChatService:
+@@ -550,8 +692,6 @@
                  if event.get("reply_to_message_id") or payload.get("reply_to_message_id"):
                      continue
                  text = event_text(event)
@@ -371,7 +371,7 @@ index 686ddbb..203be5f 100644
                  current_text = text
                  raw_id = event.get("message_id") or payload.get("message_id")
                  current_id = raw_id if isinstance(raw_id, str) else current_id
-@@ -559,14 +699,18 @@ class ChatService:
+@@ -559,14 +699,18 @@
              if want_media:
                  media = extract_media(after)
  
@@ -395,22 +395,23 @@ index 686ddbb..203be5f 100644
                  if last_text == current_text:
                      if text_stable_at is None:
                          text_stable_at = time.monotonic()
-@@ -577,10 +721,11 @@ class ChatService:
+@@ -577,10 +721,12 @@
                  last_text = None
                  text_stable_at = None
  
 -            if (refusal_markers and not media and current_text
 +            terminal = not active and (turn_done or assistant_done)
-+            if (terminal and refusal_markers and not media and current_text
++            if (terminal and (not want_media or turn_done)
++                    and refusal_markers and not media and current_text
                      and any(marker in current_text.lower() for marker in refusal_markers)):
 -                # The upstream model already refused; do not wait out the
 -                # artifact grace period for a file that will never arrive.
-+                # Refusal words can occur in a progress message. Require a
-+                # terminal assistant/turn with no active tools first.
++                # Without media, a finished assistant/refusal may precede
++                # rendering. Require an explicit media-turn boundary first.
                  return best, best_id, captured, media
  
              if want_media:
-@@ -593,7 +738,7 @@ class ChatService:
+@@ -593,7 +739,7 @@
                          text_stable_at is not None
                          and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS
                      )
@@ -419,7 +420,7 @@ index 686ddbb..203be5f 100644
                          if await approval_hold():
                              text_stable_at = None
                              media_stable_at = None
-@@ -604,20 +749,14 @@ class ChatService:
+@@ -604,20 +750,15 @@
                      media_stable_at = time.monotonic()
                  else:
                      media_stable_at = None
@@ -434,8 +435,9 @@ index 686ddbb..203be5f 100644
 -                    settle_limit = 35.0 if is_searching else 15.0
 -                    if text_stable_at is not None and time.monotonic() - text_stable_at > settle_limit:
 -                        # Text settled and no artifact arrived; surface what we have promptly.
-+                    if terminal and (turn_done or (text_stable_at is not None
-+                            and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS)):
++                    # A message boundary and quiet text do not prove that
++                    # background rendering ended. Keep the original deadline.
++                    if terminal and turn_done:
                          return best, best_id, captured, media
 -            elif (text_stable_at is not None
 -                  and time.monotonic() - text_stable_at > TEXT_SETTLE_SECONDS):
@@ -447,14 +449,15 @@ index 686ddbb..203be5f 100644
                  if await approval_hold():
                      text_stable_at = None
                      last_text = None
-@@ -629,13 +768,32 @@ class ChatService:
+@@ -629,13 +770,32 @@
                  text_stable_at = None
  
              poll_interval = 0.35 if (current_text and text_stable_at is None) else 0.6
 -            await asyncio.sleep(max(0.2, poll_interval + random.uniform(-0.05, 0.15)))
-+            await pause(max(0.2, poll_interval + random.uniform(-0.05, 0.15)))
- 
+-
 -        return best, best_id, captured, media
++            await pause(max(0.2, poll_interval + random.uniform(-0.05, 0.15)))
++
 +        raise ProtocolOperationError("chat timed out before confirmed completion", code="timeout",
 +            phase="history", delivery=delivery, session_id=session_id, message_id=message_id)
  
@@ -482,7 +485,7 @@ index 686ddbb..203be5f 100644
          self,
          prompt: str,
          *,
-@@ -646,7 +804,8 @@ class ChatService:
+@@ -646,7 +806,8 @@
      ) -> ChatResult:
          async with self._connection() as (_account, _session, conn):
              client_id = str(uuid.uuid4())
@@ -492,7 +495,7 @@ index 686ddbb..203be5f 100644
  
              try:
                  await self._register_node(conn, client_id)
-@@ -668,7 +827,9 @@ class ChatService:
+@@ -668,7 +829,9 @@
                      except asyncio.CancelledError:
                          raise
                      except Exception as exc:  # noqa: BLE001
@@ -503,7 +506,7 @@ index 686ddbb..203be5f 100644
  
                  pump_task = asyncio.create_task(pump())
                  await asyncio.sleep(0.4)  # let the subscribe attach
-@@ -687,6 +848,7 @@ class ChatService:
+@@ -687,6 +850,7 @@
                  )
  
                  parts: list[str] = []
@@ -511,7 +514,7 @@ index 686ddbb..203be5f 100644
                  deadline = time.monotonic() + timeout
                  while True:
                      remaining = deadline - time.monotonic()
-@@ -696,6 +858,9 @@ class ChatService:
+@@ -696,6 +860,9 @@
                          event = await asyncio.wait_for(queue.get(), min(5.0, remaining))
                      except TimeoutError:
                          continue
@@ -521,7 +524,7 @@ index 686ddbb..203be5f 100644
                      if not isinstance(event, dict):
                          continue
                      ts = event.get("ts_ms")
-@@ -719,6 +884,7 @@ class ChatService:
+@@ -719,6 +886,7 @@
                                               parts.append(content["text"])
                                               if on_delta:
                                                   on_delta(content["text"])
@@ -529,7 +532,7 @@ index 686ddbb..203be5f 100644
                          break
                      elif name == "message.assistant":
                          if not parts:
-@@ -727,16 +893,24 @@ class ChatService:
+@@ -727,16 +895,24 @@
                                  parts.append(text)
                                  if on_delta:
                                      on_delta(text)
