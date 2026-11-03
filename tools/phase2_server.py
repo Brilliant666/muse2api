@@ -8,6 +8,9 @@ Example (separate Linux test data, no production credentials):
 Gateway counters distinguish call entry, local send/flush completion and unknown
 writes. They do not prove upstream acceptance. Any dropped metrics invalidate
 exact event counts. No sampler sends requests or owns an additional Store.
+SIGTERM/SIGINT request graceful shutdown (exit 0) while this wrapper owns their
+handlers; repeated SIGINT retains Uvicorn's force-exit behavior. Other signals
+are untouched. SIGKILL cannot guarantee a metrics completion record.
 """
 from __future__ import annotations
 
@@ -25,6 +28,7 @@ import logging
 import os
 from pathlib import Path
 import queue
+import signal
 import sys
 import threading
 import time
@@ -465,6 +469,7 @@ def main(argv=None):
     logging.disable(logging.CRITICAL)
     sink = MetricsSink(args.metrics, args.metric_capacity)
     instrumentation = sampler = None
+    previous_signal_handlers = {}
     try:
         application = importlib.import_module("app")  # exactly one application/Store
         store_module = importlib.import_module("store")
@@ -493,16 +498,27 @@ def main(argv=None):
             unknown_posts_must_be_reviewed=True)
         sampler = Sampler(instrumentation, args.sample_seconds, args.port)
         sampler.start()
-        uvicorn.Server(uvicorn.Config(application.app, host=args.host, port=args.port,
-            workers=1, access_log=False, log_config=None)).run()
+        server = uvicorn.Server(uvicorn.Config(application.app, host=args.host, port=args.port,
+            workers=1, access_log=False, log_config=None))
+        # Uvicorn replays captured signals after restoring its previous handlers.
+        # Let that replay call this same Server instead of SIG_DFL terminating
+        # the process before our sampler/writer finally blocks can run.
+        for handled_signal in (signal.SIGTERM, signal.SIGINT):
+            previous_signal_handlers[handled_signal] = signal.signal(handled_signal, server.handle_exit)
+        server.run()
     finally:
-        if sampler is not None:
-            sampler.close()
-        if instrumentation is not None:
-            instrumentation.emit("server_exit", hook_error_count=instrumentation.hook_errors)
-            instrumentation.restore()
-        counts = sink.close()
-        print(json.dumps({"phase2_metrics": counts}), file=sys.stderr)
+        try:
+            if sampler is not None:
+                sampler.close()
+            if instrumentation is not None:
+                instrumentation.emit("server_exit", hook_error_count=instrumentation.hook_errors)
+                instrumentation.restore()
+            counts = sink.close()
+            print(json.dumps({"phase2_metrics": counts}), file=sys.stderr)
+        finally:
+            # Restore the caller's signal policy only after bounded metric drain.
+            for handled_signal, previous in previous_signal_handlers.items():
+                signal.signal(handled_signal, previous)
     return 0
 
 

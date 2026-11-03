@@ -411,4 +411,44 @@ class Phase2SafetyTests(unittest.TestCase):
         self.assertEqual(self.state.summary('L1')['consumed']['text'],1)
 
 
+    def test_bound_operation_typed_429_classifies_http502_as_rate_limit(self):
+        self.state.begin('L1','hash')
+        class Service(IntegrityService):
+            def open(inner,path,body=None,headers=None):
+                response=super().open(path,body,headers)
+                if body is not None:
+                    response.close()
+                    operations=json.loads(inner.operations_file.read_text('utf8'))
+                    operations['op-original'].update(state='unknown',delivery='accepted',
+                        code='protocol_failed',error='safe upstream rejection',upstream_status=429)
+                    batch.common.atomic_json(inner.operations_file,operations)
+                    raise urllib.error.HTTPError('http://127.0.0.1/synthetic',502,'Bad Gateway',{},
+                        io.BytesIO(b'{"error":"gateway operation failed"}'))
+                return response
+        service=Service(self.root,'typed429'); args=self.args(); args.operations_file=service.operations_file
+        runner=batch.Runner(self.state,service,service.approved,args)
+        runner.execute(batch.plan('L1')[0],[],0)
+        row=self.state.load()['cases']['L1-001']
+        self.assertEqual(row['http_status'],502); self.assertTrue(row['operation_binding_verified'])
+        self.assertEqual(row['operation_upstream_status'],429)
+        self.assertEqual(row['operation_error_code'],'protocol_failed')
+        self.assertEqual(row['failure_class'],'RATE_LIMIT'); self.assertTrue(runner.stop.is_set())
+        self.assertNotIn('upstream_error',row,'operation error must not overwrite task error evidence')
+        runner.execute(batch.plan('L1')[1],[],0); self.assertEqual(service.posts,1)
+
+    def test_unclassified_http502_stops_first_without_inventing_429(self):
+        self.state.begin('L1','hash')
+        error=urllib.error.HTTPError('http://127.0.0.1/synthetic',502,'Bad Gateway',{},
+            io.BytesIO(b'{"error":"unclassified control-plane failure"}'))
+        client=NeverSend(error); runner=batch.Runner(self.state,client,{},self.args())
+        runner.execute(batch.plan('L1')[0],[],0)
+        row=self.state.load()['cases']['L1-001']
+        self.assertEqual(row['http_status'],502)
+        self.assertEqual(row['failure_class'],'UPSTREAM_OR_VALIDATION')
+        self.assertNotEqual(row['failure_class'],'RATE_LIMIT')
+        self.assertTrue(runner.stop.is_set())
+        runner.execute(batch.plan('L1')[1],[],0)
+        self.assertEqual(sum(post for _,post in client.calls),1)
+
+
 if __name__=='__main__': unittest.main(verbosity=2)

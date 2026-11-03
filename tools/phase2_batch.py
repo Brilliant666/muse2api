@@ -56,15 +56,19 @@ class SafetyError(BatchError):
 
 STOP_FAILURES={'RATE_LIMIT','QUOTA','ACCOUNT_BANNED','DATA_CORRUPTION','CROSS_ACCOUNT',
     'IDENTITY_CONFLICT','TEXT_MISMATCH','BINDING_AMBIGUOUS','BINDING_MISSING',
-    'OPERATION_NOT_COMPLETED','AUTH','ACCESS_DENIED','OUTCOME_UNKNOWN','DECODE_BLOCKED'}
+    'OPERATION_NOT_COMPLETED','AUTH','ACCESS_DENIED','OUTCOME_UNKNOWN','DECODE_BLOCKED','UPSTREAM_OR_VALIDATION'}
 IDENTITY_FAILURES={'CROSS_ACCOUNT','IDENTITY_CONFLICT','TEXT_MISMATCH','BINDING_AMBIGUOUS','BINDING_MISSING'}
 
 
 def classify_failure(exc,record,http_code,category):
     explicit=getattr(exc,'failure_class',None)
     if explicit in IDENTITY_FAILURES-{'BINDING_MISSING'}: return explicit
-    message=' '.join(str(v or '') for v in (record.get('upstream_error'),
-        record.get('upstream_error_code'),str(exc))).lower()
+    verified=record.get('operation_binding_verified') is True
+    operation_status=record.get('operation_upstream_status') if verified else None
+    if type(operation_status) is int and operation_status==429: return 'RATE_LIMIT'
+    message=' '.join(str(v or '') for v in (record.get('upstream_error'),record.get('upstream_error_code'),
+        record.get('operation_error') if verified else None,
+        record.get('operation_error_code') if verified else None,str(exc))).lower()
     if http_code==429 or re.search(r'\b429\b',message) or any(t in message for t in ('rate limit','rate_limit','too many requests','限流','请求过多')): return 'RATE_LIMIT'
     if any(t in message for t in ('quota','credit','额度','余额不足')): return 'QUOTA'
     if any(t in message for t in ('banned','account suspended','account disabled','封禁','封号','账号禁用')): return 'ACCOUNT_BANNED'
@@ -329,6 +333,8 @@ class Runner:
         self.state.update(case,operation_id=op['id'],account_id=aid,account_alias=self.approved[aid],
             session_id=op.get('session_id'),message_id=op.get('message_id'),vm_id=op.get('vm_id'),
             operation_state=op.get('state'),operation_delivery=op.get('delivery'),
+            operation_error_code=op.get('code'),operation_error=op.get('error'),
+            operation_upstream_status=op.get('upstream_status'),
             operation_result=result,operation_binding_verified=True)
         common.atomic_json(self.state.folder(case)/'operation.json',op)
         if require_completed and (op.get('state')!='completed' or op.get('delivery')!='completed'):
