@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "qualification": "Measurement integrity only, not load/capacity/soak acceptance",
+  "metrics_sha256": "0ee7a2d1d64eb89ed61e8313ed826c5bc33ae8b117adadad72effd94f7adc155",
+  "physical_lines": 456,
+  "window_seconds": 666.863443653,
+  "sample_seconds": 5,
+  "sample_count": 133,
+  "generation_cases": 4,
+  "configured_concurrency": 1,
+  "workers": 1,
+  "summary": {
+    "event": "metrics_summary",
+    "time_ns": 1793702639030267365,
+    "enqueued": 455,
+    "written": 455,
+    "dropped": 0,
+    "writer_errors": 0,
+    "queued": 0
+  },
+  "hook_error_count_max": 0,
+  "generation_write_started": 4,
+  "generation_local_flush_completed": 4,
+  "unclassified_post_started": 0,
+  "noise_handshakes_completed": 3,
+  "connection_reuse": {
+    "test-1": {
+      "cases": 2,
+      "service_noise_connections": 1
+    },
+    "test-2": {
+      "cases": 1,
+      "service_noise_connections": 1
+    },
+    "test-3": {
+      "cases": 1,
+      "service_noise_connections": 1
+    }
+  },
+  "metrics_groups": {
+    "process_sample": {
+      "rss_bytes": {
+        "first": 74739712,
+        "last": 89821184,
+        "statistics": {
+          "n": 133,
+          "min": 74739712,
+          "max": 89821184,
+          "p50": 89812992,
+          "p95_nearest_rank": 89821184
+        }
+      },
+      "cpu_seconds_total": {
+        "first": 0.43,
+        "last": 3.4,
+        "statistics": {
+          "n": 133,
+          "min": 0.43,
+          "max": 3.4,
+          "p50": 1.91,
+          "p95_nearest_rank": 3.28
+        }
+      },
+      "fd_count": {
+        "first": 19,
+        "last": 31,
+        "statistics": {
+          "n": 133,
+          "min": 19,
+          "max": 32,
+          "p50": 31,
+          "p95_nearest_rank": 31
+        }
+      },
+      "tcp_owned_count": {
+        "first": 1,
+        "last": 7,
+        "statistics": {
+          "n": 133,
+          "min": 1,
+          "max": 8,
+          "p50": 7,
+          "p95_nearest_rank": 7
+        }
+      },
+      "tcp_owned_excluding_server_port_count": {
+        "first": 0,
+        "last": 6,
+        "statistics": {
+          "n": 133,
+          "min": 0,
+          "max": 6,
+          "p50": 6,
+          "p95_nearest_rank": 6
+        }
+      },
+      "cpu_percent_one_core_scale": {
+        "first": null,
+        "last": 0.39966905691928706,
+        "statistics": {
+          "n": 132,
+          "min": 0.0,
+          "max": 1.1990708538866925,
+          "p50": 0.3996810537980814,
+          "p95_nearest_rank": 0.7993547209107946
+        }
+      }
+    },
+    "backend_sample": {
+      "runtime_count": {
+        "first": 0,
+        "last": 3,
+        "statistics": {
+          "n": 133,
+          "min": 0,
+          "max": 3,
+          "p50": 3,
+          "p95_nearest_rank": 3
+        }
+      },
+      "active_connection_count": {
+        "first": 0,
+        "last": 3,
+        "statistics": {
+          "n": 133,
+          "min": 0,
+          "max": 3,
+          "p50": 3,
+          "p95_nearest_rank": 3
+        }
+      },
+      "active_receiver_count": {
+        "first": 0,
+        "last": 3,
+        "statistics": {
+          "n": 133,
+          "min": 0,
+          "max": 3,
+          "p50": 3,
+          "p95_nearest_rank": 3
+        }
+      },
+      "active_operation_count": {
+        "first": 0,
+        "last": 0,
+        "statistics": {
+          "n": 133,
+          "min": 0,
+          "max": 1,
+          "p50": 0,
+          "p95_nearest_rank": 1
+        }
+      },
+      "owned_task_count": {
+        "first": 0,
+        "last": 0,
+        "statistics": {
+          "n": 133,
+          "min": 0,
+          "max": 1,
+          "p50": 0,
+          "p95_nearest_rank": 1
+        }
+      },
+      "stream_count": {
+        "first": 0,
+        "last": 0,
+        "statistics": {
+          "n": 133,
+          "min": 0,
+          "max": 1,
+          "p50": 0,
+          "p95_nearest_rank": 0
+        }
+      },
+      "loop_lag_ms": {
+        "first": 0.1476010074838996,
+        "last": 0.1457009930163622,
+        "statistics": {
+          "n": 133,
+          "min": 0.1027020625770092,
+          "max": 0.3118020249530673,
+          "p50": 0.1593009801581502,
+          "p95_nearest_rank": 0.2301019849255681
+        }
+      }
+    },
+    "capacity_acquire": {
+      "elapsed_ms": {
+        "first": 0.0067999353632330894,
+        "last": 0.006100046448409557,
+        "statistics": {
+          "n": 4,
+          "min": 0.006100046448409557,
+          "max": 0.00870006624609232,
+          "p50": 0.006649992428719997,
+          "p95_nearest_rank": 0.00870006624609232
+        }
+      }
+    },
+    "account_acquire": {
+      "elapsed_ms": {
+        "first": 10.002180933952332,
+        "last": 14.729597023688257,
+        "statistics": {
+          "n": 4,
+          "min": 10.002180933952332,
+          "max": 14.729597023688257,
+          "p50": 12.060978973750025,
+          "p95_nearest_rank": 14.729597023688257
+        }
+      }
+    },
+    "store_write": {
+      "elapsed_ms": {
+        "first": 8.752783061936498,
+        "last": 8.74716800171882,
+        "statistics": {
+          "n": 40,
+          "min": 7.453736965544522,
+          "max": 13.110514031723142,
+          "p50": 9.779653511941433,
+          "p95_nearest_rank": 12.607982032932341
+        }
+      },
+      "bytes_after": {
+        "first": 23853,
+        "last": 1274,
+        "statistics": {
+          "n": 40,
+          "min": 314,
+          "max": 23853,
+          "p50": 23754.0,
+          "p95_nearest_rank": 23853
+        }
+      }
+    }
+  },
+  "latencies": {
+    "all_four_seconds": {
+      "n": 4,
+      "min": 9.366,
+      "max": 26.696,
+      "p50": 11.594999999999999,
+      "p95_nearest_rank": 26.696
+    },
+    "successful_text_seconds": {
+      "n": 3,
+      "min": 9.366,
+      "max": 12.827,
+      "p50": 10.363,
+      "p95_nearest_rank": 12.827
+    },
+    "scope": "Small serial batch only. Image latency is failed outcome, not media delivery; no concurrency capacity inference."
+  },
+  "not_covered": [
+    "10-account runtime/file-descriptor/memory lifecycle",
+    "sustained throughput",
+    "2-hour stability",
+    "production proxy behavior",
+    "real concurrent Cookie overwrite or rotation starvation"
+  ],
+  "tcp_scope": "PID-owned socket inodes from /proc; includes HTTP/control/gateway sockets. Excluding server port is still not gateway-only.",
+  "store_latency_scope": "40 actual JSON file-write calls including serialization/replace, not power-loss fsync durability or loaded production filesystem performance",
+  "idle_reclamation_decision": "No TTL or pool rewrite added. Three reusable runtimes/connections retained in this short window is not evidence of an unbounded idle leak."
+}

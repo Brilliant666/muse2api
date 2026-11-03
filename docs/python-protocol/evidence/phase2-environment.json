@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "status": "PASS",
+  "scope": "actual Linux Docker build/start and three real Muse identities, not a capacity qualification",
+  "base_sha": "4c93645fe0b9cd6ca5b12ed766703f21b5f321af",
+  "core_source_sha": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+  "live_harness_sha": "a5551b2dbb3d0a7c016764b28fdd86123cd2881d",
+  "live_tree": "9ed8182cee216a42de30cb52774ff932be8a2c7d",
+  "source_binding": {
+    "source_commit": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+    "source_tree": "f86719463e0495eed24e9dd48fa113982272a832",
+    "files": {
+      "app.py": {
+        "working_tree_sha256": "0a39dc38b9c4960ec6b46cc2dfb63dac98172142eb2392db5d4313e15d87fcc6",
+        "git_blob_sha256": "cf5506651b6d8dee15a46f65dd9da6d9b8e7409796ae40cf984a93d7677fd1fc",
+        "normalized_source_equal": true
+      },
+      "protocol_backend.py": {
+        "working_tree_sha256": "7cd3ae71a4c40f19cef27fadac0122cbd6cc5b8f94ec9f72d4fc0d35ba8bbad9",
+        "git_blob_sha256": "6a114aa5868a48038a22f94bae46935e21cb5b82a45d73e3ecc39f9dd3ac27fa",
+        "normalized_source_equal": true
+      },
+      "store.py": {
+        "working_tree_sha256": "b136a9848da35aab89f87787d7aac4fbc4fb8d701c48cdd8f4991bb542b06c25",
+        "git_blob_sha256": "0ff00ad89e990370b0be5dd27059ea13f9ea10ee96a1b66feb4d8b735a030c1b",
+        "normalized_source_equal": true
+      }
+    }
+  },
+  "harness_binding": {
+    "live_test_sha": "a5551b2dbb3d0a7c016764b28fdd86123cd2881d",
+    "live_test_tree": "9ed8182cee216a42de30cb52774ff932be8a2c7d",
+    "tools": {
+      "tools/phase2_batch.py": "b3f40a80daf8bd916aac26b60a62c462655b12d6247ffd1afbde280a7b830b18",
+      "tools/phase2_server.py": "5a755e3e2c2161c84d597781d4a009565c13a19dbe3307b7d64c083067cc48e3",
+      "tools/live_protocol_case.py": "4089fdba75c4b5377afd3b73374937ec3b38534541ceffb9e6192af7fc880951",
+      "tools/decode_acceptance_media.py": "ee13303327176e48a83836096ca7cbdc4bd2c1df29b3b4aba828f58abba374bd"
+    }
+  },
+  "protocol_dependency": {
+    "repository": "its-benjamin/muse2api-http",
+    "revision": "6309f64b44ce133a2428fadf966a395d503ce84f",
+    "manifest_changed": false,
+    "full_third_party_source_committed": false
+  },
+  "isolation": {
+    "new_worktree": true,
+    "new_venv": true,
+    "new_private_root": true,
+    "new_store": true,
+    "new_protocol_state": true,
+    "port": 18612,
+    "workers": 1,
+    "configured_concurrency": 1,
+    "production_data_written": false,
+    "original_18611_reused": false,
+    "accounts_source": "Three existing upstream accounts explicitly authorized by the user through the IIJ chat; local state is isolated; concurrent external use of the accounts is not excluded",
+    "credentials_in_git": false
+  },
+  "account_preflight": {
+    "status": "PASS",
+    "generation_requests": 0,
+    "checked_at": "2026-11-03T09:31:13Z",
+    "finished_at": "2026-11-03T09:31:40Z",
+    "distinct_upstream_identities": 3,
+    "identity_checks_on": "Windows isolated browser; actual Linux authentication then verified per account",
+    "extra_tokens_note": "Fresh UI displayed additional tokens; numeric parser did not provide extra_left. No cached quota substituted, no quota read during closeout.",
+    "accounts": [
+      {
+        "alias": "test-1",
+        "identity_verified": true,
+        "identity_source": "authenticated AuthContextProvider viewerId and prelude.user.identifier",
+        "identity_hash_scheme": "round-private HMAC-SHA256",
+        "identity_fingerprint": "743140ec379d40e56febf7090639ec8e2d4bbcfefe12024686e0ae033e92f2af",
+        "quota_current_at_preflight": true,
+        "weekly_used_pct": 27,
+        "weekly_remaining_pct": 73,
+        "checked_at": "2026-11-03T09:31:21Z",
+        "browser_cookie_persisted": true,
+        "linux_cookie_values_changed_count": 3,
+        "linux_changed_cookie_names": [
+          "hatch_vml",
+          "hatch_sess",
+          "hatch_gw"
+        ],
+        "credential_revision_unchanged": true,
+        "linux_cookie_expiry_present_count": 8
+      },
+      {
+        "alias": "test-2",
+        "identity_verified": true,
+        "identity_source": "authenticated AuthContextProvider viewerId and prelude.user.identifier",
+        "identity_hash_scheme": "round-private HMAC-SHA256",
+        "identity_fingerprint": "77146c182ad7c98337e095d86bc95fab500241f10a34fdfd1e3a89ab616e96f7",
+        "quota_current_at_preflight": true,
+        "weekly_used_pct": 2,
+        "weekly_remaining_pct": 98,
+        "checked_at": "2026-11-03T09:31:31Z",
+        "browser_cookie_persisted": true,
+        "linux_cookie_values_changed_count": 3,
+        "linux_changed_cookie_names": [
+          "hatch_sess",
+          "hatch_vml",
+          "hatch_gw"
+        ],
+        "credential_revision_unchanged": true,
+        "linux_cookie_expiry_present_count": 13
+      },
+      {
+        "alias": "test-3",
+        "identity_verified": true,
+        "identity_source": "authenticated AuthContextProvider viewerId and prelude.user.identifier",
+        "identity_hash_scheme": "round-private HMAC-SHA256",
+        "identity_fingerprint": "404a137db2611bb3bafb20962a596e85c36249e47cd74b33029fdcad45206126",
+        "quota_current_at_preflight": true,
+        "weekly_used_pct": 1,
+        "weekly_remaining_pct": 99,
+        "checked_at": "2026-11-03T09:31:40Z",
+        "browser_cookie_persisted": true,
+        "linux_cookie_values_changed_count": 3,
+        "linux_changed_cookie_names": [
+          "hatch_vml",
+          "hatch_sess",
+          "hatch_gw"
+        ],
+        "credential_revision_unchanged": true,
+        "linux_cookie_expiry_present_count": 10
+      }
+    ]
+  },
+  "builds": [
+    {
+      "status": "PASS",
+      "no_cache": true,
+      "started_at": "2026-11-03T09:10:07.407820+00:00",
+      "finished_at": "2026-11-03T09:10:42.945793+00:00",
+      "elapsed_seconds": 35.532,
+      "log_sha256": "be7930dba093b071858a93c52e8cfdbcdf490f7bfe9ca5584feb66fe3779eb44",
+      "source_files_unchanged": true,
+      "image_id": "sha256:495bb650faa1b4651a297daa1b6f4bcd90b59a41e6e7bb83d7c52ac59b4a82ef",
+      "image_os": "linux",
+      "architecture": "amd64",
+      "source_base_head": "4c93645fe0b9cd6ca5b12ed766703f21b5f321af",
+      "at_build_source_commit": null,
+      "source_snapshot_aggregate_sha256": "e3574d8254fa604d1758a9cdcfffc7930ed00c29ae5005f68056db15e823518b",
+      "later_equivalent_core_source_commit": "e878e5ce94fc47e1242b15800e08322a327cb72e",
+      "note": "Built from the then-uncommitted three-fix snapshot; commit equivalence established later by exact file binding with Git EOL normalization. Not the final 429 fix."
+    },
+    {
+      "status": "PASS",
+      "no_cache": true,
+      "started_at": "2026-11-03T09:12:40.837242+00:00",
+      "finished_at": "2026-11-03T09:13:37.000909+00:00",
+      "elapsed_seconds": 56.156,
+      "log_sha256": "2863bfd8b9bbb617e1f34cf37fcf42e0c2f6ba181014b5566d6af2137db90a8b",
+      "source_files_unchanged": true,
+      "image_id": "sha256:4e3f7216a59f0b28432261154490350bb5bd35a9cc6e4fd4371e493bf9983cd0",
+      "image_os": "linux",
+      "architecture": "amd64",
+      "source_base_head": "4c93645fe0b9cd6ca5b12ed766703f21b5f321af",
+      "at_build_source_commit": null,
+      "source_snapshot_aggregate_sha256": "e3574d8254fa604d1758a9cdcfffc7930ed00c29ae5005f68056db15e823518b",
+      "later_equivalent_core_source_commit": "e878e5ce94fc47e1242b15800e08322a327cb72e",
+      "note": "Built from the then-uncommitted three-fix snapshot; commit equivalence established later by exact file binding with Git EOL normalization. Not the final 429 fix."
+    }
+  ],
+  "final_live_image": {
+    "id": "sha256:9d5ed8a6018c78582e1eb5e8a2c64d84dfe11e3f04deb42a673301634d61dd5f",
+    "tag": "muse2api-phase2:20261103-rate-limit",
+    "parent": "sha256:4e3f7216a59f0b28432261154490350bb5bd35a9cc6e4fd4371e493bf9983cd0",
+    "delta": "COPY final protocol_backend.py then py_compile; unchanged app.py/store.py; read-only tools mounted at /app/tools",
+    "runtime_binding": {
+      "platform": "Linux",
+      "backend": {
+        "backend": "protocol",
+        "browser_running": false,
+        "running": true,
+        "runtime_count": 0,
+        "active_operations": 0,
+        "quota_supported": false,
+        "browser_controls": false,
+        "updater_supported": false,
+        "live_validation": "required"
+      },
+      "source_commit": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+      "harness_commit": "a5551b2dbb3d0a7c016764b28fdd86123cd2881d",
+      "exact_core_and_tool_hashes_match": true,
+      "account_count": 3,
+      "initial_case_ledger_exists": false
+    }
+  },
+  "linux_environment": {
+    "python": "3.12.16",
+    "system": "Linux",
+    "machine": "x86_64",
+    "packages": {
+      "Pillow": "13.0.0",
+      "muse2api-http": "0.2.0",
+      "curl_cffi": "0.17.0",
+      "cryptography": "50.0.2",
+      "fastapi": "0.162.0",
+      "uvicorn": "0.54.0"
+    },
+    "ffmpeg": "ffmpeg version 5.1.9-0+deb12u1 Copyright (c) 2000-2026 the FFmpeg developers",
+    "ffprobe": "ffprobe version 5.1.9-0+deb12u1 Copyright (c) 2007-2026 the FFmpeg developers"
+  },
+  "docker_environment": {
+    "engine": "24.0.5",
+    "api": "1.43",
+    "kernel": "6.18.54.1-microsoft-standard-WSL2",
+    "architecture": "x86_64",
+    "cpus": 24,
+    "host_memory_approx_gib": 46.9,
+    "access": "Official Linux Docker CLI via existing WSL daemon; no Docker/WSL restart",
+    "host_port_forwarding": "Not used as proof; batch client executed inside the Linux container against loopback",
+    "shared_host": true
+  },
+  "root_dockerfile_and_dockerignore_changed": false,
+  "source_byte_note": "Working-tree CRLF hashes differ from LF Git blobs. Actual image bytes match working-tree receipts; normalized source equals named Git revision."
+}

@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "phase": "python-protocol-phase2",
+  "status": "FAIL",
+  "completion": "INCOMPLETE_STOPPED_BY_USER",
+  "source_sha": "39e1489a6561878f727d961a5cc6e07f53b9cbb3",
+  "final_live_test_sha": "a5551b2dbb3d0a7c016764b28fdd86123cd2881d",
+  "base_sha": "4c93645fe0b9cd6ca5b12ed766703f21b5f321af",
+  "pr": {
+    "number": 1,
+    "repository": "Brilliant666/muse2api",
+    "url": "https://github.com/Brilliant666/muse2api/pull/1",
+    "draft_required": true,
+    "merged": false
+  },
+  "budgets": {
+    "limits": {
+      "text": 525,
+      "image": 31,
+      "video": 4,
+      "total": 560
+    },
+    "consumed": {
+      "text": 3,
+      "image": 1,
+      "video": 0
+    },
+    "remaining": {
+      "text": 522,
+      "image": 30,
+      "video": 4
+    },
+    "failed_and_timeouts_charged": true,
+    "media_budget_converted_to_text": false,
+    "remaining_is_not_permission_to_resume": true
+  },
+  "historical_budget": {
+    "text": 6,
+    "image": 2,
+    "video": 1,
+    "unchanged": true
+  },
+  "statuses": [
+    {
+      "item": "Linux fresh image build, native dependencies and HTTP startup",
+      "status": "PASS",
+      "evidence": "evidence/phase2-environment.json"
+    },
+    {
+      "item": "Three distinct authorized identities and current quotas at preflight",
+      "status": "PASS",
+      "evidence": "evidence/phase2-environment.json"
+    },
+    {
+      "item": "Linux Chat ordinary, Chat SSE, Responses ordinary",
+      "status": "PASS",
+      "evidence": "evidence/phase2-live-results.json"
+    },
+    {
+      "item": "Linux ordinary image L1-004",
+      "status": "FAIL",
+      "code": "media_missing",
+      "classification": "UPSTREAM_COMPLETED_WITHOUT_MEDIA"
+    },
+    {
+      "item": "Linux 20-request mixed functional gate",
+      "status": "FAIL",
+      "completion": "INCOMPLETE",
+      "sent": 4,
+      "planned": 20
+    },
+    {
+      "item": "Linux Responses SSE, edits, video and full real media decoding",
+      "status": "NOT_RUN",
+      "reason": "Stopped after first image failure; no output media to decode"
+    },
+    {
+      "item": "Original C3 batch >=5 identities",
+      "status": "BLOCKED",
+      "reason": "Only three distinct authorized identities available; batch not sent"
+    },
+    {
+      "item": "Authorized three-account C3P partial mixed batch",
+      "status": "NOT_RUN",
+      "reason": "User ordered all real-account sends to remain stopped"
+    },
+    {
+      "item": "C5 batch 10 identities",
+      "status": "BLOCKED",
+      "reason": "Only three distinct authorized identities; no batch sent"
+    },
+    {
+      "item": "Two-hour C3/10-account soak",
+      "status": "BLOCKED",
+      "execution": "NOT_RUN",
+      "reason": "Ten-account prerequisite missing and user stop; short metrics window does not substitute"
+    },
+    {
+      "item": "Real Muse limit/proxy/disconnect/restart/VM mismatch/media recovery fault injection in Linux",
+      "status": "NOT_RUN",
+      "reason": "User stop; controlled evidence kept separate"
+    },
+    {
+      "item": "Actual VM idle-before/wake-after proof",
+      "status": "NOT_OBSERVED",
+      "scope": "Historical first-phase natural-idle observation retained; no new wake experiment this phase"
+    },
+    {
+      "item": "10-account idle resource leak",
+      "status": "NOT_OBSERVED",
+      "execution": "NOT_RUN",
+      "reason": "No 10-account or long-running workload; bounded three-runtime cache alone is not a leak"
+    },
+    {
+      "item": "Targeted controlled and native synthetic regressions",
+      "status": "PASS",
+      "evidence": "evidence/phase2-controlled.json"
+    },
+    {
+      "item": "Evidence preservation and own-instance cleanup",
+      "status": "PASS",
+      "evidence": "evidence/phase2-preservation.json"
+    }
+  ],
+  "decisions": {
+    "python_in_process_target_concurrency3": {
+      "verdict": "NOT_ESTABLISHED",
+      "reason": "Actual Linux requests were serial concurrency1, four attempts only; controlled overlap cannot qualify real concurrency3"
+    },
+    "pool_and_lifecycle": {
+      "verdict": "TARGETED_FIXES_REQUIRED_AND_IMPLEMENTED",
+      "reason": "Reproduced head-of-line waiting from separated preselection and lease acquisition, connection cleanup and crash quarantine bugs fixed; 10-account fairness and long-term lifecycle remain unqualified"
+    },
+    "json_store_migration": {
+      "verdict": "RETAIN_FOR_NOW",
+      "reason": "Crash ordering and reconciliation fixed; no measured evidence requires migration. Single worker/exclusive Store retained; large-write contention and durability not qualified"
+    },
+    "linux_multiaccount_trial_or_controlled_prerelease": {
+      "verdict": "NOT_READY",
+      "reason": "Real media failed; L1 incomplete, no real concurrency3, original5/10-account gates and soak not completed"
+    }
+  },
+  "evidence": [
+    "evidence/phase2-environment.json",
+    "evidence/phase2-live-results.json",
+    "evidence/phase2-resources.json",
+    "evidence/phase2-controlled.json",
+    "evidence/phase2-preservation.json"
+  ],
+  "resume_policy": "Do not send further real requests under the current user stop. Preserve existing ledger/IDs/latest Cookie; no budget resets or empty-directory restart. Any future run needs new user steering and must retain these failures."
+}
