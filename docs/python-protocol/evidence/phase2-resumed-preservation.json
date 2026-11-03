@@ -1,0 +1,66 @@
+{
+  "at": "2026-11-03T16:29:31.438923+00:00",
+  "historical_files": {
+    "first_phase_ledger": {
+      "sha256": "b1f6c6120d2b9606b40fb8a57520384bc3ffa436d86348169c73270b15a30808",
+      "unchanged": true
+    },
+    "first_phase_operations": {
+      "sha256": "6d9367ee2dfd531755766b347a78f54befce57436cba1dbe7e9c0f70ebef6767",
+      "unchanged": true
+    },
+    "first_phase_tasks": {
+      "sha256": "5370df482ffa3d40945235c44c41b7478015dbb42b6d734dae1e5ba8271025fc",
+      "unchanged": true
+    },
+    "original_phase2_ledger": {
+      "sha256": "7b59725580ae290ad30809f6f7af827235d28f7af31e9be14db299faaf52875b",
+      "unchanged": true
+    }
+  },
+  "first_phase_budget_unchanged": {
+    "text": 6,
+    "image": 2,
+    "video": 1
+  },
+  "old_phase2_baseline": {
+    "text": 3,
+    "image": 1,
+    "video": 0
+  },
+  "resumed_new_case_count": 20,
+  "new_generation_post_intents": 20,
+  "total_phase2_consumed": {
+    "text": 18,
+    "image": 5,
+    "video": 1
+  },
+  "remaining": {
+    "text": 542,
+    "image": 30,
+    "video": 4
+  },
+  "limits": {
+    "text": 560,
+    "image": 35,
+    "video": 5
+  },
+  "current_operation_count": 20,
+  "current_task_count": 5,
+  "account_count": 9,
+  "accounts_with_real_hatch_sess_and_vml_value_rotation": 9,
+  "old_cookie_reimported": false,
+  "auth_latest_cookie_sync": {
+    "at": "2026-11-03T16:24:59.427056+00:00",
+    "accounts": 9,
+    "latest_cookie_and_expiry_exact_match": true,
+    "cas_revision_checked": true,
+    "source_metadata_and_auth_identity_preserved": true,
+    "test_operations_or_quarantine_copied": false,
+    "source_cookie_reimported": false,
+    "auth_account_sha256_after": "94d27e1dc4c960c0d0bf1e4be2366fffab10c57df33c5ca62f7a765a003dd8ae"
+  },
+  "test_containers_stopped": true,
+  "new_postfix_and_C3_C5_soak_not_started": true,
+  "no_production_changes": true
+}

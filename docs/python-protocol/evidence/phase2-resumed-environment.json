@@ -1,0 +1,1101 @@
+{
+  "schema_version": 1,
+  "scope": "Real Linux build and environment evidence only; live Muse and controlled peers are separate evidence layers",
+  "status": "PASS",
+  "status_scope": "Three actual source/codec builds and the two later final installed-SDK byte assertions; not overall acceptance",
+  "daemon": {
+    "engine_version": "24.0.5",
+    "api_version": "1.43",
+    "platform": "linux",
+    "architecture": "amd64",
+    "kernel": "6.18.54.1-microsoft-standard-WSL2",
+    "service_or_wsl_restarted": false
+  },
+  "reproduction_placeholders": {
+    "DOCKER_HOST": "Previously verified isolated-test daemon socket; actual local socket path omitted",
+    "SOURCE_CONTEXT": "Stage-specific isolated checkout with recorded commit and file hashes",
+    "BUILD_RECIPES": "External acceptance-only read-only verification recipes; raw recipe hashes recorded"
+  },
+  "stages": [
+    {
+      "stage": "initial",
+      "status": "PASS",
+      "source_commit": "d99ba0618f6ee94aee424e0910e531fdaf43d5b9",
+      "source_image": {
+        "tag": "muse2api-phase2-resume:20261103-source",
+        "id": "sha256:268745b962c91f546db0d2963c97eff50b07c4aa63834b303cd49ebea912afb6",
+        "os": "linux",
+        "architecture": "amd64",
+        "size_bytes": 244089847
+      },
+      "codec_image": {
+        "tag": "muse2api-phase2-resume:20261103-protocol",
+        "id": "sha256:d18f8744a4b88d2b40984708f62e2b40d2c181406e9b9eae15fe7037913495df",
+        "os": "linux",
+        "architecture": "amd64",
+        "size_bytes": 720024686,
+        "cmd": [
+          "python",
+          "-m",
+          "uvicorn",
+          "app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "18610",
+          "--workers",
+          "1"
+        ]
+      },
+      "environment": {
+        "python": "3.12.16",
+        "system": "Linux",
+        "machine": "x86_64",
+        "packages": {
+          "Pillow": "13.0.0",
+          "muse2api-http": "0.2.0",
+          "curl_cffi": "0.17.0",
+          "cryptography": "50.0.2",
+          "fastapi": "0.162.0",
+          "uvicorn": "0.54.0"
+        },
+        "ffmpeg": "ffmpeg version 5.1.9-0+deb12u1 Copyright (c) 2000-2026 the FFmpeg developers",
+        "ffprobe": "ffprobe version 5.1.9-0+deb12u1 Copyright (c) 2007-2026 the FFmpeg developers"
+      },
+      "source_binding": {
+        "aggregate_sha256": "5096d8cad676f85da1958ca7fa8b57c2cb19c3fc702c3af8c0544d6cda7f39ce",
+        "before_receipt_sha256": "0c51e4fa24265b1ab855301800e1ab3e6297c04510eedab44ca95ca55ef0eb51",
+        "after_receipt_sha256": "581222f4f92dea36cd9da5132af619d097d559965600b0ea502e49fb86a79b12",
+        "files": [
+          {
+            "path": ".dockerignore",
+            "bytes": 824,
+            "raw_sha256": "d731a82de537f1b55778c897ad8e764c95ff1cf1ca747de8b83de23655f654d6",
+            "git_blob_sha256": "bba2ae227748f49f9a0345ef7f214912ef33a2286588a8facc94d5186dc8768f",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": false
+          },
+          {
+            "path": "Dockerfile",
+            "bytes": 1440,
+            "raw_sha256": "251c59123f3d247879070d56d6804c1de86abd05ed349c9b05fa9dd84c832d58",
+            "git_blob_sha256": "64dadad79d758d787221b08c5e0ca52b3c63ef204c10f464e08caf08ea310597",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "LICENSE",
+            "bytes": 1094,
+            "raw_sha256": "4f3b30d039ec0354736b1b0e4b08bf709bb9d9624561913f86f53b6aab2caffc",
+            "git_blob_sha256": "6e8be7f11c73a41efb9b77b2a18d8c844bb533f1c50b595f19de646860c436ff",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "admin.html",
+            "bytes": 168760,
+            "raw_sha256": "2806d8d0945a52e701a9aa928b1e324a7fbd47a3ed29655d8c5d3869e219dcff",
+            "git_blob_sha256": "5a4147ddcd7abe45a4c68c8bb96583aef23346dea0cdc81e827c4a7553f5d46d",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "app.py",
+            "bytes": 140463,
+            "raw_sha256": "3f87134ce4a9396d05221f33f59d75d6f3518f1554ec1064e0129945a7df0a3e",
+            "git_blob_sha256": "24cb62228e0bb9e88aa26c113eb73df70c9075b95dd3a1ea0363e95612d8aa16",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "cdp.py",
+            "bytes": 2584,
+            "raw_sha256": "a177cb4c20ba62fadc22af5fbd5a78c4c88f408a22e5e205a8b67fe731bda095",
+            "git_blob_sha256": "c503b6ab91ebe682fa5be4538cdbcd95cabda19ec600bb993bcc2657e5f65be7",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "config.py",
+            "bytes": 8074,
+            "raw_sha256": "401e9ab80ea7bc6d5631dc8c8f92e5ee967fc8cf8fb31f5157daa4d5f3f4a931",
+            "git_blob_sha256": "4d6de2bb7479c4feec91787e5a51828793ba48bfe57338a883330f12dd3fd745",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "deploy/phase2/Dockerfile",
+            "bytes": 1391,
+            "raw_sha256": "37d2e750b49e1335c850fd1e8738b7ae322fb216a2e7b65847fe0204af5c42f1",
+            "git_blob_sha256": "1a553bb194877d64ba66a2c44e169179fd51009b7e94d33b7861cfa994e2b47a",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": false
+          },
+          {
+            "path": "email_login.py",
+            "bytes": 14030,
+            "raw_sha256": "a5c1a6ecc4ae45036e59e3a7647c5bec5bce748a4fedc40a581762e04fdb58bd",
+            "git_blob_sha256": "5f39d4eb9ba9e0d137922d84bd5543ea36f92f091775514a663aaea7ae6d3608",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "email_login_browser.py",
+            "bytes": 23757,
+            "raw_sha256": "7123ed99b97150d8435bc919ba42ed91fa1f9ea86bd6c8ccc227ee5d7c318c58",
+            "git_blob_sha256": "b259b00d1535fa1ffa37c3498788af1bfb0ae03b1bbc5ff8861b51f421e3fa98",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "engine.py",
+            "bytes": 82860,
+            "raw_sha256": "2218fb90dd53f19da75646f1d0240f92c55abcd139c04d563411e2e5c1dd4656",
+            "git_blob_sha256": "ba688656b404d2635817b9b8beb5c0cf9bc2c36ab42a9fb2dba9d614e6ed11cc",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/README.md",
+            "bytes": 2514,
+            "raw_sha256": "beb6f2b61972cc26996d100637dc8bd9c23dd7789ec2585b9425b88db801d3f1",
+            "git_blob_sha256": "26f1493e3b715536757673830e5a2116ab947858d6c5080b3a91e2fe533db4f1",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/_locales/en/messages.json",
+            "bytes": 296,
+            "raw_sha256": "f5dde059176cb2817fa5f5db4879841c4bde299c7c43cb84ec9fba143639d262",
+            "git_blob_sha256": "3747e760a9d3d77619240915a89236ff4b8f41b922ddf3062d16fc436000d349",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/_locales/zh_CN/messages.json",
+            "bytes": 298,
+            "raw_sha256": "4867b60a7c87e32f85f8c7eb1fcc615716b05d12b6183a826036757921e01e3c",
+            "git_blob_sha256": "1831098f5124dacb0db500e909fd825f893dd854a6241940ce2ad9b2c49e9ab6",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/manifest.json",
+            "bytes": 446,
+            "raw_sha256": "0bcc96cf50db2d69ac7a2078d9eb7b43f2c2f122bf4b143413f850116bf1607b",
+            "git_blob_sha256": "90590a6246b23c80888abc3ada5994653aa095ef7dcafdf04e9c982dcaf79f83",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/popup.html",
+            "bytes": 3739,
+            "raw_sha256": "e7be51710549dcd0e0310349d05b9d7e400e041ff11586e91d5ef63751682068",
+            "git_blob_sha256": "7a8bdcb510fa314092435ad16741be4f822192fff5f84592e529790472bea44d",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/popup.js",
+            "bytes": 10627,
+            "raw_sha256": "437c7ed19b8c62f097ed57da0238d12d50e8b242e4a409f4bf9d2b76302fa91e",
+            "git_blob_sha256": "a8732674939214fcbe03699daca5c88e61c2d08c6c9c02c6f979c342b8dc6d36",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/安装说明.txt",
+            "bytes": 2514,
+            "raw_sha256": "beb6f2b61972cc26996d100637dc8bd9c23dd7789ec2585b9425b88db801d3f1",
+            "git_blob_sha256": "26f1493e3b715536757673830e5a2116ab947858d6c5080b3a91e2fe533db4f1",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "muse_identity.py",
+            "bytes": 4222,
+            "raw_sha256": "5f804b9d7208295a0ffa8ff133fbcfb41ca65ccf5078abb05ab5901b07005288",
+            "git_blob_sha256": "2d134d8da22f6b564cc36d6c64ee6f55a916546f45c3d85aac0be74bfa24aee9",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol-dependency/integration.patch",
+            "bytes": 70746,
+            "raw_sha256": "2b31dc50b730b0870ab6e7099d7718e8ac43eebf6c61a9ed39eba6d63c7ebcf9",
+            "git_blob_sha256": "2b31dc50b730b0870ab6e7099d7718e8ac43eebf6c61a9ed39eba6d63c7ebcf9",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol-dependency/manifest.json",
+            "bytes": 1436,
+            "raw_sha256": "1af7de07d0c759cae29dbca48b814d8813e43ad0e81670eb6149730be4d1234c",
+            "git_blob_sha256": "1af7de07d0c759cae29dbca48b814d8813e43ad0e81670eb6149730be4d1234c",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol_backend.py",
+            "bytes": 38588,
+            "raw_sha256": "7cd3ae71a4c40f19cef27fadac0122cbd6cc5b8f94ec9f72d4fc0d35ba8bbad9",
+            "git_blob_sha256": "6a114aa5868a48038a22f94bae46935e21cb5b82a45d73e3ecc39f9dd3ac27fa",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "proxy.py",
+            "bytes": 10476,
+            "raw_sha256": "2b6500b27ca96416e684a31666c1c76679ce574948afbbd8f9d08d8bad1999e6",
+            "git_blob_sha256": "671a0f12f0e7a14b8acbf83319efff5b4c941facf6d589569764ca5e5e76ac4a",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "requirements.txt",
+            "bytes": 120,
+            "raw_sha256": "9acfb29ecdf33e542f663cd38510c7e3534637d8580c6af9cb775b6fc89654ef",
+            "git_blob_sha256": "2b83beaf20992f93598f51ca7d60bebab84bfd8bbe975b1aef7f77d0470827fe",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "store.py",
+            "bytes": 21945,
+            "raw_sha256": "33197b34a427cf1a034f975500f9f37299ad9e917e765af02edbc574a16f0d79",
+            "git_blob_sha256": "27be3dfbb262b1e91829bdad4f88f138d7f098a6f89065fc527a46a402bbdee8",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "tools/get_muse_cookie.py",
+            "bytes": 18271,
+            "raw_sha256": "072618b998951bd9b876761f42526b8f4210d54bb8494775bf46adac7233c576",
+            "git_blob_sha256": "7fea986038e6f16163acc12072dcf9f75454f0c0f1112524cb6e88a70e7af67e",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "tools/prepare_protocol.py",
+            "bytes": 16126,
+            "raw_sha256": "6de1ded33a9ff0d3150f2d7b8dcc6753b7f333090666ce52bb673428fc0c301c",
+            "git_blob_sha256": "879433e31462600c8735422847bd3e506908f528be2c3f5819d7d390311c2921",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "version.json",
+            "bytes": 1656,
+            "raw_sha256": "13fd145891451a50e8d6a2d053e8b205941a711bfd8ded92d3aecd4097fb9390",
+            "git_blob_sha256": "545aba45c41870b8e87b8b5752cae83ca85ea68765ea5dbb698dfa0a624562cf",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          }
+        ],
+        "git_eol_equivalent": true,
+        "all_source_bytes_unchanged_after_builds": true,
+        "context_file_count": 26,
+        "new_harness_and_private_data_excluded": true
+      },
+      "codec_extends_exact_stage_source": true,
+      "sdk": {
+        "fixed_git_commit": "6309f64b44ce133a2428fadf966a395d503ce84f",
+        "patch_sha256": "2b31dc50b730b0870ab6e7099d7718e8ac43eebf6c61a9ed39eba6d63c7ebcf9",
+        "manifest_output_hashes": {
+          "muse2api/chat.py": "6f842758d497460f7e006ff3b996b30fa1cd0874749d0cb4f4c7698ac7a298d0",
+          "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+          "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+          "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+          "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+        },
+        "actual_installed_sdk_file_hash_check": "NOT_RUN",
+        "actual_final_installed_module_hashes": null,
+        "actual_final_prepared_output_hashes": null,
+        "initial_check_note": "Actual Git preparation verified manifest outputs and pip installed the package; this first build did not separately hash site-packages. Manifest output hashes are not relabeled as installed-file measurements."
+      },
+      "build_steps": {
+        "source": {
+          "kind": "Actual no-cache Linux root Dockerfile build",
+          "started_at": 1793712595.2134473,
+          "finished_at": 1793712657.6488771,
+          "elapsed_seconds": 62.435,
+          "returncode": 0,
+          "log_sha256": "d52c40521fd39063da692176a0deef7abafb94de3fe8fbb165f11e61c5dd3059",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-source --file ${SOURCE_CONTEXT}/Dockerfile ${SOURCE_CONTEXT}"
+        },
+        "codec": {
+          "kind": "Actual no-cache Linux acceptance codec extension build",
+          "started_at": 1793712695.3060403,
+          "finished_at": 1793712798.9291916,
+          "elapsed_seconds": 103.623,
+          "returncode": 0,
+          "log_sha256": "c784ac09a7c87332d3d01440324ead2de427958de717338129acf7cd9f8b9a40",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-protocol --build-arg PHASE2_SOURCE_IMAGE=muse2api-phase2-resume:20261103-source --file ${SOURCE_CONTEXT}/deploy/phase2/Dockerfile ${SOURCE_CONTEXT}",
+          "source_image_id": "sha256:268745b962c91f546db0d2963c97eff50b07c4aa63834b303cd49ebea912afb6"
+        }
+      },
+      "private_build_summary_sha256": "dab86fc5ab67d9e2a3d8d3591fad9d4829a6c9c207d8ad2b4f9205675de5ae75",
+      "build_actions_only": {
+        "account_mounts": 0,
+        "generation_requests": 0,
+        "service_containers_started": 0,
+        "shared_daemon_or_wsl_restarts": 0,
+        "repository_or_deployment_edits": 0
+      },
+      "retained_setup_failure": {
+        "scope": "CLI argument parsing before build; not a dependency or generation failure",
+        "unsupported_flag": "--progress",
+        "builder_started": false,
+        "returncode": 125,
+        "elapsed_seconds": 0.42,
+        "log_sha256": "78167747d1ce8a5987bee9ca98090cbf9473249e48a8ea1fe200dfca22290d93"
+      }
+    },
+    {
+      "stage": "mediafix",
+      "status": "PASS",
+      "source_commit": "c750f2fc23b9c9d5be95d91034a1ac9151438694",
+      "source_image": {
+        "tag": "muse2api-phase2-resume:20261103-source-mediafix",
+        "id": "sha256:376d063617cd2d8926b4d0bdbd2a952cc29c3bbae428321d455419e81d8de56d",
+        "os": "linux",
+        "architecture": "amd64",
+        "size_bytes": 244474965
+      },
+      "codec_image": {
+        "tag": "muse2api-phase2-resume:20261103-protocol-mediafix",
+        "id": "sha256:b95c6ed462765a22495d921b59e99da70e370658d1c191afb118d033704c630d",
+        "os": "linux",
+        "architecture": "amd64",
+        "size_bytes": 720409804,
+        "cmd": [
+          "python",
+          "-m",
+          "uvicorn",
+          "app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "18610",
+          "--workers",
+          "1"
+        ]
+      },
+      "environment": {
+        "python": "3.12.16",
+        "system": "Linux",
+        "machine": "x86_64",
+        "packages": {
+          "Pillow": "13.0.0",
+          "muse2api-http": "0.2.0",
+          "curl_cffi": "0.17.0",
+          "cryptography": "50.0.2",
+          "fastapi": "0.162.0",
+          "uvicorn": "0.54.0"
+        },
+        "ffmpeg": "ffmpeg version 5.1.9-0+deb12u1 Copyright (c) 2000-2026 the FFmpeg developers",
+        "ffprobe": "ffprobe version 5.1.9-0+deb12u1 Copyright (c) 2007-2026 the FFmpeg developers"
+      },
+      "source_binding": {
+        "aggregate_sha256": "9cc9726ad3b94df312dc7a95625c2ee2e7029d01adc4c808636e2bbe5a9bc7eb",
+        "before_receipt_sha256": "e9a4e44ac6ed9af5455deea18db4a2789c92f4b0b8703d7fe585204e377b5623",
+        "after_receipt_sha256": "f3ad546cf5bb1b784e8f0c58b8e704d44e3af823a0dfb42a60e36b5e5092605e",
+        "files": [
+          {
+            "path": ".dockerignore",
+            "bytes": 824,
+            "raw_sha256": "d731a82de537f1b55778c897ad8e764c95ff1cf1ca747de8b83de23655f654d6",
+            "git_blob_sha256": "bba2ae227748f49f9a0345ef7f214912ef33a2286588a8facc94d5186dc8768f",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": false
+          },
+          {
+            "path": "Dockerfile",
+            "bytes": 1440,
+            "raw_sha256": "251c59123f3d247879070d56d6804c1de86abd05ed349c9b05fa9dd84c832d58",
+            "git_blob_sha256": "64dadad79d758d787221b08c5e0ca52b3c63ef204c10f464e08caf08ea310597",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "LICENSE",
+            "bytes": 1094,
+            "raw_sha256": "4f3b30d039ec0354736b1b0e4b08bf709bb9d9624561913f86f53b6aab2caffc",
+            "git_blob_sha256": "6e8be7f11c73a41efb9b77b2a18d8c844bb533f1c50b595f19de646860c436ff",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "admin.html",
+            "bytes": 168760,
+            "raw_sha256": "2806d8d0945a52e701a9aa928b1e324a7fbd47a3ed29655d8c5d3869e219dcff",
+            "git_blob_sha256": "5a4147ddcd7abe45a4c68c8bb96583aef23346dea0cdc81e827c4a7553f5d46d",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "app.py",
+            "bytes": 140463,
+            "raw_sha256": "3f87134ce4a9396d05221f33f59d75d6f3518f1554ec1064e0129945a7df0a3e",
+            "git_blob_sha256": "24cb62228e0bb9e88aa26c113eb73df70c9075b95dd3a1ea0363e95612d8aa16",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "cdp.py",
+            "bytes": 2584,
+            "raw_sha256": "a177cb4c20ba62fadc22af5fbd5a78c4c88f408a22e5e205a8b67fe731bda095",
+            "git_blob_sha256": "c503b6ab91ebe682fa5be4538cdbcd95cabda19ec600bb993bcc2657e5f65be7",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "config.py",
+            "bytes": 8074,
+            "raw_sha256": "401e9ab80ea7bc6d5631dc8c8f92e5ee967fc8cf8fb31f5157daa4d5f3f4a931",
+            "git_blob_sha256": "4d6de2bb7479c4feec91787e5a51828793ba48bfe57338a883330f12dd3fd745",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "deploy/phase2/Dockerfile",
+            "bytes": 1391,
+            "raw_sha256": "37d2e750b49e1335c850fd1e8738b7ae322fb216a2e7b65847fe0204af5c42f1",
+            "git_blob_sha256": "1a553bb194877d64ba66a2c44e169179fd51009b7e94d33b7861cfa994e2b47a",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": false
+          },
+          {
+            "path": "email_login.py",
+            "bytes": 14030,
+            "raw_sha256": "a5c1a6ecc4ae45036e59e3a7647c5bec5bce748a4fedc40a581762e04fdb58bd",
+            "git_blob_sha256": "5f39d4eb9ba9e0d137922d84bd5543ea36f92f091775514a663aaea7ae6d3608",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "email_login_browser.py",
+            "bytes": 23757,
+            "raw_sha256": "7123ed99b97150d8435bc919ba42ed91fa1f9ea86bd6c8ccc227ee5d7c318c58",
+            "git_blob_sha256": "b259b00d1535fa1ffa37c3498788af1bfb0ae03b1bbc5ff8861b51f421e3fa98",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "engine.py",
+            "bytes": 82860,
+            "raw_sha256": "2218fb90dd53f19da75646f1d0240f92c55abcd139c04d563411e2e5c1dd4656",
+            "git_blob_sha256": "ba688656b404d2635817b9b8beb5c0cf9bc2c36ab42a9fb2dba9d614e6ed11cc",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/README.md",
+            "bytes": 2514,
+            "raw_sha256": "beb6f2b61972cc26996d100637dc8bd9c23dd7789ec2585b9425b88db801d3f1",
+            "git_blob_sha256": "26f1493e3b715536757673830e5a2116ab947858d6c5080b3a91e2fe533db4f1",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/_locales/en/messages.json",
+            "bytes": 296,
+            "raw_sha256": "f5dde059176cb2817fa5f5db4879841c4bde299c7c43cb84ec9fba143639d262",
+            "git_blob_sha256": "3747e760a9d3d77619240915a89236ff4b8f41b922ddf3062d16fc436000d349",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/_locales/zh_CN/messages.json",
+            "bytes": 298,
+            "raw_sha256": "4867b60a7c87e32f85f8c7eb1fcc615716b05d12b6183a826036757921e01e3c",
+            "git_blob_sha256": "1831098f5124dacb0db500e909fd825f893dd854a6241940ce2ad9b2c49e9ab6",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/manifest.json",
+            "bytes": 446,
+            "raw_sha256": "0bcc96cf50db2d69ac7a2078d9eb7b43f2c2f122bf4b143413f850116bf1607b",
+            "git_blob_sha256": "90590a6246b23c80888abc3ada5994653aa095ef7dcafdf04e9c982dcaf79f83",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/popup.html",
+            "bytes": 3739,
+            "raw_sha256": "e7be51710549dcd0e0310349d05b9d7e400e041ff11586e91d5ef63751682068",
+            "git_blob_sha256": "7a8bdcb510fa314092435ad16741be4f822192fff5f84592e529790472bea44d",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/popup.js",
+            "bytes": 10627,
+            "raw_sha256": "437c7ed19b8c62f097ed57da0238d12d50e8b242e4a409f4bf9d2b76302fa91e",
+            "git_blob_sha256": "a8732674939214fcbe03699daca5c88e61c2d08c6c9c02c6f979c342b8dc6d36",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/安装说明.txt",
+            "bytes": 2514,
+            "raw_sha256": "beb6f2b61972cc26996d100637dc8bd9c23dd7789ec2585b9425b88db801d3f1",
+            "git_blob_sha256": "26f1493e3b715536757673830e5a2116ab947858d6c5080b3a91e2fe533db4f1",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "muse_identity.py",
+            "bytes": 4222,
+            "raw_sha256": "5f804b9d7208295a0ffa8ff133fbcfb41ca65ccf5078abb05ab5901b07005288",
+            "git_blob_sha256": "2d134d8da22f6b564cc36d6c64ee6f55a916546f45c3d85aac0be74bfa24aee9",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol-dependency/integration.patch",
+            "bytes": 70405,
+            "raw_sha256": "3b018f15a0f61411cddb70eab35da211e5aa427367a8363b4f5cd0856f8dca5b",
+            "git_blob_sha256": "3b018f15a0f61411cddb70eab35da211e5aa427367a8363b4f5cd0856f8dca5b",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol-dependency/manifest.json",
+            "bytes": 1436,
+            "raw_sha256": "99c572d37bccde8495c4065e4e538eb5501ecbc9281d5c361909cc4a91862246",
+            "git_blob_sha256": "99c572d37bccde8495c4065e4e538eb5501ecbc9281d5c361909cc4a91862246",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol_backend.py",
+            "bytes": 38588,
+            "raw_sha256": "7cd3ae71a4c40f19cef27fadac0122cbd6cc5b8f94ec9f72d4fc0d35ba8bbad9",
+            "git_blob_sha256": "6a114aa5868a48038a22f94bae46935e21cb5b82a45d73e3ecc39f9dd3ac27fa",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "proxy.py",
+            "bytes": 10476,
+            "raw_sha256": "2b6500b27ca96416e684a31666c1c76679ce574948afbbd8f9d08d8bad1999e6",
+            "git_blob_sha256": "671a0f12f0e7a14b8acbf83319efff5b4c941facf6d589569764ca5e5e76ac4a",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "requirements.txt",
+            "bytes": 120,
+            "raw_sha256": "9acfb29ecdf33e542f663cd38510c7e3534637d8580c6af9cb775b6fc89654ef",
+            "git_blob_sha256": "2b83beaf20992f93598f51ca7d60bebab84bfd8bbe975b1aef7f77d0470827fe",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "store.py",
+            "bytes": 21945,
+            "raw_sha256": "33197b34a427cf1a034f975500f9f37299ad9e917e765af02edbc574a16f0d79",
+            "git_blob_sha256": "27be3dfbb262b1e91829bdad4f88f138d7f098a6f89065fc527a46a402bbdee8",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "tools/get_muse_cookie.py",
+            "bytes": 18271,
+            "raw_sha256": "072618b998951bd9b876761f42526b8f4210d54bb8494775bf46adac7233c576",
+            "git_blob_sha256": "7fea986038e6f16163acc12072dcf9f75454f0c0f1112524cb6e88a70e7af67e",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "tools/prepare_protocol.py",
+            "bytes": 16126,
+            "raw_sha256": "6de1ded33a9ff0d3150f2d7b8dcc6753b7f333090666ce52bb673428fc0c301c",
+            "git_blob_sha256": "879433e31462600c8735422847bd3e506908f528be2c3f5819d7d390311c2921",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "version.json",
+            "bytes": 1656,
+            "raw_sha256": "13fd145891451a50e8d6a2d053e8b205941a711bfd8ded92d3aecd4097fb9390",
+            "git_blob_sha256": "545aba45c41870b8e87b8b5752cae83ca85ea68765ea5dbb698dfa0a624562cf",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          }
+        ],
+        "git_eol_equivalent": true,
+        "all_source_bytes_unchanged_after_builds": true,
+        "context_file_count": 26,
+        "new_harness_and_private_data_excluded": true
+      },
+      "codec_extends_exact_stage_source": true,
+      "sdk": {
+        "fixed_git_commit": "6309f64b44ce133a2428fadf966a395d503ce84f",
+        "patch_sha256": "3b018f15a0f61411cddb70eab35da211e5aa427367a8363b4f5cd0856f8dca5b",
+        "manifest_output_hashes": {
+          "muse2api/chat.py": "3abb7f1d636e5022781d64c0ff637e8bc628b188b85ebd3a80b84649568a383c",
+          "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+          "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+          "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+          "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+        },
+        "actual_installed_sdk_file_hash_check": "PASS",
+        "actual_final_installed_module_hashes": {
+          "muse2api/chat.py": "3abb7f1d636e5022781d64c0ff637e8bc628b188b85ebd3a80b84649568a383c",
+          "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+          "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+          "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5"
+        },
+        "actual_final_prepared_output_hashes": {
+          "muse2api/chat.py": "3abb7f1d636e5022781d64c0ff637e8bc628b188b85ebd3a80b84649568a383c",
+          "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+          "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+          "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+          "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+        },
+        "initial_check_note": null
+      },
+      "build_steps": {
+        "source": {
+          "kind": "Actual no-cache root source plus read-only installed protocol byte assertion",
+          "started_at": 1793717659.8471396,
+          "finished_at": 1793717728.9976435,
+          "elapsed_seconds": 69.151,
+          "returncode": 0,
+          "log_sha256": "90e86173f31c5f26fa477006c907f864e8608dc889d3459c4f4eed245c968aa2",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-source-mediafix --file ${BUILD_RECIPES}/Source-mediafix.Dockerfile ${SOURCE_CONTEXT}",
+          "source_recipe_raw_sha256": "37b15ed6b1f43abba45b1da3f1eed720b56dddeb4213f25fa14fe8a04bb25a84"
+        },
+        "codec_install": {
+          "kind": "Actual no-cache existing codec extension on verified mediafix source",
+          "started_at": 1793717802.8181763,
+          "finished_at": 1793717909.15312,
+          "elapsed_seconds": 106.335,
+          "returncode": 0,
+          "log_sha256": "ae9c5322d0d6c1f8083207f03e79ca98501fe2031b43b952fba3f7fdffe31c17",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-protocol-mediafix --build-arg PHASE2_SOURCE_IMAGE=muse2api-phase2-resume:20261103-source-mediafix --file ${SOURCE_CONTEXT}/deploy/phase2/Dockerfile ${SOURCE_CONTEXT}",
+          "source_image_id": "sha256:376d063617cd2d8926b4d0bdbd2a952cc29c3bbae428321d455419e81d8de56d"
+        },
+        "codec_final_sdk_byte_check": {
+          "kind": "Read-only final codec installed SDK byte verification build",
+          "started_at": 1793718005.4749973,
+          "finished_at": 1793718006.5041356,
+          "elapsed_seconds": 1.029,
+          "returncode": 0,
+          "log_sha256": "b1c1d3b7bb6ed5071fedb3dcd427e0617caea4bf098257e273f4b31909b84e11",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-protocol-mediafix --file ${BUILD_RECIPES}/Codec-mediafix-verify.Dockerfile ${SOURCE_CONTEXT}",
+          "recipe_raw_sha256": "e528eb24e7ff7bc7feb26dc69a8574e90c19c73ed73b72fd4b6654d3f21292f9",
+          "base_codec_image_id": "sha256:4bcc5cf7e9a3b089625ce6633239eec601c58a7bbaa913df9f6cc489b0f1c5e6"
+        }
+      },
+      "private_build_summary_sha256": "93e48a95882db7737300e922b82d0795412162291f32c56f81e273d592bfc579",
+      "build_actions_only": {
+        "account_mounts": 0,
+        "generation_requests": 0,
+        "service_containers_started": 0,
+        "shared_daemon_or_wsl_restarts": 0,
+        "repository_or_deployment_edits": 0
+      },
+      "initial_worktree_clean": true,
+      "acceptance_only_recipe": {
+        "source_recipe": "Committed root Dockerfile instructions, newline-normalized, plus read-only installed/prepared hash assertion",
+        "source_recipe_raw_sha256": "37b15ed6b1f43abba45b1da3f1eed720b56dddeb4213f25fa14fe8a04bb25a84",
+        "business_code_or_dependency_content_changed_by_assertion": false
+      }
+    },
+    {
+      "stage": "commentaryfix",
+      "status": "PASS",
+      "source_commit": "21ed2cd7913e527de8561b358182c7ac2432c95c",
+      "source_image": {
+        "tag": "muse2api-phase2-resume:20261103-source-commentaryfix",
+        "id": "sha256:550cc4322046bc5f305de1eb66a1da92103899f57ded734decbf27905d1f8b9c",
+        "os": "linux",
+        "architecture": "amd64",
+        "size_bytes": 244481057
+      },
+      "codec_image": {
+        "tag": "muse2api-phase2-resume:20261103-protocol-commentaryfix",
+        "id": "sha256:4bd98aee11a0d34882f809b7e0a72599ea4026a272a0563445e002e1a5bf3bab",
+        "os": "linux",
+        "architecture": "amd64",
+        "size_bytes": 720415896,
+        "cmd": [
+          "python",
+          "-m",
+          "uvicorn",
+          "app:app",
+          "--host",
+          "0.0.0.0",
+          "--port",
+          "18610",
+          "--workers",
+          "1"
+        ]
+      },
+      "environment": {
+        "python": "3.12.16",
+        "system": "Linux",
+        "machine": "x86_64",
+        "packages": {
+          "Pillow": "13.0.0",
+          "muse2api-http": "0.2.0",
+          "curl_cffi": "0.17.0",
+          "cryptography": "50.0.2",
+          "fastapi": "0.162.0",
+          "uvicorn": "0.54.0"
+        },
+        "ffmpeg": "ffmpeg version 5.1.9-0+deb12u1 Copyright (c) 2000-2026 the FFmpeg developers",
+        "ffprobe": "ffprobe version 5.1.9-0+deb12u1 Copyright (c) 2007-2026 the FFmpeg developers"
+      },
+      "source_binding": {
+        "aggregate_sha256": "7c9316784aaba4fb2ce62f51d44754384a1ffdd39da17ca159c1661aa015958d",
+        "before_receipt_sha256": "dc3fdbbb41486f99a4a7204ee39c767a8ca61ed4975e94d6cbca55a73d586a90",
+        "after_receipt_sha256": "0c0da9a3c838a9faf1eb59207978a06383a2f6d945c6a96232cd189c2309f802",
+        "files": [
+          {
+            "path": ".dockerignore",
+            "bytes": 824,
+            "raw_sha256": "d731a82de537f1b55778c897ad8e764c95ff1cf1ca747de8b83de23655f654d6",
+            "git_blob_sha256": "bba2ae227748f49f9a0345ef7f214912ef33a2286588a8facc94d5186dc8768f",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": false
+          },
+          {
+            "path": "Dockerfile",
+            "bytes": 1440,
+            "raw_sha256": "251c59123f3d247879070d56d6804c1de86abd05ed349c9b05fa9dd84c832d58",
+            "git_blob_sha256": "64dadad79d758d787221b08c5e0ca52b3c63ef204c10f464e08caf08ea310597",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "LICENSE",
+            "bytes": 1094,
+            "raw_sha256": "4f3b30d039ec0354736b1b0e4b08bf709bb9d9624561913f86f53b6aab2caffc",
+            "git_blob_sha256": "6e8be7f11c73a41efb9b77b2a18d8c844bb533f1c50b595f19de646860c436ff",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "admin.html",
+            "bytes": 168760,
+            "raw_sha256": "2806d8d0945a52e701a9aa928b1e324a7fbd47a3ed29655d8c5d3869e219dcff",
+            "git_blob_sha256": "5a4147ddcd7abe45a4c68c8bb96583aef23346dea0cdc81e827c4a7553f5d46d",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "app.py",
+            "bytes": 140463,
+            "raw_sha256": "3f87134ce4a9396d05221f33f59d75d6f3518f1554ec1064e0129945a7df0a3e",
+            "git_blob_sha256": "24cb62228e0bb9e88aa26c113eb73df70c9075b95dd3a1ea0363e95612d8aa16",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "cdp.py",
+            "bytes": 2584,
+            "raw_sha256": "a177cb4c20ba62fadc22af5fbd5a78c4c88f408a22e5e205a8b67fe731bda095",
+            "git_blob_sha256": "c503b6ab91ebe682fa5be4538cdbcd95cabda19ec600bb993bcc2657e5f65be7",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "config.py",
+            "bytes": 8074,
+            "raw_sha256": "401e9ab80ea7bc6d5631dc8c8f92e5ee967fc8cf8fb31f5157daa4d5f3f4a931",
+            "git_blob_sha256": "4d6de2bb7479c4feec91787e5a51828793ba48bfe57338a883330f12dd3fd745",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "deploy/phase2/Dockerfile",
+            "bytes": 1391,
+            "raw_sha256": "37d2e750b49e1335c850fd1e8738b7ae322fb216a2e7b65847fe0204af5c42f1",
+            "git_blob_sha256": "1a553bb194877d64ba66a2c44e169179fd51009b7e94d33b7861cfa994e2b47a",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": false
+          },
+          {
+            "path": "email_login.py",
+            "bytes": 14030,
+            "raw_sha256": "a5c1a6ecc4ae45036e59e3a7647c5bec5bce748a4fedc40a581762e04fdb58bd",
+            "git_blob_sha256": "5f39d4eb9ba9e0d137922d84bd5543ea36f92f091775514a663aaea7ae6d3608",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "email_login_browser.py",
+            "bytes": 23757,
+            "raw_sha256": "7123ed99b97150d8435bc919ba42ed91fa1f9ea86bd6c8ccc227ee5d7c318c58",
+            "git_blob_sha256": "b259b00d1535fa1ffa37c3498788af1bfb0ae03b1bbc5ff8861b51f421e3fa98",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "engine.py",
+            "bytes": 82860,
+            "raw_sha256": "2218fb90dd53f19da75646f1d0240f92c55abcd139c04d563411e2e5c1dd4656",
+            "git_blob_sha256": "ba688656b404d2635817b9b8beb5c0cf9bc2c36ab42a9fb2dba9d614e6ed11cc",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/README.md",
+            "bytes": 2514,
+            "raw_sha256": "beb6f2b61972cc26996d100637dc8bd9c23dd7789ec2585b9425b88db801d3f1",
+            "git_blob_sha256": "26f1493e3b715536757673830e5a2116ab947858d6c5080b3a91e2fe533db4f1",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/_locales/en/messages.json",
+            "bytes": 296,
+            "raw_sha256": "f5dde059176cb2817fa5f5db4879841c4bde299c7c43cb84ec9fba143639d262",
+            "git_blob_sha256": "3747e760a9d3d77619240915a89236ff4b8f41b922ddf3062d16fc436000d349",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/_locales/zh_CN/messages.json",
+            "bytes": 298,
+            "raw_sha256": "4867b60a7c87e32f85f8c7eb1fcc615716b05d12b6183a826036757921e01e3c",
+            "git_blob_sha256": "1831098f5124dacb0db500e909fd825f893dd854a6241940ce2ad9b2c49e9ab6",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/manifest.json",
+            "bytes": 446,
+            "raw_sha256": "0bcc96cf50db2d69ac7a2078d9eb7b43f2c2f122bf4b143413f850116bf1607b",
+            "git_blob_sha256": "90590a6246b23c80888abc3ada5994653aa095ef7dcafdf04e9c982dcaf79f83",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/popup.html",
+            "bytes": 3739,
+            "raw_sha256": "e7be51710549dcd0e0310349d05b9d7e400e041ff11586e91d5ef63751682068",
+            "git_blob_sha256": "7a8bdcb510fa314092435ad16741be4f822192fff5f84592e529790472bea44d",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/popup.js",
+            "bytes": 10627,
+            "raw_sha256": "437c7ed19b8c62f097ed57da0238d12d50e8b242e4a409f4bf9d2b76302fa91e",
+            "git_blob_sha256": "a8732674939214fcbe03699daca5c88e61c2d08c6c9c02c6f979c342b8dc6d36",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "extension/安装说明.txt",
+            "bytes": 2514,
+            "raw_sha256": "beb6f2b61972cc26996d100637dc8bd9c23dd7789ec2585b9425b88db801d3f1",
+            "git_blob_sha256": "26f1493e3b715536757673830e5a2116ab947858d6c5080b3a91e2fe533db4f1",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "muse_identity.py",
+            "bytes": 4222,
+            "raw_sha256": "5f804b9d7208295a0ffa8ff133fbcfb41ca65ccf5078abb05ab5901b07005288",
+            "git_blob_sha256": "2d134d8da22f6b564cc36d6c64ee6f55a916546f45c3d85aac0be74bfa24aee9",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol-dependency/integration.patch",
+            "bytes": 71530,
+            "raw_sha256": "f367d4bf7f2e942e2dd838d63116f0166830f4786932bd0e550c3faaff1eba5a",
+            "git_blob_sha256": "f367d4bf7f2e942e2dd838d63116f0166830f4786932bd0e550c3faaff1eba5a",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol-dependency/manifest.json",
+            "bytes": 1436,
+            "raw_sha256": "5f1d6b71d947ffb4419a2aed618761a31c827fc5acdc62e77f0b593478c4317e",
+            "git_blob_sha256": "5f1d6b71d947ffb4419a2aed618761a31c827fc5acdc62e77f0b593478c4317e",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "protocol_backend.py",
+            "bytes": 38588,
+            "raw_sha256": "7cd3ae71a4c40f19cef27fadac0122cbd6cc5b8f94ec9f72d4fc0d35ba8bbad9",
+            "git_blob_sha256": "6a114aa5868a48038a22f94bae46935e21cb5b82a45d73e3ecc39f9dd3ac27fa",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "proxy.py",
+            "bytes": 10476,
+            "raw_sha256": "2b6500b27ca96416e684a31666c1c76679ce574948afbbd8f9d08d8bad1999e6",
+            "git_blob_sha256": "671a0f12f0e7a14b8acbf83319efff5b4c941facf6d589569764ca5e5e76ac4a",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "requirements.txt",
+            "bytes": 120,
+            "raw_sha256": "9acfb29ecdf33e542f663cd38510c7e3534637d8580c6af9cb775b6fc89654ef",
+            "git_blob_sha256": "2b83beaf20992f93598f51ca7d60bebab84bfd8bbe975b1aef7f77d0470827fe",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "store.py",
+            "bytes": 21945,
+            "raw_sha256": "33197b34a427cf1a034f975500f9f37299ad9e917e765af02edbc574a16f0d79",
+            "git_blob_sha256": "27be3dfbb262b1e91829bdad4f88f138d7f098a6f89065fc527a46a402bbdee8",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "tools/get_muse_cookie.py",
+            "bytes": 18271,
+            "raw_sha256": "072618b998951bd9b876761f42526b8f4210d54bb8494775bf46adac7233c576",
+            "git_blob_sha256": "7fea986038e6f16163acc12072dcf9f75454f0c0f1112524cb6e88a70e7af67e",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "tools/prepare_protocol.py",
+            "bytes": 16126,
+            "raw_sha256": "6de1ded33a9ff0d3150f2d7b8dcc6753b7f333090666ce52bb673428fc0c301c",
+            "git_blob_sha256": "879433e31462600c8735422847bd3e506908f528be2c3f5819d7d390311c2921",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          },
+          {
+            "path": "version.json",
+            "bytes": 1656,
+            "raw_sha256": "13fd145891451a50e8d6a2d053e8b205941a711bfd8ded92d3aecd4097fb9390",
+            "git_blob_sha256": "545aba45c41870b8e87b8b5752cae83ca85ea68765ea5dbb698dfa0a624562cf",
+            "git_eol_normalized_equal": true,
+            "copy_context_whitelisted": true
+          }
+        ],
+        "git_eol_equivalent": true,
+        "all_source_bytes_unchanged_after_builds": true,
+        "context_file_count": 26,
+        "new_harness_and_private_data_excluded": true
+      },
+      "codec_extends_exact_stage_source": true,
+      "sdk": {
+        "fixed_git_commit": "6309f64b44ce133a2428fadf966a395d503ce84f",
+        "patch_sha256": "f367d4bf7f2e942e2dd838d63116f0166830f4786932bd0e550c3faaff1eba5a",
+        "manifest_output_hashes": {
+          "muse2api/chat.py": "ea7356e5987bdacbda75fb38253bcc76395f273a0df2920f894259d9218d21ab",
+          "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+          "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+          "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+          "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+        },
+        "actual_installed_sdk_file_hash_check": "PASS",
+        "actual_final_installed_module_hashes": {
+          "muse2api/chat.py": "ea7356e5987bdacbda75fb38253bcc76395f273a0df2920f894259d9218d21ab",
+          "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+          "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+          "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5"
+        },
+        "actual_final_prepared_output_hashes": {
+          "muse2api/chat.py": "ea7356e5987bdacbda75fb38253bcc76395f273a0df2920f894259d9218d21ab",
+          "muse2api/filesystem.py": "8b7a42169bad65856d4d5199c1b614552d468919d8a133ef5f7c92c6bb71060b",
+          "muse2api/gateway.py": "c627b771cf3476b583835e7a1efa18e991bab027be9959dff7f15ffce0fd6311",
+          "muse2api/media.py": "8e953cfce82ab0a82fbb7b2f528c2b1b248c03c10f063b802007313411aa1fa5",
+          "pyproject.toml": "23d03afa0d977a7991351c8b5194d0d8a182368d40fbd799bb371d994bfd2dc5"
+        },
+        "initial_check_note": null
+      },
+      "build_steps": {
+        "source": {
+          "kind": "Actual no-cache committed root source plus read-only installed SDK assertion",
+          "started_at": 1793720746.7960827,
+          "finished_at": 1793720792.9878175,
+          "elapsed_seconds": 46.192,
+          "returncode": 0,
+          "log_sha256": "1d24fe6d72a2feb30522a7cf58e0eb63a93d9ae721e45630c3a8423294212c82",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-source-commentaryfix --file ${BUILD_RECIPES}/Source-commentaryfix.Dockerfile ${SOURCE_CONTEXT}",
+          "source_recipe_raw_sha256": "6d79e585cb150c9bb57148bca4f3b6b9db20a586675cd1b0fa39b9f838eabfa3"
+        },
+        "codec_install": {
+          "kind": "Actual no-cache committed codec extension on commentaryfix source",
+          "started_at": 1793720834.914819,
+          "finished_at": 1793720904.4252682,
+          "elapsed_seconds": 69.51,
+          "returncode": 0,
+          "log_sha256": "f65832e5ab775c50507ba77eecce38b52a0ccfafd16be06d9ca86c61cce7f374",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-protocol-commentaryfix --build-arg PHASE2_SOURCE_IMAGE=muse2api-phase2-resume:20261103-source-commentaryfix --file ${SOURCE_CONTEXT}/deploy/phase2/Dockerfile ${SOURCE_CONTEXT}",
+          "source_image_id": "sha256:550cc4322046bc5f305de1eb66a1da92103899f57ded734decbf27905d1f8b9c"
+        },
+        "codec_final_sdk_byte_check": {
+          "kind": "Read-only final codec installed SDK byte assertion build",
+          "started_at": 1793720941.8342922,
+          "finished_at": 1793720942.7124488,
+          "elapsed_seconds": 0.878,
+          "returncode": 0,
+          "log_sha256": "588012378423463811e163e975d8343737b931f92830ff1bd378ca9827b9d9bd",
+          "command": "docker --host ${DOCKER_HOST} build --no-cache --tag muse2api-phase2-resume:20261103-protocol-commentaryfix --file ${BUILD_RECIPES}/Codec-commentaryfix-verify.Dockerfile ${SOURCE_CONTEXT}",
+          "recipe_raw_sha256": "489046849a4e176c1283620d93027ada0b57d843656f198e625a37d9609f2adb",
+          "base_codec_image_id": "sha256:c9eb6e9f9384d369782f1644afbacb2a0039da500062a3891ee4d4f0bf79b66d"
+        }
+      },
+      "private_build_summary_sha256": "f2c3f871c1b2922dae643650c9442382fac01ffc2f6cbc5a074e14ff4fdb75cb",
+      "build_actions_only": {
+        "account_mounts": 0,
+        "generation_requests": 0,
+        "service_containers_started": 0,
+        "shared_daemon_or_wsl_restarts": 0,
+        "repository_or_deployment_edits": 0
+      },
+      "initial_worktree_clean": true,
+      "acceptance_only_recipe": {
+        "source_recipe": "Committed root Dockerfile instructions newline-normalized plus read-only installed/prepared SDK hash assertion",
+        "source_recipe_raw_sha256": "6d79e585cb150c9bb57148bca4f3b6b9db20a586675cd1b0fa39b9f838eabfa3",
+        "business_code_or_dependency_content_changed_by_assertion": false
+      }
+    }
+  ],
+  "evidence_layers": {
+    "actual_fixed_git_prepare_and_dependency_installation": "PASS",
+    "native_curl_package_installed": "PASS",
+    "native_curl_request_or_noise_handshake_from_build_checks": "NOT_RUN",
+    "real_muse_generation_from_build_checks": "NOT_RUN",
+    "final_commentary_sdk_real_generation_validation": "NOT_RUN",
+    "note": "curl_cffi 0.17.0 was actually installed in Linux. Package installation, codec checks and source hashes do not establish a native transport handshake or real Muse result. Separate case evidence owns those claims."
+  },
+  "optional_session_probe_wrapper": {
+    "default_enabled": false,
+    "live_enabled": false,
+    "live_status": "NOT_RUN",
+    "controlled_fake_observer_tests": 5,
+    "controlled_original_metrics_tests": 6,
+    "wrapper_raw_sha256": "7b90a78cc518d34ad894d90ed0ae1d93126790edb599b7878694e7922d5049cb",
+    "observer_tests_raw_sha256": "07085a75a0699a8824c9305809df2acbc70f463ea65e6cef299a5e8df56207ce",
+    "scope": "Fake existing Runtime/connection and controlled metrics only. Shutdown cleanup precedes the original Backend stop. No live observer or performance-baseline use.",
+    "verification_boundary": "Original six metrics tests passed after the stop-hook change; the final observer metadata fields were checked with the five observer tests. This is not a new Linux signal or live RPC test."
+  },
+  "not_run": {
+    "native_postfix_five_case_batch": "NOT_RUN",
+    "target_concurrency_three_batch": "NOT_RUN",
+    "capacity_concurrency_five_batch": "NOT_RUN",
+    "two_hour_soak": "NOT_RUN",
+    "live_optional_session_probe": "NOT_RUN",
+    "final_commentary_sdk_real_generation": "NOT_RUN"
+  },
+  "retention": {
+    "earlier_images_and_evidence_preserved": true,
+    "no_store_or_credentials_read_to_prepare_this_file": true,
+    "no_new_build_test_network_or_generation_to_prepare_this_file": true
+  },
+  "privacy": {
+    "personal_paths_credentials_raw_principals_and_live_account_ids_included": false,
+    "actual_private_commands_and_paths_replaced_with_placeholders": true
+  }
+}

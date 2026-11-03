@@ -1,0 +1,919 @@
+{
+  "schema_version": 1,
+  "scope": "Closed Linux single-worker, concurrency-one measurements; nine accounts",
+  "statistics_method": {
+    "median": "standard median; average the two central observations when n is even",
+    "p95": "nearest rank: sorted values at ceil(0.95*n), 1-based",
+    "rounding": "durations and derived statistics rounded to 6 decimal places",
+    "latency": "client case lifetime including polling/delivery; all initial outcomes retained",
+    "sample_extrema": "resource first/last/peak are periodic samples, not continuously observed global extrema"
+  },
+  "new_cases": 20,
+  "new_generation_intents": {
+    "text": 15,
+    "image": 4,
+    "video": 1
+  },
+  "phase2_total_consumed": {
+    "text": 18,
+    "image": 5,
+    "video": 1
+  },
+  "overall_initial_business_outcomes": {
+    "PASS": 18,
+    "FAIL": 2
+  },
+  "overall_per_account": {
+    "pool-01": {
+      "case_count": 3,
+      "categories": {
+        "text": 3
+      },
+      "tool_states": {
+        "PASS": 3
+      },
+      "initial_business_states": {
+        "PASS": 3
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 3,
+        "min": 7.902,
+        "median": 10.79,
+        "p95_nearest_rank": 13.968,
+        "max": 13.968
+      }
+    },
+    "pool-02": {
+      "case_count": 3,
+      "categories": {
+        "text": 2,
+        "image": 1
+      },
+      "tool_states": {
+        "PASS": 2,
+        "FAIL": 1
+      },
+      "initial_business_states": {
+        "PASS": 1,
+        "FAIL": 2
+      },
+      "initial_business_success_fraction": 0.333333,
+      "case_latency_seconds": {
+        "count": 3,
+        "min": 12.863,
+        "median": 13.892,
+        "p95_nearest_rank": 15.641,
+        "max": 15.641
+      }
+    },
+    "pool-03": {
+      "case_count": 2,
+      "categories": {
+        "text": 2
+      },
+      "tool_states": {
+        "PASS": 2
+      },
+      "initial_business_states": {
+        "PASS": 2
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 2,
+        "min": 8.112,
+        "median": 8.748,
+        "p95_nearest_rank": 9.384,
+        "max": 9.384
+      }
+    },
+    "pool-04": {
+      "case_count": 2,
+      "categories": {
+        "image": 1,
+        "text": 1
+      },
+      "tool_states": {
+        "PASS": 2
+      },
+      "initial_business_states": {
+        "PASS": 2
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 2,
+        "min": 12.747,
+        "median": 26.5045,
+        "p95_nearest_rank": 40.262,
+        "max": 40.262
+      }
+    },
+    "pool-05": {
+      "case_count": 2,
+      "categories": {
+        "text": 1,
+        "image": 1
+      },
+      "tool_states": {
+        "PASS": 2
+      },
+      "initial_business_states": {
+        "PASS": 2
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 2,
+        "min": 12.101,
+        "median": 33.282,
+        "p95_nearest_rank": 54.463,
+        "max": 54.463
+      }
+    },
+    "pool-06": {
+      "case_count": 2,
+      "categories": {
+        "text": 2
+      },
+      "tool_states": {
+        "PASS": 2
+      },
+      "initial_business_states": {
+        "PASS": 2
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 2,
+        "min": 11.256,
+        "median": 12.72,
+        "p95_nearest_rank": 14.184,
+        "max": 14.184
+      }
+    },
+    "pool-07": {
+      "case_count": 2,
+      "categories": {
+        "image": 1,
+        "text": 1
+      },
+      "tool_states": {
+        "PASS": 2
+      },
+      "initial_business_states": {
+        "PASS": 2
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 2,
+        "min": 9.183,
+        "median": 35.8225,
+        "p95_nearest_rank": 62.462,
+        "max": 62.462
+      }
+    },
+    "pool-08": {
+      "case_count": 2,
+      "categories": {
+        "text": 1,
+        "video": 1
+      },
+      "tool_states": {
+        "PASS": 2
+      },
+      "initial_business_states": {
+        "PASS": 2
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 2,
+        "min": 14.886,
+        "median": 31.7315,
+        "p95_nearest_rank": 48.577,
+        "max": 48.577
+      }
+    },
+    "pool-09": {
+      "case_count": 2,
+      "categories": {
+        "text": 2
+      },
+      "tool_states": {
+        "PASS": 2
+      },
+      "initial_business_states": {
+        "PASS": 2
+      },
+      "initial_business_success_fraction": 1.0,
+      "case_latency_seconds": {
+        "count": 2,
+        "min": 11.724,
+        "median": 12.6125,
+        "p95_nearest_rank": 13.501,
+        "max": 13.501
+      }
+    }
+  },
+  "runs": [
+    {
+      "run": "L2",
+      "metrics_sha256": "2be07526ae1e6b0007e947f19f50795e9793d79f8b663adfa559950e6b97c883",
+      "configuration": {
+        "backend": "protocol",
+        "concurrency": 1,
+        "platform": "linux",
+        "python": "3.12.16",
+        "workers": 1,
+        "versions": {
+          "muse2api-http": "0.2.0",
+          "curl_cffi": "0.17.0",
+          "cryptography": "50.0.2",
+          "uvicorn": "0.54.0",
+          "fastapi": "0.162.0"
+        }
+      },
+      "generating_sdk_chat_sha256": "6f842758d497460f7e006ff3b996b30fa1cd0874749d0cb4f4c7698ac7a298d0",
+      "metrics_complete": true,
+      "metrics_records_including_summary": 844,
+      "metrics_footer": {
+        "written": 843,
+        "enqueued": 843,
+        "queued": 0,
+        "dropped": 0,
+        "writer_errors": 0
+      },
+      "hook_errors": 0,
+      "store_write_errors": 0,
+      "service_stopped_exit_code": 0,
+      "exit_code_evidence": "supervising-agent Docker inspect; metrics have server_exit and complete footer",
+      "timing": {
+        "service_observation_seconds": 485.826834,
+        "client_case_round_elapsed_sum_seconds": 213.814,
+        "measured_successful_account_lease_union_seconds": 204.940347,
+        "generation_first_write_to_final_account_release_span_seconds": 207.574109,
+        "scope": "Service window includes idle/setup/recovery. Client elapsed sum excludes gaps between separate D rounds. Lease union measures local ownership, not proven upstream execution duration."
+      },
+      "case_count": 11,
+      "categories": {
+        "text": 8,
+        "image": 3
+      },
+      "tool_states": {
+        "PASS": 10,
+        "FAIL": 1
+      },
+      "initial_business_states": {
+        "PASS": 10,
+        "FAIL": 1
+      },
+      "case_latency_seconds_all_initial_outcomes": {
+        "count": 11,
+        "min": 8.112,
+        "median": 12.863,
+        "p95_nearest_rank": 62.462,
+        "max": 62.462
+      },
+      "per_account": {
+        "pool-01": {
+          "case_count": 2,
+          "categories": {
+            "text": 2
+          },
+          "tool_states": {
+            "PASS": 2
+          },
+          "initial_business_states": {
+            "PASS": 2
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 2,
+            "min": 10.79,
+            "median": 12.379,
+            "p95_nearest_rank": 13.968,
+            "max": 13.968
+          }
+        },
+        "pool-02": {
+          "case_count": 2,
+          "categories": {
+            "text": 1,
+            "image": 1
+          },
+          "tool_states": {
+            "PASS": 1,
+            "FAIL": 1
+          },
+          "initial_business_states": {
+            "PASS": 1,
+            "FAIL": 1
+          },
+          "initial_business_success_fraction": 0.5,
+          "case_latency_seconds": {
+            "count": 2,
+            "min": 12.863,
+            "median": 13.3775,
+            "p95_nearest_rank": 13.892,
+            "max": 13.892
+          }
+        },
+        "pool-03": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 8.112,
+            "median": 8.112,
+            "p95_nearest_rank": 8.112,
+            "max": 8.112
+          }
+        },
+        "pool-04": {
+          "case_count": 1,
+          "categories": {
+            "image": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 40.262,
+            "median": 40.262,
+            "p95_nearest_rank": 40.262,
+            "max": 40.262
+          }
+        },
+        "pool-05": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 12.101,
+            "median": 12.101,
+            "p95_nearest_rank": 12.101,
+            "max": 12.101
+          }
+        },
+        "pool-06": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 11.256,
+            "median": 11.256,
+            "p95_nearest_rank": 11.256,
+            "max": 11.256
+          }
+        },
+        "pool-07": {
+          "case_count": 1,
+          "categories": {
+            "image": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 62.462,
+            "median": 62.462,
+            "p95_nearest_rank": 62.462,
+            "max": 62.462
+          }
+        },
+        "pool-08": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 14.886,
+            "median": 14.886,
+            "p95_nearest_rank": 14.886,
+            "max": 14.886
+          }
+        },
+        "pool-09": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 11.724,
+            "median": 11.724,
+            "p95_nearest_rank": 11.724,
+            "max": 11.724
+          }
+        }
+      },
+      "native_generation_write_intents": 11,
+      "native_generation_flush_completed": 11,
+      "all_cases_one_native_generation_write": true,
+      "generation_count_scope": "Observed native local write/flush, not independent upstream acceptance count",
+      "unclassified_post_attempts": 0,
+      "concurrency": {
+        "sampled_active_operations_peak": 1,
+        "successful_account_leases_peak": 1,
+        "account_leases_remaining": 0,
+        "release_events_without_tracked_acquire": 9,
+        "release_scope": "Unmatched maintenance/repeated releases do not create or subtract active leases",
+        "runtime_peak": 9,
+        "active_gateway_connections_peak": 9,
+        "active_receivers_peak": 9,
+        "active_streams_peak": 1
+      },
+      "websocket_reuse": {
+        "noise_handshakes_completed": 9,
+        "connections_used_for_generation": 9,
+        "connections_with_multiple_generation_operations": 2,
+        "maximum_generation_operations_on_one_connection": 2,
+        "gateway_rpc_writes_total": 192,
+        "scope": "Handshake/RPC totals include non-generation recovery/reads; generation reuse counts only the listed new cases"
+      },
+      "process": {
+        "rss_bytes": {
+          "first": 80814080,
+          "last": 106438656,
+          "peak": 106438656,
+          "delta": 25624576
+        },
+        "fd_count": {
+          "first": 23,
+          "last": 55,
+          "peak": 56
+        },
+        "cpu_seconds_total": {
+          "first": 0.71,
+          "last": 3.86,
+          "peak": 3.86
+        },
+        "cpu_percent_one_core_scale": {
+          "first": null,
+          "last": 0.3996703824025037,
+          "peak": 1.598625795690658
+        },
+        "tcp_owned_count": {
+          "first": 3,
+          "last": 19,
+          "peak": 20
+        },
+        "tcp_owned_excluding_server_port_count": {
+          "first": 2,
+          "last": 18,
+          "peak": 18
+        }
+      },
+      "cpu_seconds_delta": 3.15,
+      "cpu_scope": "CPU percent uses one-core scale; TCP counts include API/control/media sockets and are not exclusively Noise gateways",
+      "store_write_latency_ms": {
+        "count": 139,
+        "min": 7.250563,
+        "median": 12.417771,
+        "p95_nearest_rank": 17.520094,
+        "max": 22.911915
+      },
+      "store_write_by_category": {
+        "accounts": {
+          "count": 84,
+          "min": 9.440844,
+          "median": 14.182499,
+          "p95_nearest_rank": 18.430281,
+          "max": 22.911915
+        },
+        "operations": {
+          "count": 37,
+          "min": 7.250563,
+          "median": 9.775081,
+          "p95_nearest_rank": 13.343858,
+          "max": 17.06426
+        },
+        "tasks": {
+          "count": 18,
+          "min": 7.439737,
+          "median": 9.969126,
+          "p95_nearest_rank": 15.698839,
+          "max": 15.698839
+        }
+      },
+      "store_durability_scope": "Existing JSON write/atomic replace completion on mounted filesystem; no added fsync or power-loss claim",
+      "account_acquire_wait_ms": {
+        "count": 11,
+        "min": 10.461759,
+        "median": 16.382259,
+        "p95_nearest_rank": 23.65176,
+        "max": 23.65176
+      },
+      "capacity_acquire_wait_ms": {
+        "count": 11,
+        "min": 0.0044,
+        "median": 0.005001,
+        "p95_nearest_rank": 0.0289,
+        "max": 0.0289
+      }
+    },
+    {
+      "run": "FIXED-C1",
+      "metrics_sha256": "75d4b88be72baf9fce2168231b1e94d182ec04aafc007e1b66be3b80b942c968",
+      "configuration": {
+        "backend": "protocol",
+        "concurrency": 1,
+        "platform": "linux",
+        "python": "3.12.16",
+        "workers": 1,
+        "versions": {
+          "muse2api-http": "0.2.0",
+          "curl_cffi": "0.17.0",
+          "cryptography": "50.0.2",
+          "uvicorn": "0.54.0",
+          "fastapi": "0.162.0"
+        }
+      },
+      "generating_sdk_chat_sha256": "3abb7f1d636e5022781d64c0ff637e8bc628b188b85ebd3a80b84649568a383c",
+      "metrics_complete": true,
+      "metrics_records_including_summary": 1018,
+      "metrics_footer": {
+        "written": 1017,
+        "enqueued": 1017,
+        "queued": 0,
+        "dropped": 0,
+        "writer_errors": 0
+      },
+      "hook_errors": 0,
+      "store_write_errors": 0,
+      "service_stopped_exit_code": 0,
+      "exit_code_evidence": "supervising-agent Docker inspect; metrics have server_exit and complete footer",
+      "timing": {
+        "service_observation_seconds": 1171.128178,
+        "client_case_round_elapsed_sum_seconds": 187.041,
+        "measured_successful_account_lease_union_seconds": 181.9933,
+        "generation_first_write_to_final_account_release_span_seconds": 381.596174,
+        "scope": "Service window includes idle/setup/recovery. Client elapsed sum excludes gaps between separate D rounds. Lease union measures local ownership, not proven upstream execution duration."
+      },
+      "case_count": 9,
+      "categories": {
+        "text": 7,
+        "image": 1,
+        "video": 1
+      },
+      "tool_states": {
+        "PASS": 9
+      },
+      "initial_business_states": {
+        "PASS": 8,
+        "FAIL": 1
+      },
+      "case_latency_seconds_all_initial_outcomes": {
+        "count": 9,
+        "min": 7.902,
+        "median": 13.501,
+        "p95_nearest_rank": 54.463,
+        "max": 54.463
+      },
+      "per_account": {
+        "pool-01": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 7.902,
+            "median": 7.902,
+            "p95_nearest_rank": 7.902,
+            "max": 7.902
+          }
+        },
+        "pool-02": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "FAIL": 1
+          },
+          "initial_business_success_fraction": 0.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 15.641,
+            "median": 15.641,
+            "p95_nearest_rank": 15.641,
+            "max": 15.641
+          }
+        },
+        "pool-03": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 9.384,
+            "median": 9.384,
+            "p95_nearest_rank": 9.384,
+            "max": 9.384
+          }
+        },
+        "pool-04": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 12.747,
+            "median": 12.747,
+            "p95_nearest_rank": 12.747,
+            "max": 12.747
+          }
+        },
+        "pool-05": {
+          "case_count": 1,
+          "categories": {
+            "image": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 54.463,
+            "median": 54.463,
+            "p95_nearest_rank": 54.463,
+            "max": 54.463
+          }
+        },
+        "pool-06": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 14.184,
+            "median": 14.184,
+            "p95_nearest_rank": 14.184,
+            "max": 14.184
+          }
+        },
+        "pool-07": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 9.183,
+            "median": 9.183,
+            "p95_nearest_rank": 9.183,
+            "max": 9.183
+          }
+        },
+        "pool-08": {
+          "case_count": 1,
+          "categories": {
+            "video": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 48.577,
+            "median": 48.577,
+            "p95_nearest_rank": 48.577,
+            "max": 48.577
+          }
+        },
+        "pool-09": {
+          "case_count": 1,
+          "categories": {
+            "text": 1
+          },
+          "tool_states": {
+            "PASS": 1
+          },
+          "initial_business_states": {
+            "PASS": 1
+          },
+          "initial_business_success_fraction": 1.0,
+          "case_latency_seconds": {
+            "count": 1,
+            "min": 13.501,
+            "median": 13.501,
+            "p95_nearest_rank": 13.501,
+            "max": 13.501
+          }
+        }
+      },
+      "native_generation_write_intents": 9,
+      "native_generation_flush_completed": 9,
+      "all_cases_one_native_generation_write": true,
+      "generation_count_scope": "Observed native local write/flush, not independent upstream acceptance count",
+      "unclassified_post_attempts": 0,
+      "concurrency": {
+        "sampled_active_operations_peak": 1,
+        "successful_account_leases_peak": 1,
+        "account_leases_remaining": 0,
+        "release_events_without_tracked_acquire": 1,
+        "release_scope": "Unmatched maintenance/repeated releases do not create or subtract active leases",
+        "runtime_peak": 9,
+        "active_gateway_connections_peak": 9,
+        "active_receivers_peak": 9,
+        "active_streams_peak": 1
+      },
+      "websocket_reuse": {
+        "noise_handshakes_completed": 10,
+        "connections_used_for_generation": 9,
+        "connections_with_multiple_generation_operations": 0,
+        "maximum_generation_operations_on_one_connection": 1,
+        "gateway_rpc_writes_total": 173,
+        "scope": "Handshake/RPC totals include non-generation recovery/reads; generation reuse counts only the listed new cases"
+      },
+      "process": {
+        "rss_bytes": {
+          "first": 75182080,
+          "last": 106676224,
+          "peak": 106676224,
+          "delta": 31494144
+        },
+        "fd_count": {
+          "first": 19,
+          "last": 51,
+          "peak": 56
+        },
+        "cpu_seconds_total": {
+          "first": 0.51,
+          "last": 6.41,
+          "peak": 6.41
+        },
+        "cpu_percent_one_core_scale": {
+          "first": null,
+          "last": 0.39966169157197307,
+          "peak": 1.3988810440227493
+        },
+        "tcp_owned_count": {
+          "first": 1,
+          "last": 17,
+          "peak": 20
+        },
+        "tcp_owned_excluding_server_port_count": {
+          "first": 0,
+          "last": 16,
+          "peak": 18
+        }
+      },
+      "cpu_seconds_delta": 5.9,
+      "cpu_scope": "CPU percent uses one-core scale; TCP counts include API/control/media sockets and are not exclusively Noise gateways",
+      "store_write_latency_ms": {
+        "count": 117,
+        "min": 7.430918,
+        "median": 11.404121,
+        "p95_nearest_rank": 14.464704,
+        "max": 33.808453
+      },
+      "store_write_by_category": {
+        "accounts": {
+          "count": 68,
+          "min": 10.525909,
+          "median": 12.15294,
+          "p95_nearest_rank": 15.203538,
+          "max": 33.808453
+        },
+        "operations": {
+          "count": 35,
+          "min": 7.431213,
+          "median": 9.823788,
+          "p95_nearest_rank": 13.045076,
+          "max": 14.464704
+        },
+        "tasks": {
+          "count": 14,
+          "min": 7.430918,
+          "median": 9.302838,
+          "p95_nearest_rank": 12.180143,
+          "max": 12.180143
+        }
+      },
+      "store_durability_scope": "Existing JSON write/atomic replace completion on mounted filesystem; no added fsync or power-loss claim",
+      "account_acquire_wait_ms": {
+        "count": 9,
+        "min": 11.718067,
+        "median": 13.61242,
+        "p95_nearest_rank": 18.930805,
+        "max": 18.930805
+      },
+      "capacity_acquire_wait_ms": {
+        "count": 9,
+        "min": 0.004,
+        "median": 0.0056,
+        "p95_nearest_rank": 0.011101,
+        "max": 0.011101
+      }
+    }
+  ],
+  "limits": {
+    "real_concurrency_3": "NOT_RUN",
+    "real_concurrency_5": "NOT_RUN",
+    "ten_independent_accounts": "BLOCKED: nine available",
+    "two_hour_stability": "NOT_RUN",
+    "idle_connection_leak": "NOT_OBSERVED: short runs, no ten-account soak",
+    "latest_commentary_fix_real_generation": "NOT_RUN: controlled validation only",
+    "account_lease_scope": "Local leases do not prove upstream turn completion; D10 demonstrated premature release before its later real answer"
+  }
+}
